@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-:root {
-    --secondary-color: #A1E3F9;
-    --hover-color: #578FCA;
-    --darker-color: #3674B5;
-    --main-color: #D1F8EF;
+@theme {
+    --color-secondary-100: #A1E3F9;
+    --color-hover-color: #578FCA;
+    --color-darker-color: #3674B5;
+    --color-main-color: #D1F8EF;
     --site-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --header-font-size: 0.9rem;
 }
