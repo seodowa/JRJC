@@ -5,6 +5,6 @@
     --color-hover-color: rgba(0,0,0,0.15);
     --color-darker-color: #3674B5;
     --color-main-color: #D1F8EF;
-    --site-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --header-font-size: 0.9rem;
+    --font-site-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --text-header-font-size: 0.9rem;
 }

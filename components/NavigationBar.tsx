@@ -2,7 +2,7 @@ import "@/app/globals.css";
 import React from "react";
 
 export default function NavigationBar() {
-    const navigation = ["Cars", "Reviews", "About Us", "Book Now"];
+    const navigation = ["Cars", "Reviews", "About Us"];
 
     return (
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
@@ -37,10 +37,12 @@ export default function NavigationBar() {
                     </label>
                     {navigation.map(
                         (item) => (
-                            <a key={item} href="#" className="px-5 py-5 h-auto w-full flex hover:bg-hover-color 
+                            <a key={item} href="#" className="text-lg px-5 py-5 h-auto w-full flex hover:text-cyan-600
                                                               md:w-auto md:h-full md:py-0 md:items-center">{item}</a>
                         )
                     )}
+                    <a href="#" className="text-lg font-bold text-cyan-800 px-5 py-5 h-auto w-full flex hover:text-cyan-600
+                                           md:w-auto md:h-full md:py-0 md:items-center">Book Now</a>
                 </div>
             </nav>
         </header>
