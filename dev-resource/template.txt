@@ -1,0 +1,29 @@
+Here's a breakdown of the responsive elements:
+
+The main container div changes from column to row layout:
+
+flex flex-col   /* Default for mobile */
+md:flex-row-reverse   /* Changes to row-reverse at medium screens */
+
+The content container adjusts height and width:
+
+h-1/2 w-full   /* Default: half height, full width */
+md:h-full md:w-1/2   /* Medium screens: full height, half width */
+
+The "Book Now" button resizes:
+
+py-2 px-16 text-2xl   /* Default padding and text size */
+md:py-3 md:px-16 md:text-3xl   /* Adjusted for medium screens */
+
+The car image positioning changes:
+
+top-1/2   /* Default: positioned halfway from top */
+md:top-auto   /* Medium screens: auto positioning */
+
+Tailwind's responsive breakpoints are:
+
+sm: 640px and up
+md: 768px and up
+lg: 1024px and up
+xl: 1280px and up
+2xl: 1536px and up
