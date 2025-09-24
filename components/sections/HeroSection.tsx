@@ -3,7 +3,7 @@ import "@/app/globals.css";
 export default function HeroSection() {
   return (
     <section id="hero" className="bg-main-color min-h-screen
-                    flex flex-col items-center -mt-12
+                    flex flex-col items-center -mt-12 overflow-hidden
                     md:flex-row-reverse">
        <div className="flex flex-col items-center w-full h-1/2
                        md:min-h-screen md:w-1/2 pt-40 md:pt-60 md:pl-20 
