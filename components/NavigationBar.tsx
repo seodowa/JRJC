@@ -6,8 +6,8 @@ export default function NavigationBar() {
 
     return (
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
-                           bg-[rgba(255,255,255,0.15)] md:backdrop-blur-md">
-            <nav className="flex justify-end items-center h-12 px-3 md:pr-0">
+                           bg-[rgba(255,255,255,0.15)] md:backdrop-blur-md z-2">
+            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 bg-transparent">
                 <p className="mr-auto">JRJC</p>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">

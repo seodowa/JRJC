@@ -12,7 +12,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <NavigationBar/>
-        {children}
+        <main>
+          {children}
+        </main>
       </body>
     </html>
   );
