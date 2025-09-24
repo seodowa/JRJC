@@ -7,7 +7,7 @@ export default function Home() {
                     md:flex-row-reverse">
        <div className="h-1/2 flex flex-col justify-center items-center w-full
                        md:h-full md:w-1/2 md:justify-start md:pt-46 md:pl-20 
-                       md:bg-gradient-to-l from-main-color from-80% to-transparent">
+                       md:bg-gradient-to-l from-main-color from-85% to-transparent">
           <div className="flex flex-col justify-center items-center">
             <h1 className="font-extrabold text-8xl text-[#578FCA]">JRJC</h1>
             <h3 className="pt-2 pb-9 text-2xl">Car Rental Services</h3>
