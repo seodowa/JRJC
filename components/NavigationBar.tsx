@@ -7,8 +7,8 @@ export default function NavigationBar() {
 
     return (
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
-                           bg-[rgba(255,255,255,0.15)] backdrop-blur-md z-11 overflow-hidden">
-            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 bg-transparent z-3">
+                           bg-[rgba(255,255,255,0.15)] backdrop-blur-md z-100 overflow-hidden">
+            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 bg-transparent relative z-100">
                 <p className="mr-auto">JRJC</p>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">
@@ -23,9 +23,9 @@ export default function NavigationBar() {
                                 peer-checked:fixed 
                                 peer-checked:top-0 
                                 peer-checked:right-0 
-                                peer-checked:z-[9]"></label>
+                                peer-checked:z-[100]"></label>
                 {/* Hamburger menu for smaller screen width */}
-                <div className="pt-2 fixed peer-checked:right-0 z-20
+                <div className="pt-2 fixed peer-checked:right-0 z-100
                                 top-0 -right-full bg-[rgba(255,255,255,0.15)] backdrop-blur-md flex flex-col 
                                 items-start w-38 h-full 
                                 shadow-[-1px_3px_5px_rgba(0,0,0,0.2)]

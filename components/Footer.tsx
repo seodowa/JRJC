@@ -15,7 +15,7 @@ export default function Footer() {
             <ul className="flex gap-4 flex-col *:flex *:flex-row *:w-full *:gap-2 *:text-nowrap sm:flex-row">
                 <li>
                     <FbIcon size={ICONSIZE}/>
-                    <a href={FBLINK} className="hover:text-gray-300">JRJC Car Rental</a>
+                    <a href={FBLINK} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300">JRJC Car Rental</a>
                 </li>
                 <li>
                     <EmailIcon size={ICONSIZE}/>
