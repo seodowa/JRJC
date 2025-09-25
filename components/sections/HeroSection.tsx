@@ -17,7 +17,7 @@ export default function HeroSection() {
           </div>
        </div>
        <div className="flex overflow-hidden object-fit absolute left-0 top-4/11 md:top-auto w-full max-h-screen">
-          <img src="/images/kentb_car_gradient.webp" className="opacity-30 min-w-5xl"/>
+          <img src="/images/kentb_car_gradient.webp" className="opacity-30 max-w-3xl sm:max-w-4xl md:max-w-full"/>
        </div>
     </section>
   );
