@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const { username, password } = await req.json();
   const supabase = await createClient();
 
-  // Fetch user by username - match the capitalization from signup
+  
   const { data: user, error } = await supabase
     .from("Accounts")  // Capital 'A'
     .select('"ID", "Username", "Password", "Account_Type"')  // All capitalized with quotes
@@ -34,12 +34,5 @@ export async function POST(req: Request) {
 
   (await cookies()).set("session", session, { expires, httpOnly: true });
 
-  return NextResponse.json({ 
-    message: "Logged in successfully", 
-    user: {
-      ID: user.ID,
-      Username: user.Username,
-      Account_Type: user.Account_Type
-    }
-  });
+  return NextResponse.json({ message: "Login successful" });
 }

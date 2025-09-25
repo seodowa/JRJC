@@ -5,10 +5,10 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req: Request) {
   try {
-    console.log("Signup endpoint hit");
+  
     
     const { username, password, account_type } = await req.json();
-    console.log("Received data:", { username, account_type });
+   
     
     if (!username || !password || !account_type) {
       return NextResponse.json(
@@ -18,9 +18,9 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
-    console.log("Supabase client created");
+   
 
-    // Check if username already exists
+    
     const { data: existing, error: checkError } = await supabase
       .from("Accounts")
       .select('"ID"')
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Username already taken" }, { status: 400 });
     }
 
-    // Insert new account
+   
     const { data, error } = await supabase
       .from("Accounts")
       .insert([{ 
@@ -49,21 +49,21 @@ export async function POST(req: Request) {
       .select()
       .single();
 
-    console.log("Insert result:", { data, error });
+   
 
     if (error) {
       console.error("Insert error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Create session
+   
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     const session = await encrypt({ 
       user: { id: data.ID, username: data.Username }, 
       expires 
     });
 
-    console.log("Session created");
+  
 
     (await cookies()).set("session", session, { expires, httpOnly: true });
 
