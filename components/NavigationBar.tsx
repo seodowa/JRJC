@@ -1,6 +1,7 @@
 import "@/app/globals.css";
 import React from "react";
 import HamburgerIcon from "./icons/HamburgerIcon";
+import CloseIcon from "./icons/CloseIcon";
 
 export default function NavigationBar() {
     const navigation = ["Cars", "Reviews", "About Us"];
@@ -12,7 +13,7 @@ export default function NavigationBar() {
                 <p className="mr-auto">JRJC</p>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#000000"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+                    <HamburgerIcon />
                 </label>
                 {/* For translucent background when opening hamburger menu */}
                 <label htmlFor="sidebar-active" id="overlay" 
@@ -34,7 +35,7 @@ export default function NavigationBar() {
                                 md:h-full md:justify-end md:items-center 
                                 md:shadow-none md:bg-transparent md:backdrop-blur-none">
                     <label htmlFor="sidebar-active" className="md:hidden">
-                        <HamburgerIcon />
+                        <CloseIcon />
                     </label>
                     {navigation.map(
                         (item) => (
