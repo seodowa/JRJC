@@ -7,8 +7,8 @@ export default function NavigationBar() {
     const navigation = ["Cars", "Reviews", "About Us"];
 
     return (
-        <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
-                           bg-[rgba(255,255,255,0.15)] backdrop-blur-md z-100 overflow-hidden">
+        <section className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
+                           bg-[rgba(255,255,255,0.15)] z-1 overflow-hidden">
             <nav className="flex justify-end items-center h-12 px-3 md:pr-0 bg-transparent relative z-100">
                 <p className="mr-auto">JRJC</p>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
@@ -47,6 +47,6 @@ export default function NavigationBar() {
                                            md:w-auto md:h-full md:py-0 md:items-center">Book Now</a>
                 </div>
             </nav>
-        </header>
+        </section>
     );
 }
