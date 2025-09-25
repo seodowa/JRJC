@@ -3,9 +3,10 @@
 @theme {
     --color-secondary-100: #A1E3F9;
     --color-secondary-50: #EEFFFB;
-    --color-hover-color: rgba(0,0,0,0.15);
+    --color-hover-color: oklch(60.9% 0.126 221.723); 
     --color-darker-color: #3674B5;
     --color-main-color: #D1F8EF;
+    --color-footer-color: #3D4358;
     --font-site-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --text-header-font-size: 0.9rem;
 }

@@ -2,7 +2,7 @@ import "@/app/globals.css";
 
 export default function HeroSection() {
   return (
-    <section id="hero" className="bg-main-color min-h-screen
+    <section id="hero" className="bg-main-color min-h-screen relative z-0
                     flex flex-col items-center -mt-12 overflow-hidden
                     md:flex-row-reverse">
        <div className="flex flex-col items-center w-full h-1/2
@@ -16,7 +16,7 @@ export default function HeroSection() {
                                   shadow-md">Book Now</a>
           </div>
        </div>
-       <div className="flex overflow-hidden object-fit absolute left-0 top-4/11 md:top-auto w-full">
+       <div className="flex overflow-hidden object-fit absolute left-0 top-4/11 md:top-auto w-full max-h-screen">
           <img src="/images/kentb_car_gradient.webp" className="opacity-30 min-w-5xl"/>
        </div>
     </section>
