@@ -92,6 +92,7 @@ const BookingPage: React.FC = () => {
                   <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Personal Information</h1>
                 </div>
 
+                {/* Switch case guro ni dri para magpakita og different pages sa booking */}
                 <div className="p-6">
                   <form onSubmit={handleSubmit}>
                     <div className="space-y-6">
