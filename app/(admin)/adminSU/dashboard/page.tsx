@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { logout } from '@/app/(admin)/services/auth/auth';
+import AsyncButton from '@/components/AsyncButton';
 
 export default function AdminSU() {
   const router = useRouter();
@@ -24,12 +25,13 @@ export default function AdminSU() {
                  overflow-hidden"
     >
       <div className="font-bold text-9xl mb-10">This is Admin Page</div>
-      <button
+      <AsyncButton
         onClick={handleLogout}
         className="px-6 py-3 text-white bg-red-600 hover:bg-red-700 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        loadingText="Logging out..."
       >
         Log out
-      </button>
+      </AsyncButton>
     </div>
   );
 }

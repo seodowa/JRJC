@@ -1,18 +1,20 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import PasswordInput from "./PasswordInput"; // Import the custom PasswordInput component
+import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
 import { login } from "../../app/(admin)/services/auth/auth";
+import AsyncButton from "@/components/AsyncButton";
 
 const LoginForm: React.FC = () => {
     const [username, setUsername] = useState("");
     const router = useRouter();
+    const formRef = useRef<HTMLFormElement | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleLogin = async () => {
         try {
-            const form = e.currentTarget;
+            const form = formRef.current;
+            if (!form) return;
             const data = new FormData(form);
             const username = String(data.get('username') || '');
             const password = String(data.get('password') || '');
@@ -28,9 +30,17 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="grid h-full lg:w-150 md:w-100 sm:w-80 flex-col place-items-center gap-4 rounded-2xl
+        <form
+            ref={formRef}
+            onSubmit={(e) => {
+                e.preventDefault();
+                // Support Enter key submission by delegating to the same async handler
+                void handleLogin();
+            }}
+            className="grid h-full lg:w-150 md:w-100 sm:w-80 flex-col place-items-center gap-4 rounded-2xl
                 outline-[0.50px] outline-offset-[-0.50px] outline-white/20
-                bg-black/5 backdrop-blur-sm shadow-lg shadow-black/25 p-10">
+                bg-black/5 backdrop-blur-sm shadow-lg shadow-black/25 p-10"
+        >
             <h2 className="text-4xl font-bold mb-4 text-center">Login</h2>
             <div>
                 <input
@@ -47,7 +57,7 @@ const LoginForm: React.FC = () => {
                 />
             </div>
             <div className="mt-4">
-                <PasswordInput
+                <PasswordInputField
                     id="password"
                     name="password"
                     placeholder="Enter your password"
@@ -56,13 +66,14 @@ const LoginForm: React.FC = () => {
             </div>
             <a className="underline pl-30 text-sm -mt-3.5" href="#">Forgot Password?</a>
             <div className="mt-6">
-                <button
-                    type="submit"
+                <AsyncButton
+                    onClick={handleLogin}
                     className="mb-4 w-36 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
                               text-black hover:bg-[#8BFFF1] transition-colors duration-200"
+                    loadingText="Logging in..."
                 >
                     Log in
-                </button>
+                </AsyncButton>
             </div>
         </form>
     );

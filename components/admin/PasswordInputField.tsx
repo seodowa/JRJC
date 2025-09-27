@@ -5,7 +5,7 @@ interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
   className?: string;
 }
 
-export default function PasswordInput({ className = '', ...inputProps }: PasswordInputProps) {
+export default function PasswordInputField({ className = '', ...inputProps }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
