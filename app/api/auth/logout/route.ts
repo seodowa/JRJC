@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export async function POST() {
-  (await cookies()).set("session", "", { expires: new Date(0) });
-  return NextResponse.json({ message: "Logged out successfully" });
+  // Delete the custom session cookie created on login
+  (await cookies()).delete("session");
+  return NextResponse.json({ message: "Logout successful" });
 }
