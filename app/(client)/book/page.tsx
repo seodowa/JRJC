@@ -105,58 +105,54 @@ const BookingPage: React.FC = () => {
 
                 <div className="p-6">
                   <form onSubmit={handleSubmit}>
-                    {/* Mobile View - Custom Grid Layout */}
-                    <div className="lg:hidden space-y-6">
-                      {/* First Name - Full width */}
-                      <InputField
-                        label="First Name"
-                        name="firstName"
-                        type="text"
-                        value={personalInfo.firstName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your first name"
-                        required
-                      />
-
-                      {/* Last Name and Suffix - Side by side */}
+                    <div className="space-y-6">
+                      {/* On larger screens, 3 columns and 2 rows */}
                       <div className="grid grid-cols-3 gap-4">
-                        <div className="col-span-2">
-                          <InputField
-                            label="Last Name"
-                            name="lastName"
-                            type="text"
-                            value={personalInfo.lastName}
-                            onChange={handleInputChange}
-                            placeholder="Enter your last name"
-                            required
-                          />
-                        </div>
-                        <div className="col-span-1">
-                          <InputField
-                            label="Suffix"
-                            name="suffix"
-                            type="select"
-                            value={personalInfo.suffix}
-                            onChange={handleInputChange}
-                            selectOptions={suffixOptions}
-                            optional
-                          />
-                        </div>
-                      </div>
+                        {/* On smaller screens, expand to full width */}
+                        <InputField
+                          label="First Name"
+                          name="firstName"
+                          type="text"
+                          value={personalInfo.firstName}
+                          onChange={handleInputChange}
+                          placeholder="Enter your first name"
+                          required
+                          className='col-span-3 md:col-span-1'
+                        />
 
-                      {/* Email - Full width */}
-                      <InputField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        value={personalInfo.email}
-                        onChange={handleInputChange}
-                        placeholder="Enter your email"
-                        required
-                      />
+                        {/* On smaller screens, Last Name occupies 2 cols and Suffix 1*/}
+                        <InputField
+                          label="Last Name"
+                          name="lastName"
+                          type="text"
+                          value={personalInfo.lastName}
+                          onChange={handleInputChange}
+                          placeholder="Enter your last name"
+                          required
+                          className='col-span-2 md:col-span-1'
+                        />
+                    
+                        <InputField
+                          label="Suffix"
+                          name="suffix"
+                          type="text"
+                          value={personalInfo.suffix}
+                          onChange={handleInputChange}
+                          placeholder='(e.g., Jr.)'
+                          optional
+                        />
 
-                      {/* Mobile Number and Valid ID - Side by side */}
-                      <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                          label="Email"
+                          name="email"
+                          type="email"
+                          value={personalInfo.email}
+                          onChange={handleInputChange}
+                          placeholder="Enter your email"
+                          required
+                          className='col-span-3 md:col-span-1'
+                        />
+                      
                         <InputField
                           label="Mobile Number"
                           name="mobileNumber"
@@ -165,11 +161,13 @@ const BookingPage: React.FC = () => {
                           onChange={handleInputChange}
                           placeholder="Enter your mobile number"
                           required
+                          className='col-span-2 md:col-span-1'
                         />
 
                         <div className="space-y-2">
                           <label className="block text-sm font-medium text-gray-700">
-                            Valid ID *
+                            Valid ID
+                            <span className="inline text-red-500 ml-1">*</span>
                           </label>
                           <div className="flex items-center justify-center w-full">
                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
@@ -197,90 +195,6 @@ const BookingPage: React.FC = () => {
                             </p>
                           )}
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Desktop View - 3x2 Grid */}
-                    <div className="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <InputField
-                        label="First Name"
-                        name="firstName"
-                        type="text"
-                        value={personalInfo.firstName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your first name"
-                        required
-                      />
-
-                      <InputField
-                        label="Last Name"
-                        name="lastName"
-                        type="text"
-                        value={personalInfo.lastName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your last name"
-                        required
-                      />
-
-                      <InputField
-                        label="Suffix"
-                        name="suffix"
-                        type="select"
-                        value={personalInfo.suffix}
-                        onChange={handleInputChange}
-                        selectOptions={suffixOptions}
-                        optional
-                      />
-
-                      <InputField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        value={personalInfo.email}
-                        onChange={handleInputChange}
-                        placeholder="Enter your email"
-                        required
-                      />
-
-                      <InputField
-                        label="Mobile Number"
-                        name="mobileNumber"
-                        type="tel"
-                        value={personalInfo.mobileNumber}
-                        onChange={handleInputChange}
-                        placeholder="Enter your mobile number"
-                        required
-                      />
-
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Valid ID *
-                        </label>
-                        <div className="flex items-center justify-center w-full">
-                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                              </svg>
-                              <p className="mb-2 text-sm text-gray-500">
-                                <span className="font-semibold">Click to upload</span> or drag and drop
-                              </p>
-                              <p className="text-xs text-gray-500">PDF, PNG, JPG (MAX. 10MB)</p>
-                            </div>
-                            <input 
-                              type="file" 
-                              className="hidden" 
-                              onChange={handleFileChange}
-                              accept=".pdf,.png,.jpg,.jpeg"
-                              required
-                            />
-                          </label>
-                        </div>
-                        {personalInfo.validId && (
-                          <p className="text-sm text-green-600 mt-2">
-                            ✓ {personalInfo.validId.name}
-                          </p>
-                        )}
                       </div>
                     </div>
 
