@@ -13,15 +13,6 @@ interface PersonalInfo {
   validId: File | null;
 }
 
-const suffixOptions = [
-  { value: '', label: 'Select suffix' },
-  { value: 'Jr.', label: 'Jr.' },
-  { value: 'Sr.', label: 'Sr.' },
-  { value: 'II', label: 'II' },
-  { value: 'III', label: 'III' },
-  { value: 'IV', label: 'IV' },
-];
-
 const BookingPage: React.FC = () => {
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     firstName: '',
@@ -55,10 +46,8 @@ const BookingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Blue Lip at Top - Mobile only */}
-      <div className="lg:hidden bg-blue-600 h-5 rounded-b-lg"></div>
-      
+    <div className="min-h-screen bg-main-color md:bg-transparent md:bg-gradient-to-b from-main-color from-80% md:from-60% lg:from-40% to-transparent -mt-12 pt-9 md:pt-12 relative overflow-hidden">
+      <img src="/images/BG.webp" className="opacity-20 min-w-full absolute bottom-0 -z-2"/>
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Mobile Progress Bar - Only shows on mobile */}
