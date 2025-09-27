@@ -1,11 +1,8 @@
 // middleware.ts
-import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { decrypt } from '@/lib'; // Import your decrypt function
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-
+const secretKey = "secret"; // Should match your lib.ts secret
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,40 +16,42 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Create a response object
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  // Check for your custom session
+  const sessionCookie = request.cookies.get("session")?.value;
 
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
-
-  // Get current session
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session) {
+  if (!sessionCookie) {
     // No session — redirect to login
     return NextResponse.redirect(new URL('/adminSU', request.url));
   }
 
-  // Optionally: check user role
-  // const userRole = session.user.user_metadata.role;
-  // if (pathname.startsWith('/admin') && userRole !== 'admin') {
-  //   return NextResponse.redirect(new URL('/unauthorized', request.url));
-  // }
+  try {
+    // Decrypt and validate your custom session
+    const session = await decrypt(sessionCookie);
+    
+    // Check if session is expired
+    if (new Date() > new Date(session.expires)) {
+      return NextResponse.redirect(new URL('/adminSU', request.url));
+    }
 
-  // Valid session — continue
-  return response;
+    // Optional: Check user role for admin routes
+    if (pathname.startsWith('/adminSU/dashboard')) {
+      const userRole = session.user.account_type;
+      
+    }
+
+    // Valid session — continue
+    return NextResponse.next();
+
+  } catch (error) {
+    // Invalid session — redirect to login
+    console.error('Session validation error:', error);
+    return NextResponse.redirect(new URL('/adminSU', request.url));
+  }
+}
+
+
+export const config = {
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }
