@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import PasswordInput from "./PasswordInput"; // Import the custom PasswordInput component
-import { login } from "../services/auth/auth";
+import { login } from "../../app/(admin)/services/auth/auth";
 
 const LoginForm: React.FC = () => {
     const [username, setUsername] = useState("");
@@ -54,7 +54,7 @@ const LoginForm: React.FC = () => {
                     required
                 />
             </div>
-            <a className="underline justify-self-end text-sm -mt-3.5" href="#">Forgot Password?</a>
+            <a className="underline pl-30 text-sm -mt-3.5" href="#">Forgot Password?</a>
             <div className="mt-6">
                 <button
                     type="submit"
