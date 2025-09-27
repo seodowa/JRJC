@@ -12,7 +12,11 @@ export default function AdminSU() {
       await logout();
     } catch (e) {
       console.error(e);
-      // proceed to redirect even if API returns non-OK, to ensure user leaves protected area
+      // Show an error toast but still redirect to login
+      const message = e instanceof Error ? e.message : 'Logout failed';
+      // Dynamic import to avoid SSR issues here
+      const { toast } = await import("@/components/ui/use-toast");
+      toast({ variant: 'destructive', title: 'Logout failed', description: message });
     } finally {
       router.push('/adminSU');
     }

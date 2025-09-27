@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
 import { login } from "../../app/(admin)/services/auth/auth";
 import AsyncButton from "@/components/AsyncButton";
+import { useToast } from "@/components/ui/use-toast";
 
 const LoginForm: React.FC = () => {
     const [username, setUsername] = useState("");
     const router = useRouter();
     const formRef = useRef<HTMLFormElement | null>(null);
+    const { toast } = useToast();
 
     const handleLogin = async () => {
         try {
@@ -25,7 +27,12 @@ const LoginForm: React.FC = () => {
             router.push("/adminSU/dashboard");
         } catch (error) {
             console.error("Login failed:", error);
-            alert("Invalid username or password");
+            const description = error instanceof Error ? error.message : "Invalid username or password";
+            toast({
+                variant: "destructive",
+                title: "Login failed",
+                description,
+            });
         }
     };
 
@@ -68,7 +75,7 @@ const LoginForm: React.FC = () => {
             <div className="mt-6">
                 <AsyncButton
                     onClick={handleLogin}
-                    className="mb-4 w-36 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
+                    className="mb-4 w-40 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
                               text-black hover:bg-[#8BFFF1] transition-colors duration-200"
                     loadingText="Logging in..."
                 >

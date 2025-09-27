@@ -5,6 +5,8 @@ export const metadata = {
     description: "Admin Superuser Layout",
 }
 
+import Toaster from "@/components/ui/toaster";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
      <html lang="en">
@@ -12,6 +14,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <main>
             {children}
             </main>
+            {/* Toasts for admin route group */}
+            <Toaster />
         </body>
     </html>
     );
