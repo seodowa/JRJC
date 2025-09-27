@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
   if (!session) return;
 
   const parsed = await decrypt(session);
-  parsed.expires = new Date(Date.now() + 10 * 60 * 1000); // extend 10min
+  parsed.expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);// 7 days
   const res = NextResponse.next();
   res.cookies.set({
     name: "session",
