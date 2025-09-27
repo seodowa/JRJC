@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only run auth checks on protected routes
-  const protectedRoutes = ['/adminSU/dashboard', '/adminSU/bookings', '/adminSU/cars', '/adminSU/reviews'];
+  const protectedRoutes = ['/adminSU/dashboard', '/adminSU/bookings', '/adminSU/cars', '/adminSU/reviews', '/adminSU/settings'];
   const isProtected = protectedRoutes.some((path) => pathname.startsWith(path));
 
   // Pass through non-protected routes
