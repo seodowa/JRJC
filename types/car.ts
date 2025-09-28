@@ -1,8 +1,6 @@
 // types/car.ts
 
 export interface CarPricing {
-    id: number,
-    car_id: number,
     location: string,
     price_12_hours: number,
     price_24_hours: number
@@ -13,7 +11,7 @@ export interface Car {
   model: string
   brand: string
   year: number
-  price: CarPricing
+  price: CarPricing[]
   image: string
   transmission: 'Manual' | 'Automatic' 
   seats: number

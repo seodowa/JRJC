@@ -1,1 +1,1 @@
-export type { Car, CarFilters } from './car'
+export type { Car, CarFilters, CarPricing } from './car'
