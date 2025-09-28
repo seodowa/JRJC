@@ -1,0 +1,1 @@
+export type { Car, CarFilters } from './car'

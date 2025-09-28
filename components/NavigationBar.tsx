@@ -43,7 +43,7 @@ export default function NavigationBar() {
                                                               md:w-auto md:h-full md:py-0 md:items-center">{item}</a>
                         )
                     )}
-                    <a href="#" className="text-lg font-bold text-[#3674B5] px-5 py-5 h-auto w-full flex hover:text-hover-color
+                    <a href="book" className="text-lg font-bold text-[#3674B5] px-5 py-5 h-auto w-full flex hover:text-hover-color
                                            md:w-auto md:h-full md:py-0 md:items-center">Book Now</a>
                 </div>
             </nav>
