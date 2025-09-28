@@ -2,18 +2,22 @@
 
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
-import { login } from "../../app/(admin)/services/auth/auth";
-import AsyncButton from "@/components/AsyncButton";
+import { login } from "@/app/(admin)/services/auth/auth";
 import { useToast } from "@/components/ui/use-toast";
+import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
+import AsyncButton from "@/components/AsyncButton";
 
-const LoginForm: React.FC = () => {
+const AdminLoginForm: React.FC = () => {
     const [username, setUsername] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const formRef = useRef<HTMLFormElement | null>(null);
     const { toast } = useToast();
 
     const handleLogin = async () => {
+        if (isLoading) return;
+
+        setIsLoading(true);
         try {
             const form = formRef.current;
             if (!form) return;
@@ -33,6 +37,8 @@ const LoginForm: React.FC = () => {
                 title: "Login failed",
                 description,
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -48,7 +54,7 @@ const LoginForm: React.FC = () => {
                 outline-[0.50px] outline-offset-[-0.50px] outline-white/20
                 bg-black/5 backdrop-blur-sm shadow-lg shadow-black/25 p-10"
         >
-            <h2 className="text-4xl font-bold mb-4 text-center">Login</h2>
+            <h2 className="text-4xl font-bold mb-4 text-center">LOGIN</h2>
             <div>
                 <input
                     type="text"
@@ -59,22 +65,27 @@ const LoginForm: React.FC = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     required
                     autoComplete="username"
-                    className="w-[250px] rounded-3xl border border-white/30 bg-white p-2
-                    text-black placeholder:font-normal placeholder-black/70 backdrop-blur-sm shadow-lg"
+                    className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
+                    focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
+                    placeholder:font-normal placeholder-black/70  backdrop-blur-sm shadow-lg transition duration-200"
                 />
             </div>
             <div className="mt-4">
                 <PasswordInputField
                     id="password"
                     name="password"
-                    placeholder="Enter your password"
+                    placeholder="Password"
+                    className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
+                    focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
+                    placeholder:font-normal placeholder-black/70 backdrop-blur-sm shadow-lg transition duration-200"
                     required
                 />
             </div>
             <a className="underline pl-30 text-sm -mt-3.5" href="#">Forgot Password?</a>
             <div className="mt-6">
                 <AsyncButton
-                    onClick={handleLogin}
+                    type="submit"
+                    isLoading={isLoading}
                     className="mb-4 w-40 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
                               text-black hover:bg-[#8BFFF1] transition-colors duration-200"
                     loadingText="Logging in..."
@@ -86,4 +97,4 @@ const LoginForm: React.FC = () => {
     );
 };
 
-export default LoginForm;
+export default AdminLoginForm;

@@ -1,4 +1,4 @@
-import LoginForm from "../../../components/admin/LoginForm";
+import AdminLoginForm from "../../../components/admin/AdminLoginForm";
 
 export default function AdminSU() {
   return (
@@ -17,7 +17,7 @@ export default function AdminSU() {
           className="w-full max-w-[150px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-[400px] xl:max-w-[500px]
                      h-auto object-contain"
         /> 
-        <LoginForm />
+        <AdminLoginForm />
       </div>
     </div>
   );
