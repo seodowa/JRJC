@@ -15,7 +15,7 @@ export default function AdminSU() {
       // Show an error toast but still redirect to login
       const message = e instanceof Error ? e.message : 'Logout failed';
       // Dynamic import to avoid SSR issues here
-      const { toast } = await import("@/components/ui/use-toast");
+      const { toast } = await import("@/components/toast/use-toast");
       toast({ variant: 'destructive', title: 'Logout failed', description: message });
     } finally {
       router.push('/adminSU');

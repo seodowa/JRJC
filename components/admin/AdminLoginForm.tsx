@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/app/(admin)/services/auth/auth";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/toast/use-toast";
 import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
 import AsyncButton from "@/components/AsyncButton";
 

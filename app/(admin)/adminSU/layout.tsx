@@ -1,5 +1,5 @@
 import "@/app/globals.css";
-import Toaster from "@/components/ui/toaster";
+import Toaster from "@/components/toast/toaster";
 import AdminLayoutClient from "./AdminLayoutClient";
 
 export const metadata = {
