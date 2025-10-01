@@ -225,12 +225,12 @@ const BookingPage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Transmission
               </label>
-              <input
-                type="text"
-                disabled
-                value="Automatic"
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
-              />
+             <select
+                name="transmission"
+                required
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-500 "></select>
+                <option value="Automatic">Automatic</option>
+                <option value="Manual">Manual</option>
             </div>
 
             {/* Area Dropdown */}
@@ -271,7 +271,7 @@ const BookingPage: React.FC = () => {
               <input
                 type="text"
                 disabled
-                value="Diesel"
+                value="Gasoline(Unleaded)"
                 className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
               />
             </div>
