@@ -27,9 +27,11 @@ const AdminLoginForm: React.FC = () => {
 
             await login(username, password);
 
-            // Redirect to the admin dashboard or home page
-            router.push("/adminSU/dashboard");
-        } catch (error) {
+                  toast({
+                    title: "Verification email sent",
+                    description: "Please check your email for a verification link.",
+                  });
+                  router.push("/check-email");        } catch (error) {
             console.error("Login failed:", error);
             const description = error instanceof Error ? error.message : "Invalid username or password";
             toast({
