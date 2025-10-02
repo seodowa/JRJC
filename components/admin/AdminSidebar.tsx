@@ -29,7 +29,7 @@ const AdminSidebar = ({ isCollapsed, user, handleLogout }: AdminSidebarProps) =>
       className={`bg-white border-r border-gray-300 text-[#333333] h-screen p-2 fixed inset-y-0 left-0 z-30 transition-transform duration-300 ease-in-out md:sticky md:top-0 md:translate-x-0 md:w-60 ${isCollapsed ? '-translate-x-full' : 'translate-x-0'}`}
     >
     <div className="flex flex-col h-full ">
-        <div className="hidden md:flex flex-col items-center my-8">
+        <div className="flex flex-col items-center my-8">
             <div className="w-36 h-36 rounded-full bg-gray-300 mb-4"></div>
             <div>
                 <span className="font-bold text-2xl justify-self-center">{user?.username || 'Admin'}</span>

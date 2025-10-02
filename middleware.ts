@@ -2,8 +2,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { decrypt } from '@/lib'; // Import your decrypt function
 
-const secretKey = "secret"; // Should match your lib.ts secret
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
