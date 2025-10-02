@@ -90,13 +90,14 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
     scrollRef.current?.scrollBy({ left: distance, behavior: "smooth" });
   };
 
-  const selectedCarData = cars.find(car => car.id === selectedCar);
-
-  const handleCarSelect = (car: Car) => {
-    setSelectedCar(car.id);
-    setIsOpen(false);
-    onCarSelect?.(car);
-  };
+  const selectedCarData = cars.find(car => car.Model_ID === selectedCar);
+  // In SelectCar component
+const handleCarSelect = (car: Car) => {
+  
+  setSelectedCar(car.Model_ID); // Use Model_ID instead of id
+  setIsOpen(false);
+  onCarSelect?.(car);
+};
 
   const handleClearSelection = () => {
     setSelectedCar(null);

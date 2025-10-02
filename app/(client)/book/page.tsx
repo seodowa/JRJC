@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import InputField from "@/components/InputField";
 import SelectCar from "@/components/SelectCar";
+import { useCarPricing } from "@/hooks/useCarPricing";
 
 interface PersonalInfo {
   firstName: string;
@@ -49,10 +50,13 @@ const BookingPage: React.FC = () => {
 
   
   const [selectedCar, setSelectedCar] = useState<number | null>(null);
+  const { pricingData, loading, error, calculatePrice } = useCarPricing(selectedCar);
   const [selectedCarData, setSelectedCarData] = useState<any>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [fileInputKey, setFileInputKey] = useState<number>(0); // Add key to reset file input
+
+ 
 
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
@@ -261,164 +265,202 @@ const BookingPage: React.FC = () => {
           </>
         );
 
-      case 2:
-        return (
-          <div className="p-6">
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Model Selection - Card carousel */}
-                  <div className="md:col-span-2">
-                    <SelectCar 
-                      selectedCar={selectedCar} 
-                      setSelectedCar={setSelectedCar}
-                      onCarSelect={setSelectedCarData}
-                    />
-                  </div>
+case 2:
+  return (
+    <div className="p-6">
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Model Selection - Card carousel */}
+            <div className="md:col-span-2">
+              <SelectCar 
+                selectedCar={selectedCar} 
+                setSelectedCar={setSelectedCar}
+                onCarSelect={setSelectedCarData}
+              />
+              
+            </div>
 
-                  {/* Transmission (Display only) */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Transmission
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value={selectedCarData?.Transmission_Types?.Name || "—"}
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
-                    />
-                  </div>
+            {/* Transmission (Display only) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Transmission
+              </label>
+              <input
+                type="text"
+                disabled
+                value={selectedCarData?.Transmission_Types?.Name || "—"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+              />
+            </div>
 
-                  {/* Area Dropdown */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Area <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="area"
-                      value={rentalInfo.area}
-                      onChange={handleRentalInputChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    >
-                      <option value="">Select area</option>
-                      <option value="Manolo-CBD">Manolo-CBD</option>
-                      <option value="Bukidnon-Mis. Ori.">Bukidnon-Mis. Ori.</option>
-                      <option value="Outside Region 10">Outside Region 10</option>
-                    </select>
-                  </div>
+            {/* Area Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Area <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="area"
+                value={rentalInfo.area}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+                disabled={loading} // Only disable while loading, not based on selectedCar
+              >
+                <option value="">Select area</option>
+                {pricingData.map((area) => (
+                  <option key={area.Location} value={area.Location}>
+                    {area.Location}
+                  </option>
+                ))}
+              </select>
+              
+              {!selectedCar && !loading && (
+                <div className="text-sm text-gray-500 mt-1">Please select a car first</div>
+              )}
+              {loading && (
+                <div className="text-sm text-gray-500 mt-1">Loading pricing...</div>
+              )}
+              {error && (
+                <div className="text-sm text-red-500 mt-1">{error}</div>
+              )}
+            </div>
 
-                  {/* Date Picker */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="date"
-                      value={rentalInfo.date}
-                      onChange={handleRentalInputChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
+            {/* Date Picker */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                name="date"
+                value={rentalInfo.date}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
 
-                  {/* Fuel Type (Disabled) */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Fuel Type
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value="Gasoline(Unleaded)"
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
-                    />
-                  </div>
+            {/* Fuel Type (Disabled) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fuel Type
+              </label>
+              <input
+                type="text"
+                disabled
+                value="Gasoline(Unleaded)"
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+              />
+            </div>
 
-                  {/* Self-drive Dropdown */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Self-drive? <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="selfDrive"
-                      value={rentalInfo.selfDrive}
-                      onChange={handleRentalInputChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    >
-                      <option value="">Select</option>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
+            {/* Self-drive Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Self-drive? <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="selfDrive"
+                value={rentalInfo.selfDrive}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
 
-                  {/* Duration Dropdown */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Duration <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="duration"
-                      value={rentalInfo.duration}
-                      onChange={handleRentalInputChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    >
-                      <option value="">Select duration</option>
-                      <option value="12 hours">₱XXXX/12 hours</option>
-                      <option value="24 hours">₱XXXX/24 hours</option>
-                    </select>
-                  </div>
+            {/* Duration Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Duration <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="duration"
+                value={rentalInfo.duration}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+                disabled={!rentalInfo.area}
+              >
+                <option value="">Select duration</option>
+                <option 
+                  value="12 hours"
+                  disabled={!calculatePrice(rentalInfo.area, "12 hours")}
+                >
+                  {calculatePrice(rentalInfo.area, "12 hours") 
+                    ? `₱${calculatePrice(rentalInfo.area, "12 hours")}/12 hours`
+                    : "12 hours - Not available"
+                  }
+                </option>
+                <option value="24 hours">
+                  {calculatePrice(rentalInfo.area, "24 hours") 
+                    ? `₱${calculatePrice(rentalInfo.area, "24 hours")}/24 hours`
+                    : "₱XXXX/24 hours"
+                  }
+                </option>
+              </select>
+              {!rentalInfo.area && (
+                <div className="text-sm text-gray-500 mt-1">Please select an area first</div>
+              )}
+            </div>
 
-                  {/* Time Dropdown */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Time <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="time"
-                      value={rentalInfo.time}
-                      onChange={handleRentalInputChange}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    >
-                      <option value="">Select time</option>
-                      <option value="08:00 AM">08:00 AM</option>
-                      <option value="09:00 AM">09:00 AM</option>
-                      <option value="10:00 AM">10:00 AM</option>
-                      <option value="11:00 AM">11:00 AM</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Price + Buttons */}
-              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
-                <span className="text-sm font-semibold text-gray-800">
-                  Initial Price:
-                </span>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </form>
+            {/* Time Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Time <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="time"
+                value={rentalInfo.time}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Select time</option>
+                <option value="08:00 AM">08:00 AM</option>
+                <option value="09:00 AM">09:00 AM</option>
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="11:00 AM">11:00 AM</option>
+              </select>
+            </div>
           </div>
-        );
+        </div>
 
+        {/* Price + Buttons */}
+        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-gray-800">
+              Initial Price: ₱{calculatePrice(rentalInfo.area, rentalInfo.duration) || "0"}
+            </span>
+            {rentalInfo.area && rentalInfo.duration && (
+              <span className="text-xs text-gray-600 mt-1">
+                {rentalInfo.area} • {rentalInfo.duration} • {selectedCarData?.Name || "No car selected"}
+              </span>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              disabled={!calculatePrice(rentalInfo.area, rentalInfo.duration)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
       case 3:
         return (
           <div className="relative p-6">
