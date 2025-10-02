@@ -437,7 +437,7 @@ case 2:
             </span>
             {rentalInfo.area && rentalInfo.duration && (
               <span className="text-xs text-gray-600 mt-1">
-                {rentalInfo.area} • {rentalInfo.duration} • {selectedCarData?.Name || "No car selected"}
+                {rentalInfo.area} • {rentalInfo.duration} • {selectedCarData?.Model_Name || "No car selected"}
               </span>
             )}
           </div>
