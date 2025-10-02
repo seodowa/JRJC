@@ -47,10 +47,12 @@ const BookingPage: React.FC = () => {
     referenceNumber: "",
   });
 
+  
   const [selectedCar, setSelectedCar] = useState<number | null>(null);
   const [selectedCarData, setSelectedCarData] = useState<any>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [fileInputKey, setFileInputKey] = useState<number>(0); // Add key to reset file input
 
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
@@ -62,14 +64,25 @@ const BookingPage: React.FC = () => {
 
   // Personal Info Handlers
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+  
+  // Only allow numbers for mobile number field
+  if (name === "mobileNumber") {
+    // Remove any non-digit characters
+    const numbersOnly = value.replace(/\D/g, "");
+    setPersonalInfo((prev) => ({
+      ...prev,
+      [name]: numbersOnly,
+    }));
+  } else {
     setPersonalInfo((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }
+};
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -112,8 +125,14 @@ const BookingPage: React.FC = () => {
   };
 
   const handleBack = () => {
-    if (currentStep > 1) setCurrentStep((prev) => prev - 1);
-  };
+  if (currentStep > 1) {
+    // Reset the file input key when going back to step 1
+    if (currentStep === 2) {
+      setFileInputKey(prev => prev + 1);
+    }
+    setCurrentStep((prev) => prev - 1);
+  }
+};
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -210,12 +229,13 @@ const BookingPage: React.FC = () => {
                             </p>
                           </div>
                           <input
-                            type="file"
-                            className="hidden"
-                            onChange={handleFileChange}
-                            accept=".pdf,.png,.jpg,.jpeg"
-                            required
-                          />
+                          key={fileInputKey}
+                          type="file"
+                          className="hidden"
+                          onChange={handleFileChange}
+                          accept=".pdf,.png,.jpg,.jpeg"
+                          required={!personalInfo.validId}
+                        />
                         </label>
                       </div>
                       {personalInfo.validId && (
