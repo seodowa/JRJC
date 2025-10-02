@@ -1,8 +1,9 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { sendVerificationEmail } from '@/lib/nodemailer(smtp)/email';
+import { sendOtpEmail } from '@/lib/nodemailer(smtp)/email';
 import { supabaseAdmin } from '@/utils/supabase/admin';
+import { createHash } from 'crypto';
 
 export async function POST(req: Request) {
   const { username, password } = await req.json();
@@ -22,17 +23,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
   }
 
-  // Generate a verification token
-  const randomBytes = new Uint8Array(32);
-  crypto.getRandomValues(randomBytes);
-  const token = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-  const expires = new Date(Date.now() + 10 * 60 * 1000); // Token expires in 10 minutes
+  // Generate a 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expires = new Date(Date.now() + 3 * 60 * 1000); // OTP expires in 3 minutes
 
-  // Store the token in the database
+  // Hash the OTP
+  const hashedOtp = createHash('sha256').update(otp).digest('hex');
+
+  // Store the hashed OTP in the database
   const { error: updateError } = await supabaseAdmin
     .from('Accounts')
     .update({
-      verification_token: token,
+      verification_token: hashedOtp,
       verification_token_expires_at: expires.toISOString(),
     })
     .eq("Username", user.Username);
@@ -42,9 +44,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
-  // Send the verification email
+  // Send the plaintext OTP to the user's email
   try {
-    await sendVerificationEmail(user.Email, token);
+    await sendOtpEmail(user.Email, otp, expires);
   } catch (emailError) {
     console.error('Failed to send verification email:', emailError);
     return NextResponse.json({ error: 'Failed to send verification email. Please try again later.' }, { status: 500 });

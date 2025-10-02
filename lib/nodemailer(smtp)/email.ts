@@ -23,3 +23,16 @@ export async function sendVerificationEmail(email: string, token: string) {
     html: `<p>Click <a href="${verificationLink}">here</a> to verify your login.</p>`,
   });
 }
+
+export async function sendOtpEmail(email: string, otp: string, expires: Date) {
+  const now = new Date();
+  const diffInMs = expires.getTime() - now.getTime();
+  const diffInMinutes = Math.round(diffInMs / 60000);
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Your OTP Code',
+    html: `<p>Your OTP code is: <strong>${otp}</strong>. It will expire in <strong>${diffInMinutes}</strong> minutes.</p>`,
+  });
+}
