@@ -186,7 +186,7 @@ const calculateRentalDetails = () => {
   const days = Math.ceil(hours / 24);
 
   // Determine which options to show
-  const show12HourOption = hours <= 24; // Only show 12hr if actual duration is 12 hours or less
+  const show12HourOption = hours <= 24 ; // Only show 12hr if actual duration is 12 hours and 24 hrs
   const show24HourOption = hours <= 24; // Show 24hr if actual duration is 24 hours or less
 
   // Calculate prices for each option
@@ -235,6 +235,38 @@ const {
   show12HourOption, 
   show24HourOption 
 } = calculateRentalDetails();
+
+// Helper function to calculate return time based on selected duration
+const calculateReturnTime = () => {
+  if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) {
+    return { returnDate: "", returnTime: "" };
+  }
+
+  const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
+  let returnDateTime;
+
+  if (rentalInfo.duration === "12 hours") {
+    // Add 12 hours
+    returnDateTime = new Date(startDateTime.getTime() + (12 * 60 * 60 * 1000));
+  } else if (rentalInfo.duration === "24 hours") {
+    // Add 24 hours
+    returnDateTime = new Date(startDateTime.getTime() + (24 * 60 * 60 * 1000));
+  } else if (rentalInfo.duration?.includes("days")) {
+    // Add the number of days
+    const days = parseInt(rentalInfo.duration);
+    returnDateTime = new Date(startDateTime.getTime() + (days * 24 * 60 * 60 * 1000));
+  } else {
+    // Default to end date/time
+    returnDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
+  }
+
+  const returnDate = returnDateTime.toISOString().split('T')[0];
+  const returnTime = formatTime(returnDateTime.toTimeString().slice(0, 5));
+
+  return { returnDate, returnTime };
+};
+
+const { returnDate, returnTime } = calculateReturnTime();
 
 
 
@@ -604,42 +636,45 @@ case 2:
         </div>
 
        {/* Price + Buttons */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-gray-800">
-              {rentalInfo.duration ? `Initial Price: ₱${totalPrice}` : "Initial Price: ₱0"}
-            </span>
-            {rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time && (
-              <div className="text-xs text-gray-600 mt-1 space-y-1">
-                <div>
-                  <span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}
-                </div>
-                <div>
-                  <span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {formatTime(rentalInfo.time)}
-                </div>
-                <div>
-                  <span className="font-medium">Vehicle:</span> {selectedCarData?.Model_Name || "No car selected"} • {rentalInfo.area}
-                </div>
+      <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-gray-800">
+            {rentalInfo.duration ? `Initial Price: ₱${totalPrice}` : "Initial Price: ₱0"}
+          </span>
+          {rentalInfo.startDate && rentalInfo.time && rentalInfo.duration && (
+            <div className="text-xs text-gray-600 mt-1 space-y-1">
+              <div>
+                <span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}
               </div>
-            )}
-          </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
-            >
-              Back
-            </button>
-            <button
-              type="submit"
-              disabled={!rentalInfo.duration}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
+              <div>
+                <span className="font-medium">Return:</span> {formatDate(returnDate)} at {returnTime}
+              </div>
+              <div>
+                <span className="font-medium">Duration:</span> {rentalInfo.duration}
+              </div>
+              <div>
+                <span className="font-medium">Vehicle:</span> {selectedCarData?.Model_Name || "No car selected"} • {rentalInfo.area}
+              </div>
+            </div>
+          )}
         </div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            disabled={!rentalInfo.duration}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      </div>
       </form>
     </div>
   );
