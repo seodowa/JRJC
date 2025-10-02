@@ -1,9 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "@/components/InputField";
 import SelectCar from "@/components/SelectCar";
 import { useCarPricing } from "@/hooks/useCarPricing";
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { MobileTimePicker } from "@mui/x-date-pickers";
+
 
 interface PersonalInfo {
   firstName: string;
@@ -16,7 +22,8 @@ interface PersonalInfo {
 
 interface RentalInfo {
   area: string;
-  date: string;
+  startDate: string;  // Changed from date to startDate
+  endDate: string;    // Add endDate
   selfDrive: string;
   duration: string;
   time: string;
@@ -37,11 +44,12 @@ const BookingPage: React.FC = () => {
   });
 
   const [rentalInfo, setRentalInfo] = useState<RentalInfo>({
-    area: "",
-    date: "",
-    selfDrive: "",
-    duration: "",
-    time: "",
+  area: "",
+  startDate: "",
+  endDate: "",
+  selfDrive: "",
+  duration: "",
+  time: "",
   });
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
@@ -55,6 +63,7 @@ const BookingPage: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [fileInputKey, setFileInputKey] = useState<number>(0); // Add key to reset file input
+  const [selectedTime, setSelectedTime] = useState<Dayjs | null>(null);
 
  
 
@@ -137,6 +146,119 @@ const BookingPage: React.FC = () => {
     setCurrentStep((prev) => prev - 1);
   }
 };
+
+// Helper function to format date (e.g., "Oct 15, 2024")
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+// Helper function to format time (e.g., "11:30 AM")
+const formatTime = (timeString: string) => {
+  const [hours, minutes] = timeString.split(':');
+  const hour = parseInt(hours);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour > 12 ? hour - 12 : hour;
+  return `${displayHour}:${minutes} ${period}`;
+};
+
+
+// Calculate rental duration in hours based on dates AND time
+const calculateRentalDetails = () => {
+  if (!rentalInfo.startDate || !rentalInfo.endDate || !rentalInfo.time) {
+    return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false };
+  }
+
+  // Parse dates with the selected time
+  const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
+  const endDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
+  
+  // Calculate difference in hours
+  const timeDiff = endDateTime.getTime() - startDateTime.getTime();
+  const hours = Math.ceil(timeDiff / (1000 * 3600));
+  
+  if (hours <= 0) return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false };
+
+  // Calculate days (for multi-day pricing)
+  const days = Math.ceil(hours / 24);
+
+  // Determine which options to show
+  const show12HourOption = hours <= 24; // Only show 12hr if actual duration is 12 hours or less
+  const show24HourOption = hours <= 24; // Show 24hr if actual duration is 24 hours or less
+
+  // Calculate prices for each option
+  const twelveHourPrice = calculatePrice(rentalInfo.area, "12 hours");
+  const twentyFourHourPrice = calculatePrice(rentalInfo.area, "24 hours");
+  const multiDayPrice = days * twentyFourHourPrice;
+
+  // Calculate total price based on selected duration
+  let totalPrice = 0;
+  if (rentalInfo.duration === "12 hours") {
+    totalPrice = twelveHourPrice;
+  } else if (rentalInfo.duration === "24 hours") {
+    totalPrice = twentyFourHourPrice;
+  } else if (rentalInfo.duration?.includes("days")) {
+    totalPrice = multiDayPrice;
+  } else {
+    // Default to appropriate price based on hours
+    if (hours <= 12) {
+      totalPrice = twelveHourPrice;
+    } else if (hours <= 24) {
+      totalPrice = twentyFourHourPrice;
+    } else {
+      totalPrice = multiDayPrice;
+    }
+  }
+
+  return { 
+    hours, 
+    days, 
+    totalPrice,
+    twelveHourPrice,
+    twentyFourHourPrice,
+    multiDayPrice,
+    show12HourOption, 
+    show24HourOption 
+  };
+};
+
+const { 
+  hours, 
+  days, 
+  totalPrice,
+  twelveHourPrice,
+  twentyFourHourPrice, 
+  multiDayPrice,
+  show12HourOption, 
+  show24HourOption 
+} = calculateRentalDetails();
+
+
+
+
+// Auto-set duration when dates AND time change, but allow dropdown for < 48hr rentals
+useEffect(() => {
+  if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
+    const { hours } = calculateRentalDetails();
+    
+    // Only auto-set if no duration is selected or if it's a multi-day rental
+    if (!rentalInfo.duration || hours > 48) {
+      if (hours <= 12) {
+        setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
+      } else if (hours <= 24) {
+        setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
+      } else {
+        // More than 24 hours - calculate days
+        const days = Math.ceil(hours / 24);
+        setRentalInfo(prev => ({ ...prev, duration: `${days} days` }));
+      }
+    }
+  }
+}, [rentalInfo.startDate, rentalInfo.endDate, rentalInfo.time]);
+
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -326,18 +448,63 @@ case 2:
               )}
             </div>
 
-            {/* Date Picker */}
+            {/* Time Dropdown - Move this BEFORE dates */}
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Pick-up Time <span className="text-red-500">*</span>
+            </label>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <MobileTimePicker
+                label="Select time"
+                value={selectedTime}
+                onChange={(newTime: Dayjs | null) => {
+                  setSelectedTime(newTime);
+                  const timeString = newTime ? newTime.format('HH:mm') : '';
+                  setRentalInfo(prev => ({ ...prev, time: timeString }));
+                }}
+                ampm={true}
+                minutesStep={30}
+                slotProps={{
+                  textField: {
+                    required: true,
+                    fullWidth: true,
+                    size: "small",
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </div>
+            {/* Start Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date <span className="text-red-500">*</span>
+                Start Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
-                name="date"
-                value={rentalInfo.date}
+                name="startDate"
+                value={rentalInfo.startDate}
                 onChange={handleRentalInputChange}
+                min={new Date().toISOString().split('T')[0]}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                 required
+                disabled={!rentalInfo.time} // Disable until time is selected
+              />
+            </div>
+
+            {/* End Date */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                End Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                name="endDate"
+                value={rentalInfo.endDate}
+                onChange={handleRentalInputChange}
+                min={rentalInfo.startDate || new Date().toISOString().split('T')[0]}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+                disabled={!rentalInfo.startDate}
               />
             </div>
 
@@ -372,73 +539,88 @@ case 2:
               </select>
             </div>
 
-            {/* Duration Dropdown */}
+           
+           {/* Duration Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Duration <span className="text-red-500">*</span>
               </label>
-              <select
-                name="duration"
-                value={rentalInfo.duration}
-                onChange={handleRentalInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                required
-                disabled={!rentalInfo.area}
-              >
-                <option value="">Select duration</option>
-                <option 
-                  value="12 hours"
-                  disabled={!calculatePrice(rentalInfo.area, "12 hours")}
+              
+              {hours > 0 ? (
+                <select
+                  name="duration"
+                  value={rentalInfo.duration}
+                  onChange={handleRentalInputChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                  required
                 >
-                  {calculatePrice(rentalInfo.area, "12 hours") 
-                    ? `₱${calculatePrice(rentalInfo.area, "12 hours")}/12 hours`
-                    : "12 hours - Not available"
-                  }
-                </option>
-                <option value="24 hours">
-                  {calculatePrice(rentalInfo.area, "24 hours") 
-                    ? `₱${calculatePrice(rentalInfo.area, "24 hours")}/24 hours`
-                    : "₱XXXX/24 hours"
-                  }
-                </option>
-              </select>
-              {!rentalInfo.area && (
-                <div className="text-sm text-gray-500 mt-1">Please select an area first</div>
+                  <option value="">Select duration</option>
+                  
+                  {/* Show 12-hour option only if actual duration is 12 hours or less */}
+                  {show12HourOption && (
+                    <option value="12 hours">
+                      ₱{twelveHourPrice}/12 hours
+                    </option>
+                  )}
+                  
+                  {/* Show 24-hour option only if actual duration is 24 hours or less */}
+                  {show24HourOption && (
+                    <option value="24 hours">
+                      ₱{twentyFourHourPrice}/24 hours
+                    </option>
+                  )}
+                  
+                  {/* Show multi-day option for rentals longer than 24 hours */}
+                  {hours > 24 && (
+                    <option value={`${days} days`}>
+                      ₱{multiDayPrice} for {days} {days === 1 ? 'day' : 'days'} ({hours} hours total)
+                    </option>
+                  )}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value="Select dates and time first"
+                  disabled
+                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+                />
               )}
+              
+              <div className="text-sm text-gray-500 mt-1">
+                {hours > 0 ? (
+                  <>
+                    {hours} hours total • 
+                    {show12HourOption ? " 12-hour return possible" : 
+                    show24HourOption ? " 24-hour return possible" : 
+                    " Multi-day rental"}
+                  </>
+                ) : (
+                  "Select dates and time to calculate duration"
+                )}
+              </div>
             </div>
-
-            {/* Time Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="time"
-                value={rentalInfo.time}
-                onChange={handleRentalInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="">Select time</option>
-                <option value="08:00 AM">08:00 AM</option>
-                <option value="09:00 AM">09:00 AM</option>
-                <option value="10:00 AM">10:00 AM</option>
-                <option value="11:00 AM">11:00 AM</option>
-              </select>
-            </div>
+            
           </div>
         </div>
 
-        {/* Price + Buttons */}
+       {/* Price + Buttons */}
         <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-gray-800">
-              Initial Price: ₱{calculatePrice(rentalInfo.area, rentalInfo.duration) || "0"}
+              {rentalInfo.duration ? `Initial Price: ₱${totalPrice}` : "Initial Price: ₱0"}
             </span>
-            {rentalInfo.area && rentalInfo.duration && (
-              <span className="text-xs text-gray-600 mt-1">
-                {rentalInfo.area} • {rentalInfo.duration} • {selectedCarData?.Model_Name || "No car selected"}
-              </span>
+            {rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time && (
+              <div className="text-xs text-gray-600 mt-1 space-y-1">
+                <div>
+                  <span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}
+                </div>
+                <div>
+                  <span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {formatTime(rentalInfo.time)}
+                </div>
+                <div>
+                  <span className="font-medium">Vehicle:</span> {selectedCarData?.Model_Name || "No car selected"} • {rentalInfo.area}
+                </div>
+              </div>
             )}
           </div>
           <div className="flex gap-3">
@@ -451,7 +633,7 @@ case 2:
             </button>
             <button
               type="submit"
-              disabled={!calculatePrice(rentalInfo.area, rentalInfo.duration)}
+              disabled={!rentalInfo.duration}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               Next
