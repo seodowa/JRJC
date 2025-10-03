@@ -7,7 +7,11 @@ export default {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'jrjc-cyan': '#8BFFF1',
+      },
+    },
   },
   plugins: [],
 } satisfies Config

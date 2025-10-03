@@ -431,8 +431,7 @@ case 2:
                 selectedCar={selectedCar} 
                 setSelectedCar={setSelectedCar}
                 onCarSelect={setSelectedCarData}
-              />
-              
+              />              
             </div>
 
             {/* Transmission (Display only) */}

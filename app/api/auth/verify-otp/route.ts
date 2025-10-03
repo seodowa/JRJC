@@ -4,25 +4,31 @@ import { cookies } from 'next/headers';
 import { encrypt } from '@/lib';
 import { createClient } from '@/utils/supabase/server';
 import { supabaseAdmin } from '@/utils/supabase/admin';
+import { createHash } from 'crypto';
 
 export async function POST(req: Request) {
-  const { token } = await req.json();
-  console.log("Verify route: Received token for lookup:", token);
+  const { username, otp, trustDevice } = await req.json();
   const supabase = await createClient();
 
   const { data: user, error } = await supabase
     .from('Accounts')
-    .select('"ID", "Username", "Account_Type"')
-    .eq('verification_token', token)
-    .gt('verification_token_expires_at', new Date().toISOString())
+    .select('"ID", "Username", "Account_Type", "verification_token", "verification_token_expires_at"')
+    .eq('"Username"', username)
     .maybeSingle();
 
   if (error || !user) {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    return NextResponse.json({ error: 'Invalid user.' }, { status: 401 });
+  }
+
+  const hashedOtp = createHash('sha256').update(otp).digest('hex');
+
+  if (user.verification_token !== hashedOtp || new Date(user.verification_token_expires_at) < new Date()) {
+    return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401 });
   }
 
   // Create session
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  const sessionDuration = trustDevice ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 days or 1 day
+  const expires = new Date(Date.now() + sessionDuration);
   const session = await encrypt({
     user: {
       id: user.ID,

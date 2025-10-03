@@ -6,18 +6,22 @@ import { login } from "@/app/(admin)/services/auth/auth";
 import { useToast } from "@/components/toast/use-toast";
 import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
 import AsyncButton from "@/components/AsyncButton";
+import OTPModal from "./OTPModal";
 
 const AdminLoginForm: React.FC = () => {
     const [username, setUsername] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+    const [isSubmittingOtp, setIsSubmittingOtp] = useState(false);
+    const [isResending, setIsResending] = useState(false);
     const router = useRouter();
     const formRef = useRef<HTMLFormElement | null>(null);
     const { toast } = useToast();
 
-    const handleLogin = async () => {
-        if (isLoading) return;
+    const handleLogin = async (showLoading = true) => {
+        if (isLoading && showLoading) return;
 
-        setIsLoading(true);
+        if (showLoading) setIsLoading(true);
         try {
             const form = formRef.current;
             if (!form) return;
@@ -27,11 +31,13 @@ const AdminLoginForm: React.FC = () => {
 
             await login(username, password);
 
-                  toast({
-                    title: "Verification email sent",
-                    description: "Please check your email for a verification link.",
-                  });
-                  router.push("/check-email");        } catch (error) {
+            toast({
+                title: "Verification email sent",
+                description: "Please check your email for a verification link.",
+            });
+            setUsername(username); // Store username for OTP submission
+            setIsOtpModalOpen(true);
+        } catch (error) {
             console.error("Login failed:", error);
             const description = error instanceof Error ? error.message : "Invalid username or password";
             toast({
@@ -40,62 +46,117 @@ const AdminLoginForm: React.FC = () => {
                 description,
             });
         } finally {
-            setIsLoading(false);
+            if (showLoading) setIsLoading(false);
+        }
+    };
+
+    const handleOtpSubmit = async (otp: string, trustDevice: boolean) => {
+        setIsSubmittingOtp(true);
+        try {
+            const response = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, otp, trustDevice }),
+            });
+
+            if (response.ok) {
+                toast({
+                    title: "Login successful",
+                    description: "Redirecting to dashboard...",
+                });
+                router.push('/adminSU/dashboard');
+            } else {
+                const data = await response.json();
+                throw new Error(data.error || "OTP verification failed.");
+            }
+        } catch (error) {
+            console.error("OTP verification failed:", error);
+            const description = error instanceof Error ? error.message : "An unexpected error occurred.";
+            toast({
+                variant: "destructive",
+                title: "OTP Verification Failed",
+                description,
+            });
+        } finally {
+            setIsSubmittingOtp(false);
+        }
+    };
+
+    const handleResendCode = async () => {
+        if (isResending) return;
+
+        setIsResending(true);
+        try {
+            // This will re-trigger the login flow, which sends a new OTP
+            await handleLogin(false);
+        } finally {
+            setIsResending(false);
         }
     };
 
     return (
-        <form
-            ref={formRef}
-            onSubmit={(e) => {
-                e.preventDefault();
-                // Support Enter key submission by delegating to the same async handler
-                void handleLogin();
-            }}
-            className="grid h-full lg:w-150 md:w-100 sm:w-80 flex-col place-items-center gap-4 rounded-2xl
-                outline-[0.50px] outline-offset-[-0.50px] outline-white/20
-                bg-black/5 backdrop-blur-sm shadow-lg shadow-black/25 p-10"
-        >
-            <h2 className="text-4xl font-bold mb-4 text-center">LOGIN</h2>
-            <div>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    autoComplete="username"
-                    className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
-                    focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
-                    placeholder:font-normal placeholder-black/70  backdrop-blur-sm shadow-lg transition duration-200"
-                />
-            </div>
-            <div className="mt-4">
-                <PasswordInputField
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                    className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
-                    focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
-                    placeholder:font-normal placeholder-black/70 backdrop-blur-sm shadow-lg transition duration-200"
-                    required
-                />
-            </div>
-            <a className="underline pl-30 text-sm -mt-3.5" href="#">Forgot Password?</a>
-            <div className="mt-6">
-                <AsyncButton
-                    type="submit"
-                    isLoading={isLoading}
-                    className="mb-4 w-40 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
-                              text-black hover:bg-[#8BFFF1] transition-colors duration-200"
-                    loadingText="Logging in..."
-                >
-                    Log in
-                </AsyncButton>
-            </div>
-        </form>
+        <>
+            <form
+                ref={formRef}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    void handleLogin();
+                }}
+                className="grid h-full lg:w-150 md:w-100 sm:w-80 flex-col place-items-center gap-4 rounded-2xl
+                    outline-[0.50px] outline-offset-[-0.50px] outline-white/20
+                    bg-black/5 backdrop-blur-sm shadow-lg shadow-black/25 p-10"
+            >
+                <h2 className="text-4xl font-bold mb-4 text-center">LOGIN</h2>
+                <div>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        autoComplete="username"
+                        className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
+                        focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
+                        placeholder:font-normal placeholder-black/70  backdrop-blur-sm shadow-lg transition duration-200"
+                    />
+                </div>
+                <div className="mt-4">
+                    <PasswordInputField
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
+                        focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
+                        placeholder:font-normal placeholder-black/70 backdrop-blur-sm shadow-lg transition duration-200"
+                        required
+                    />
+                </div>
+                <a className="underline pl-30 text-sm -mt-3.5" href="#">Forgot Password?</a>
+                <div className="mt-6">
+                    <AsyncButton
+                        type="submit"
+                        isLoading={isLoading}
+                        className="mb-4 w-40 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
+                                  text-black hover:bg-[#8BFFF1] transition-colors duration-200"
+                        loadingText="Logging in..."
+                    >
+                        Log in
+                    </AsyncButton>
+                </div>
+            </form>
+            <OTPModal
+                isOpen={isOtpModalOpen}
+                onClose={() => setIsOtpModalOpen(false)}
+                onSubmit={handleOtpSubmit}
+                isSubmitting={isSubmittingOtp}
+                onResend={handleResendCode}
+                isResending={isResending}
+            />
+        </>
     );
 };
 
