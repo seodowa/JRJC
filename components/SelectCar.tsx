@@ -1,24 +1,9 @@
-// components/SelectCar.tsx (fixed version)
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-
-interface Car {
-  id: number;
-  Model_Name: string;
-  Transmission_ID?: number;
-  Manufacturer_ID?: number;
-  Fuel_Type_ID?: number;
-  Year_Model?: number;
-  Number_Of_Seats?: number;
-  image?: string | null;
-  Transmission_Types?: {
-    ID: number;
-    Name: string;
-  };
-  [key: string]: any;
-}
+import { Car } from "@/types";
+import CarCard from "./CarCard";
 
 interface SelectCarProps {
   selectedCar: number | null;
@@ -42,10 +27,26 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
       try {
         setLoading(true);
         
-        // First get cars
+        // Fetch cars with related data
         const { data: carsData, error: carsError } = await supabase
           .from("Car_Models")
-          .select("*");
+          .select(`
+            *,
+            Transmission_Types (
+              Name
+            ),
+            Manufacturer (
+              Manufacturer_Name
+            ),
+            Fuel_Types (
+              Fuel
+            ),
+            Car_Pricing (
+              Location,
+              Price_12_Hours,
+              Price_24_Hours
+            )
+          `);
 
         if (carsError) {
           setError(carsError.message);
@@ -53,25 +54,29 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
           return;
         }
 
-        // Get all transmission types
-        const { data: transmissionData, error: transmissionError } = await supabase
-          .from("Transmission_Types")
-          .select("*");
-
-        // Combine the data - FIXED: use ID (uppercase) instead of id
-        const carsWithTransmission = carsData?.map(car => {
-          const transmission = transmissionData?.find(trans => trans.Transmission_ID === car.Transmission_ID);
-          
-                return {
-          ...car,
-          Transmission_Types: transmission ? {
-            ID: transmission.Transmission_ID,  // Map from Transmission to ID
-            Name: transmission.Name
-          } : undefined
-        };
-      }) || [];
         if (!mounted) return;
-        setCars(carsWithTransmission);
+
+        console.log("First car data structure:", carsData?.[0]);
+
+        // Transform the data to match the Car type
+        const transformedCars: Car[] = carsData?.map(car => ({
+          id: car.id,
+          brand: car.Manufacturer?.Manufacturer_Name,
+          model: car.Model_Name,
+          year: car.Year_Model,
+          transmission: car.Transmission_Types?.Name || "Unknown",
+          fuelType: car.Fuel_Types?.Fuel || "Unknown",
+          image: car.image,
+          price: car.Car_Prices || [
+            { location: "Location 1", price_12_hours: 0, price_24_hours: 0 },
+            { location: "Location 2", price_12_hours: 0, price_24_hours: 0 },
+            { location: "Location 3", price_12_hours: 0, price_24_hours: 0 }
+          ],
+          seats: car.Number_Of_Seats,
+          available: car.Available || true
+        })) || [];
+
+        setCars(transformedCars);
         
       } catch (err) {
         setError("Failed to fetch cars");
@@ -90,19 +95,32 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
     scrollRef.current?.scrollBy({ left: distance, behavior: "smooth" });
   };
 
-  const selectedCarData = cars.find(car => car.Model_ID === selectedCar);
-  // In SelectCar component
-const handleCarSelect = (car: Car) => {
-  
-  setSelectedCar(car.Model_ID); // Use Model_ID instead of id
-  setIsOpen(false);
-  onCarSelect?.(car);
-};
+  const selectedCarData = cars.find(car => car.id === selectedCar);
+
+  const handleCarSelect = (car: Car) => {
+    setSelectedCar(car.id);
+    setIsOpen(false);
+    onCarSelect?.(car);
+  };
 
   const handleClearSelection = () => {
     setSelectedCar(null);
     onCarSelect?.(null);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -113,7 +131,7 @@ const handleCarSelect = (car: Car) => {
       >
         {selectedCarData ? (
           <div className="flex items-center justify-between">
-            <span>{selectedCarData.Model_Name}</span>
+            <span>{`${selectedCarData.brand} ${selectedCarData.model} ${selectedCarData.year}`}</span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -164,7 +182,7 @@ const handleCarSelect = (car: Car) => {
               <button
                 type="button"
                 onClick={() => scrollBy(-320)}
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 shadow-sm mr-2 flex-shrink-0"
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 shadow-sm mr-2 flex-shrink-0 z-20"
                 aria-label="Scroll left"
               >
                 ‹
@@ -172,7 +190,7 @@ const handleCarSelect = (car: Car) => {
 
               <div
                 ref={scrollRef}
-                className="flex overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide"
+                className="flex overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide flex-1"
                 style={{ scrollBehavior: "smooth" }}
               >
                 {cars.map((car) => (
@@ -181,25 +199,15 @@ const handleCarSelect = (car: Car) => {
                     onClick={() => handleCarSelect(car)}
                     role="button"
                     tabIndex={0}
-                    className={`flex-shrink-0 w-64 border rounded-xl p-4 bg-white shadow-sm cursor-pointer transition-all duration-200 snap-start
-                      ${selectedCar === car.id ? "border-blue-600 ring-2 ring-blue-200" : "border-gray-200 hover:border-blue-400"}`}
+                    className={`flex-shrink-0 cursor-pointer transition-all duration-200 snap-start
+                      ${selectedCar === car.id ? "ring-2 ring-blue-500 ring-offset-2 rounded-3xl" : "hover:scale-105"}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        handleCarSelect(car);
+                      }
+                    }}
                   >
-                    <div className="w-full h-32 bg-gray-100 rounded-md mb-4 flex items-center justify-center overflow-hidden">
-                      {car.image ? (
-                        <img 
-                          src={car.image} 
-                          alt={car.Model_Name} 
-                          className="h-full object-contain"
-                        />
-                      ) : (
-                        <span className="text-gray-400">No Image</span>
-                      )}
-                    </div>
-
-                    <h3 className="font-semibold text-lg">{car.Model_Name}</h3>
-                    <p className="text-sm text-gray-500">Transmission: {car.Transmission_Types?.Name || "—"}</p>
-                    <p className="text-sm text-gray-500">Year: {car.Year_Model ?? "—"}</p>
-                    <p className="text-sm text-gray-500">Seats: {car.Number_Of_Seats ?? "—"}</p>
+                    <CarCard {...car} />
                   </div>
                 ))}
               </div>
@@ -207,11 +215,31 @@ const handleCarSelect = (car: Car) => {
               <button
                 type="button"
                 onClick={() => scrollBy(320)}
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 shadow-sm ml-2 flex-shrink-0"
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 shadow-sm ml-2 flex-shrink-0 z-20"
                 aria-label="Scroll right"
               >
                 ›
               </button>
+            </div>
+          )}
+
+          {/* Selected car preview */}
+          {selectedCarData && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Currently Selected:</h4>
+              <div className="flex items-center gap-4">
+                {selectedCarData.image && (
+                  <img 
+                    src={selectedCarData.image} 
+                    alt={`${selectedCarData.brand} ${selectedCarData.model}`}
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                )}
+                <div>
+                  <p className="font-semibold">{`${selectedCarData.brand} ${selectedCarData.model} ${selectedCarData.year}`}</p>
+                  <p className="text-sm text-gray-600">{selectedCarData.transmission} • {selectedCarData.fuelType}</p>
+                </div>
+              </div>
             </div>
           )}
         </div>

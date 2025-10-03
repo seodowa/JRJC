@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { carPricingService, CarPricing } from '@/app/services/carPricingService';
+import { carPricingService, CarPricing } from '@/lib/supabase/queries/carPricing';
 
 export const useCarPricing = (carModelId?: number | null) => {
   const [pricingData, setPricingData] = useState<CarPricing[]>([]);
