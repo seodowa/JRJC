@@ -207,7 +207,7 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
                       }
                     }}
                   >
-                    <CarCard {...car} />
+                    <CarCard car={car} />
                   </div>
                 ))}
               </div>
