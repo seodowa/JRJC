@@ -679,114 +679,144 @@ case 2:
     </div>
   );
       case 3:
-        return (
-          <div className="relative p-6">
-            {/* Main Payment Section */}
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                  {/* Payment Details Text */}
-                  <div>
-                    <p className="text-sm text-gray-700 mb-4">
-                      Please scan the QR Code for GCash Payment and pay the booking
-                      fee. For the <strong>total payment</strong>, you may pay through
-                      face-to-face.
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      <strong>Booking Fee:</strong> ₱XXX
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      <strong>Cost Breakdown:</strong> ₱XXX
-                    </p>
+  // Calculate fees and totals
+  const bookingFee = 500; // Fixed booking fee
+  const carWashFee = 300; // Fixed car wash fee
+  const initialPayment = totalPrice || 0; // From case 2
+  const totalPayment = bookingFee + carWashFee + initialPayment;
 
-                    <p className="mt-6 text-sm font-semibold text-gray-800">
-                      Total Payment: ₱XXXX
-                    </p>
-
-                    {/* Reference Upload */}
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Upload the reference number below:
-                        <span className="text-red-500 ml-1">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="referenceNumber"
-                        value={paymentInfo.referenceNumber}
-                        onChange={handlePaymentInputChange}
-                        placeholder="Enter GCash reference number"
-                        required
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  {/* QR Code */}
-                  <div className="flex justify-center">
-                    <img
-                      src="/images/qr-sample.png"
-                      alt="QR Code"
-                      className="w-48 h-48 border rounded-md shadow-sm"
-                    />
-                  </div>
-                </div>
+  return (
+    <div className="relative p-6">
+      {/* Main Payment Section */}
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            {/* Payment Details Text */}
+            <div>
+              <p className="text-sm text-gray-700 mb-4">
+                Please scan the QR Code for GCash Payment and pay the booking
+                fee. For the <strong>total payment</strong>, you may pay through
+                face-to-face.
+              </p>
+              
+              {/* Cost Breakdown */}
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-gray-700">
+                  <strong>Booking Fee:</strong> ₱{bookingFee}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Cost Breakdown:</strong> ₱{initialPayment} (Rental) + ₱{carWashFee} (Car Wash)
+                </p>
               </div>
 
-              {/* Buttons */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
-                >
-                  Back
-                </button>
+              {/* Total Payment */}
+              <p className="mt-6 text-sm font-semibold text-gray-800">
+                Total Payment: ₱{totalPayment}
+              </p>
 
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
-                >
-                  Book
-                </button>
+              {/* Reference Upload */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Upload the reference number below:
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="referenceNumber"
+                  value={paymentInfo.referenceNumber}
+                  onChange={handlePaymentInputChange}
+                  placeholder="Enter GCash reference number"
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
-            </form>
+            </div>
 
-            {/* Confirmation Popup */}
-            {showConfirm && (
-              <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg w-80 p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2 text-center">
-                    Are you sure you want to confirm your booking?
-                  </h2>
-                  <p className="text-sm text-gray-600 mb-4 text-center">
-                    <strong>Reminders:</strong>
-                    <br />
-                    BLA <br />
-                    BLA <br />
-                    BLA <br />
-                    BLA
-                  </p>
-
-                  <div className="flex justify-between">
-                    <button
-                      onClick={handleCancelConfirm}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md w-[45%]"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleFinalSubmit}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md w-[45%]"
-                    >
-                      Confirm
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* QR Code */}
+            <div className="flex justify-center">
+              <img
+                src="/images/qr-sample.png"
+                alt="QR Code"
+                className="w-48 h-48 border rounded-md shadow-sm"
+              />
+            </div>
           </div>
-        );
+        </div>
 
+        {/* Buttons */}
+        <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+          >
+            Back
+          </button>
+
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+          >
+            Book
+          </button>
+        </div>
+      </form>
+
+      {/* Confirmation Popup */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-80 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2 text-center">
+              Are you sure you want to confirm your booking?
+            </h2>
+            <p className="text-sm text-gray-600 mb-4 text-center">
+              <strong>Reminders:</strong>
+              <br />
+              BLA <br />
+              BLA <br />
+              BLA <br />
+              BLA
+            </p>
+
+            {/* Display payment summary in confirmation */}
+            <div className="text-sm text-gray-700 mb-4 p-3 bg-gray-50 rounded-md">
+              <div className="flex justify-between">
+                <span>Booking Fee:</span>
+                <span>₱{bookingFee}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Rental Cost:</span>
+                <span>₱{initialPayment}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Car Wash Fee:</span>
+                <span>₱{carWashFee}</span>
+              </div>
+              <div className="flex justify-between font-semibold border-t mt-2 pt-2">
+                <span>Total Payment:</span>
+                <span>₱{totalPayment}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-between">
+              <button
+                onClick={handleCancelConfirm}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md w-[45%]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFinalSubmit}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md w-[45%]"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
       default:
         return null;
     }
