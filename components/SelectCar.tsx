@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { Car } from "@/types";
 import CarCard from "./CarCard";
+import { fetchCars } from "@/lib/supabase/queries/cars";
 
 interface SelectCarProps {
   selectedCar: number | null;
@@ -12,7 +12,6 @@ interface SelectCarProps {
 }
 
 export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: SelectCarProps) {
-  const supabase = createClient();
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,73 +22,33 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
   useEffect(() => {
     let mounted = true;
     
-    const fetchCars = async () => {
+    const loadCars = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Fetch cars with related data
-        const { data: carsData, error: carsError } = await supabase
-          .from("Car_Models")
-          .select(`
-            *,
-            Transmission_Types (
-              Name
-            ),
-            Manufacturer (
-              Manufacturer_Name
-            ),
-            Fuel_Types (
-              Fuel
-            ),
-            Car_Pricing (
-              Location,
-              Price_12_Hours,
-              Price_24_Hours
-            )
-          `);
-
-        if (carsError) {
-          setError(carsError.message);
-          setLoading(false);
-          return;
-        }
-
+        const carsData = await fetchCars();
+        
         if (!mounted) return;
-
+        
         console.log("First car data structure:", carsData?.[0]);
-
-        // Transform the data to match the Car type
-        const transformedCars: Car[] = carsData?.map(car => ({
-          id: car.id,
-          brand: car.Manufacturer?.Manufacturer_Name,
-          model: car.Model_Name,
-          year: car.Year_Model,
-          transmission: car.Transmission_Types?.Name || "Unknown",
-          fuelType: car.Fuel_Types?.Fuel || "Unknown",
-          image: car.image,
-          price: car.Car_Prices || [
-            { location: "Location 1", price_12_hours: 0, price_24_hours: 0 },
-            { location: "Location 2", price_12_hours: 0, price_24_hours: 0 },
-            { location: "Location 3", price_12_hours: 0, price_24_hours: 0 }
-          ],
-          seats: car.Number_Of_Seats,
-          available: car.Available || true
-        })) || [];
-
-        setCars(transformedCars);
+        setCars(carsData);
         
       } catch (err) {
-        setError("Failed to fetch cars");
+        if (!mounted) return;
+        setError(err instanceof Error ? err.message : "Failed to fetch cars");
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchCars();
+    loadCars();
     return () => {
       mounted = false;
     };
-  }, [supabase]);
+  }, []);
 
   const scrollBy = (distance: number) => {
     scrollRef.current?.scrollBy({ left: distance, behavior: "smooth" });

@@ -442,7 +442,7 @@ case 2:
               <input
                 type="text"
                 disabled
-                value={selectedCarData?.Transmission_Types?.Name || "—"}
+                value={selectedCarData?.transmission || "—"}
                 className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
               />
             </div>

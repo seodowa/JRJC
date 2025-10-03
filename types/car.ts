@@ -1,9 +1,9 @@
 // types/car.ts
 
 export interface CarPricing {
-    location: string,
-    price_12_hours: number,
-    price_24_hours: number
+    Location: string,
+    Price_12_Hours: number,
+    Price_24_Hours: number
 }
 
 export interface Car {
