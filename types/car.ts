@@ -7,7 +7,7 @@ export interface CarPricing {
 }
 
 export interface Car {
-  id: string
+  id: number
   model: string
   brand: string
   year: number
