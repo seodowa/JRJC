@@ -13,7 +13,36 @@ interface CarouselProps<T> {
 
 export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: CarouselProps<T> ) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragOffset, setDragOffset] = useState(0);  // How far dragged
+    const [startPos, setStartPos] = useState(0);
     const maxIndex = Math.max(0, items.length - itemsPerView);
+
+    const handleTouchStart = (e: TouchEvent) => {
+        setIsDragging(true)
+        setStartPos(e.touches[0].clientX)  // Record start position
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+        if (!isDragging) return
+    
+        const currentPos = e.touches[0].clientX
+        const diff = currentPos - startPos
+        setDragOffset(diff)  // Update drag distance
+    }
+
+    const handleTouchEnd = () => {
+        // Check if swipe was far enough
+        if (dragOffset > 50) {
+            prevSlide()  // Swiped right
+        } else if (dragOffset < -50) {
+            nextSlide()  // Swiped left
+        }
+    
+        // Reset
+        setIsDragging(false)
+        setDragOffset(0)
+    }
 
     const nextSlide = () => {
         setCurrentIndex(prev => (prev >= maxIndex ? 0 : prev + 1))
@@ -28,19 +57,19 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
     }
 
     return (
-      <div className="w-full max-w-4xl">
-        <div className="relative h-170 flex items-center justify-center">
+      <div className="w-full max-w-4xl px-3 overflow-hidden">
+        <div className="relative h-155 flex items-center justify-center">
           {(
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-0 z-20 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+                className="absolute left-0 z-40 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <ChevronLeft size={24} />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-0 z-20 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+                className="absolute right-0 z-40 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <ChevronRight size={24} />
               </button>
@@ -66,12 +95,12 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
                 opacity = 1
                 scale = 1
               } else if (isLeft) {
-                transformStyle = 'translateX(-80%)'
+                transformStyle = 'translateX(-100%)'
                 zIndex = 10
                 opacity = 0.5
                 scale = 0.8
               } else if (isRight) {
-                transformStyle = 'translateX(80%)'
+                transformStyle = 'translateX(100%)'
                 zIndex = 10
                 opacity = 0.5
                 scale = 0.8
@@ -80,7 +109,7 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
               return (
                 <div
                   key={index}
-                  className="absolute transition-all duration-500 ease-out"
+                  className="absolute transition-all duration-500 ease-out mb-8"
                   style={{
                     transform: `${transformStyle} scale(${scale})`,
                     zIndex,
@@ -103,7 +132,7 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
                   key={index}
                   onClick={() => goToSlide(index)}
                   className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentIndex ? 'bg-blue-600 w-8' : 'bg-gray-300'
+                    index === currentIndex ? 'bg-[#578FCA] 0 w-8' : 'bg-gray-300'
                   }`}
                 />
               ))}
