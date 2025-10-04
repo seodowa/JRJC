@@ -50,5 +50,21 @@ export const cars: Car[] = [
         seats: 5,
         fuelType: 'Gasoline',
         available: true
+    },
+    {
+        id: 4,
+        model: "Test",
+        brand: "Lorem",
+        year: 2020,
+        price: [
+            { Location: "Manolo-CDO", Price_12_Hours: 1000, Price_24_Hours: 1300 },
+            { Location: "Bukidnon/Mis. Or.", Price_12_Hours: 1400, Price_24_Hours: 1700 },
+            { Location: "Outside Region 10", Price_12_Hours: 0, Price_24_Hours: 2000 },
+        ],
+        image: "null",
+        transmission: 'Manual', 
+        seats: 5,
+        fuelType: 'Gasoline',
+        available: true
     }
 ]

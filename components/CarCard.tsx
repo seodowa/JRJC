@@ -16,7 +16,7 @@ export default function CarCard( { car }: { car:Car } ) {
     };
 
     return (
-        <div className="flex flex-col justify-between items-center bg-white min-w-xs max-w-xs shadow-md rounded-3xl p-4">
+        <div className="flex flex-col shrink-0 justify-between items-center bg-white min-w-xs max-w-xs shadow-md rounded-3xl p-4">
             <img src={car.image} className="rounded-2xl min-w-full max-w-full aspect-video"/>
             <div className="flex flex-col justify-center items-center pt-2">
                 <h1 className="text-lg font-semibold">{`${car.brand} ${car.model} ${car.year}`}</h1>
