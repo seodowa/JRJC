@@ -1,6 +1,7 @@
 // types/car.ts
 
 export interface CarPricing {
+    Car_ID: number,
     Location: string,
     Price_12_Hours: number,
     Price_24_Hours: number
