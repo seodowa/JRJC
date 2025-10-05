@@ -281,6 +281,8 @@ useEffect(() => {
   loadCars();
 }, []);
 
+console.log("deds:", selectedCarData);
+
 // Auto-set duration when dates AND time change, but allow dropdown for < 48hr rentals
 useEffect(() => {
   if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
@@ -442,6 +444,7 @@ case 2:
                 setSelectedCar={setSelectedCar}
                 onCarSelect={setSelectedCarData}
                 cars={cars}
+                
               />              
             </div>
 
@@ -663,7 +666,9 @@ case 2:
                 <span className="font-medium">Duration:</span> {rentalInfo.duration}
               </div>
               <div>
-                <span className="font-medium">Vehicle:</span> {selectedCarData?.Model_Name || "No car selected"} • {rentalInfo.area}
+                <span className="font-medium">Vehicle:</span> <span>{selectedCarData.brand}</span>{" "}
+                <span>{selectedCarData.model}</span>{" "}
+                <span>({selectedCarData.year})</span> • {rentalInfo.area}
               </div>
             </div>
           )}
