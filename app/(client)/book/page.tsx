@@ -9,6 +9,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { MobileTimePicker } from "@mui/x-date-pickers";
+import { Car } from "@/types";
+import { fetchCars } from "@/lib/supabase/queries/cars";
 
 
 interface PersonalInfo {
@@ -64,6 +66,7 @@ const BookingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [fileInputKey, setFileInputKey] = useState<number>(0); // Add key to reset file input
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(null);
+  const [cars, setCars] = useState<Car[]>([]);
 
  
 
@@ -269,7 +272,14 @@ const calculateReturnTime = () => {
 const { returnDate, returnTime } = calculateReturnTime();
 
 
-
+useEffect(() => {
+  const loadCars = async () => {
+    const carData = await fetchCars();
+    console.log("Fetched cars in parent:", carData);
+    setCars(carData);
+  };
+  loadCars();
+}, []);
 
 // Auto-set duration when dates AND time change, but allow dropdown for < 48hr rentals
 useEffect(() => {
@@ -431,6 +441,7 @@ case 2:
                 selectedCar={selectedCar} 
                 setSelectedCar={setSelectedCar}
                 onCarSelect={setSelectedCarData}
+                cars={cars}
               />              
             </div>
 

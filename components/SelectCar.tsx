@@ -3,52 +3,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Car } from "@/types";
 import CarCard from "./CarCard";
-import { fetchCars } from "@/lib/supabase/queries/cars";
 
 interface SelectCarProps {
   selectedCar: number | null;
   setSelectedCar: React.Dispatch<React.SetStateAction<number | null>>;
   onCarSelect?: (car: Car | null) => void;
+  cars: Car[]; // Required car data prop
 }
 
-export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: SelectCarProps) {
-  const [cars, setCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export default function SelectCar({ 
+  selectedCar, 
+  setSelectedCar, 
+  onCarSelect, 
+  cars 
+}: SelectCarProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    
-    const loadCars = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const carsData = await fetchCars();
-        
-        if (!mounted) return;
-        
-        console.log("First car data structure:", carsData?.[0]);
-        setCars(carsData);
-        
-      } catch (err) {
-        if (!mounted) return;
-        setError(err instanceof Error ? err.message : "Failed to fetch cars");
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadCars();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const scrollBy = (distance: number) => {
     scrollRef.current?.scrollBy({ left: distance, behavior: "smooth" });
@@ -81,6 +52,7 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
     };
   }, []);
 
+ 
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Dropdown trigger */}
@@ -117,26 +89,14 @@ export default function SelectCar({ selectedCar, setSelectedCar, onCarSelect }: 
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 p-4">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Select a car:</h3>
-          
-          {loading && (
-            <div className="text-center py-4">
-              <p className="text-sm text-gray-500">Loading cars...</p>
-            </div>
-          )}
-          
-          {error && (
-            <div className="text-center py-4">
-              <p className="text-sm text-red-500">Error: {error}</p>
-            </div>
-          )}
 
-          {!loading && !error && cars.length === 0 && (
+          {cars.length === 0 && (
             <div className="text-center py-4">
               <p className="text-sm text-gray-500">No car models available</p>
             </div>
           )}
 
-          {!loading && !error && cars.length > 0 && (
+          {cars.length > 0 && (
             <div className="flex items-center">
               <button
                 type="button"

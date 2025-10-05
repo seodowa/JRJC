@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { carPricingService, CarPricing } from '@/lib/supabase/queries/carPricing';
+import { fetchSpecificCarPricing } from '@/lib/supabase/queries/cars';
+import { CarPricing } from '@/types';
 
 export const useCarPricing = (carModelId?: number | null) => {
   const [pricingData, setPricingData] = useState<CarPricing[]>([]);
@@ -18,7 +19,7 @@ export const useCarPricing = (carModelId?: number | null) => {
       try {
         setLoading(true);
         // Pass carModelId to the service!
-        const data = await carPricingService.getCarPricing(carModelId);
+        const data = await fetchSpecificCarPricing(carModelId);
         setPricingData(data);
         setError(null);
       } catch (err) {
