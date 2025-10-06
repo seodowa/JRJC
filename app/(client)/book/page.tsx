@@ -12,6 +12,7 @@ import { MobileTimePicker } from "@mui/x-date-pickers";
 import { Car } from "@/types";
 import { fetchCars } from "@/lib/supabase/queries/cars";
 import { createBooking } from "@/lib/supabase/queries/booking";
+import BookingCalendar from "@/components/BookingCalendar";
 
 interface PersonalInfo {
   firstName: string;
@@ -498,37 +499,18 @@ const BookingPage: React.FC = () => {
                     </LocalizationProvider>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Start Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={rentalInfo.startDate}
-                      onChange={handleRentalInputChange}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                      disabled={!rentalInfo.time}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      End Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={rentalInfo.endDate}
-                      onChange={handleRentalInputChange}
-                      min={rentalInfo.startDate || new Date().toISOString().split('T')[0]}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                      required
-                      disabled={!rentalInfo.startDate}
-                    />
-                  </div>
+                  <BookingCalendar
+                    selectedCar={selectedCar}
+                    startDate={rentalInfo.startDate}
+                    endDate={rentalInfo.endDate}
+                    onStartDateChange={(date) => 
+                      setRentalInfo(prev => ({ ...prev, startDate: date }))
+                    }
+                    onEndDateChange={(date) => 
+                      setRentalInfo(prev => ({ ...prev, endDate: date }))
+                    }
+                    minDate={dayjs()}
+                  />
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

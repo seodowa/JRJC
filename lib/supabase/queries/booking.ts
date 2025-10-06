@@ -27,9 +27,11 @@ export interface BookingData {
   initialPayment: number;
 }
 
+const supabase = createClient();
+
 // utils/supabase/bookingQueries.ts
 export const createBooking = async (bookingData: BookingData) => {
-  const supabase = createClient();
+ 
   
   try {
     console.log("Starting booking creation...");
@@ -122,4 +124,22 @@ export const createBooking = async (bookingData: BookingData) => {
     console.error("Error creating booking:", error);
     throw error;
   }
+};
+
+// lib/supabase/queries/booking.ts
+export const fetchBookedDates = async (carModelId: number) => {
+  const { data, error } = await supabase
+    .from('Booking_Details')
+    .select('Booking_Start_Date_Time, Booking_End_Date_Time')
+    .eq('Model_ID', carModelId)
+    .in('Booking_Status_ID', [1, 2, 3]) // Adjust these IDs based on your Booking_Status table
+    // Assuming: 1 = Confirmed, 2 = Paid, 3 = In Progress, etc.
+    // Exclude: 4 = Cancelled, 5 = Completed, etc.
+
+  if (error) {
+    console.error('Error fetching booked dates:', error);
+    return [];
+  }
+
+  return data || [];
 };
