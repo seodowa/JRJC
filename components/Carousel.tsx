@@ -13,15 +13,7 @@ interface CarouselProps<T> {
 
 export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: CarouselProps<T> ) {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragOffset, setDragOffset] = useState(0);  // How far dragged
-    const [startPos, setStartPos] = useState(0);
     const maxIndex = Math.max(0, items.length - itemsPerView);
-
-    const handleTouchStart = (e: TouchEvent) => {
-        setIsDragging(true)
-        setStartPos(e.touches[0].clientX)  // Record start position
-    }
 
     const nextSlide = () => {
         setCurrentIndex(prev => (prev >= maxIndex ? 0 : prev + 1))
@@ -96,7 +88,6 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
                     filter: isCenter ? 'blur(0)' : 'blur(2px)',
                     pointerEvents: isVisible ? 'auto' : 'none'
                   }}
-                  onClick={() => !isCenter && goToSlide(index)}
                 >
                   {renderItem(item, index)}
                 </div>

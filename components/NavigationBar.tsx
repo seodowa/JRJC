@@ -4,12 +4,12 @@ import HamburgerIcon from "./icons/HamburgerIcon";
 import CloseIcon from "./icons/CloseIcon";
 
 export default function NavigationBar() {
-    const navigation = ["Cars", "Reviews", "About Us"];
+    const navigation = ["Booking Tracker", "Cars", "Reviews", "About Us"];
 
     return (
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
                            bg-[rgba(255,255,255,0.15)] md:backdrop-blur-lg z-50 overflow-hidden">
-            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50">
+            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50 font-main-font">
                 <p className="mr-auto">JRJC</p>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">
@@ -39,7 +39,7 @@ export default function NavigationBar() {
                     </label>
                     {navigation.map(
                         (item) => (
-                            <a key={item} href="#" className="text-lg px-5 py-5 h-auto w-full flex hover:text-hover-color
+                            <a key={item} href="#" className="text-lg px-5 2xl:px-12 py-5 h-auto w-full flex hover:text-hover-color
                                                               md:w-auto md:h-full md:py-0 md:items-center">{item}</a>
                         )
                     )}

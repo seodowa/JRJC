@@ -9,8 +9,8 @@ export default function Footer() {
     const FBLINK = "https://www.facebook.com/profile.php?id=61555492203800";
   
     return (
-    <section id="footer" className="h-auto relative bg-footer-color flex flex-col items-center py-10">
-        <h1 className="font-semibold text-xl text-center text-white pb-6">Contact Us</h1>
+    <section id="footer" className="h-auto relative bg-footer-color flex flex-col items-center py-10 font-secondary-font">
+        <h1 className="text-xl text-center text-white pb-6">Contact Us</h1>
         <div className="w-screen flex justify-center items-center text-white">
             <ul className="flex gap-4 flex-col *:flex *:flex-row *:w-full *:gap-2 *:text-nowrap sm:flex-row">
                 <li>

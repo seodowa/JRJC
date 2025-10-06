@@ -7,6 +7,7 @@
     --color-darker-color: #3674B5;
     --color-main-color: #D1F8EF;
     --color-footer-color: #3D4358;
-    --font-site-fonts: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-main-font: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+    --font-secondary-font: 'Inter', Tahoma, Geneva, Verdana, sans-serif;
     --text-header-font-size: 0.9rem;
 }

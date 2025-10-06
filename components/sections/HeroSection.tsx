@@ -2,7 +2,7 @@ import "@/app/globals.css";
 
 export default function HeroSection() {
   return (
-    <section id="hero" className="bg-main-color min-h-screen relative z-0
+    <section id="hero" className="bg-main-color font-main-font min-h-screen relative z-0
                     flex flex-col items-center -mt-12 overflow-hidden
                     md:flex-row-reverse">
        <div className="flex flex-col items-center w-full h-1/2
