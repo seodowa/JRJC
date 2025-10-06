@@ -99,7 +99,7 @@ export default function ReviewCard({ review }: { review: Review }) {
           onClick={handleHelpful}
           className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
             hasVotedHelpful 
-              ? 'bg-darker-color text-white ' 
+              ? 'bg-secondary-100 text-darker-color ' 
               : 'hover:bg-gray-100 text-gray-600'
           }`}
         >
