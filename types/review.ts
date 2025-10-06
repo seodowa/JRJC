@@ -1,5 +1,5 @@
 export interface Review {
-  id: string              // Required for React/database
+  id: number              // Required for React/database
   userName: string
   rating: number          // 1-5
   comment: string
