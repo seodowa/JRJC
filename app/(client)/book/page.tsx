@@ -67,7 +67,7 @@ const BookingPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-
+  const [dateRangeError, setDateRangeError] = useState<string | null>(null);
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
 
@@ -159,6 +159,7 @@ const BookingPage: React.FC = () => {
     }
   };
 
+  
   // Rental Info Handlers
   const handleRentalInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -499,8 +500,9 @@ const BookingPage: React.FC = () => {
                     </LocalizationProvider>
                   </div>
 
+                 <div className="md:col-span-2">
                   <BookingCalendar
-                    selectedCar={selectedCar}
+                    selectedCar={selectedCarData?.id}
                     startDate={rentalInfo.startDate}
                     endDate={rentalInfo.endDate}
                     onStartDateChange={(date) => 
@@ -509,8 +511,18 @@ const BookingPage: React.FC = () => {
                     onEndDateChange={(date) => 
                       setRentalInfo(prev => ({ ...prev, endDate: date }))
                     }
+                    onRangeError={setDateRangeError}
                     minDate={dayjs()}
                   />
+                  
+                  {/* Show range error in BookingPage if needed */}
+                  {dateRangeError && (
+                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                      <p className="text-sm text-red-700">{dateRangeError}</p>
+                    </div>
+                  )}
+                </div>
+
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -632,12 +644,12 @@ const BookingPage: React.FC = () => {
                     Back
                   </button>
                   <button
-                    type="submit"
-                    disabled={!rentalInfo.duration}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    Next
-                  </button>
+                type="submit"
+                disabled={!rentalInfo.duration || dateRangeError !== null}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
                 </div>
               </div>
             </form>
