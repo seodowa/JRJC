@@ -6,7 +6,7 @@ export default function HeroSection() {
                     flex flex-col items-center -mt-12 overflow-hidden
                     md:flex-row-reverse">
        <div className="flex flex-col items-center w-full h-1/2
-                       md:min-h-screen md:w-1/2 pt-40 md:pt-60 md:pl-20 
+                       md:min-h-screen md:w-3/5 pt-40 md:pt-60 md:pl-20 
                        md:bg-gradient-to-l from-main-color from-85% to-transparent z-1">
           <div className="flex flex-col justify-center items-center">
             <h1 className="font-extrabold text-8xl text-[#578FCA]">JRJC</h1>
@@ -16,8 +16,8 @@ export default function HeroSection() {
                                   shadow-md">Book Now</a>
           </div>
        </div>
-       <div className="flex overflow-hidden object-fit absolute left-0 top-4/11 md:top-auto w-full max-h-screen">
-          <img src="/images/kentb_car_gradient.webp" className="opacity-30 max-w-3xl sm:max-w-4xl md:max-w-full"/>
+       <div className="flex overflow-hidden object-cover absolute left-0 top-5/11 md:top-auto w-full max-h-screen">
+          <img src="/images/kentb_car_gradient.webp" className="opacity-30 min-w-3xl max-w-3xl sm:max-w-4xl md:max-w-full max-h-screen object-cover"/>
        </div>
     </section>
   );
