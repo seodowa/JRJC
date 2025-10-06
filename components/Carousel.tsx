@@ -23,27 +23,6 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
         setStartPos(e.touches[0].clientX)  // Record start position
     }
 
-    const handleTouchMove = (e: TouchEvent) => {
-        if (!isDragging) return
-    
-        const currentPos = e.touches[0].clientX
-        const diff = currentPos - startPos
-        setDragOffset(diff)  // Update drag distance
-    }
-
-    const handleTouchEnd = () => {
-        // Check if swipe was far enough
-        if (dragOffset > 50) {
-            prevSlide()  // Swiped right
-        } else if (dragOffset < -50) {
-            nextSlide()  // Swiped left
-        }
-    
-        // Reset
-        setIsDragging(false)
-        setDragOffset(0)
-    }
-
     const nextSlide = () => {
         setCurrentIndex(prev => (prev >= maxIndex ? 0 : prev + 1))
     }
