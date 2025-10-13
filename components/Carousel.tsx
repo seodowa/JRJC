@@ -8,12 +8,14 @@ import React from "react";
 interface CarouselProps<T> {
   items: T[]                                
   renderItem: (item: T, index: number) => ReactNode
-  itemsPerView?: number 
+  itemsPerView?: number
+  height: number 
 }
 
-export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: CarouselProps<T> ) {
+export default function Carousel<T>( { items, renderItem, itemsPerView = 1, height = 100 }: CarouselProps<T> ) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const maxIndex = Math.max(0, items.length - itemsPerView);
+    const carouselClassName = `relative h-${height} flex items-center justify-center`;
 
     const nextSlide = () => {
         setCurrentIndex(prev => (prev >= maxIndex ? 0 : prev + 1))
@@ -28,8 +30,8 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1 }: Ca
     }
 
     return (
-      <div className="w-full max-w-4xl px-3 overflow-hidden">
-        <div className="relative h-155 flex items-center justify-center">
+      <div className="w-full px-3 sm:px-21 lg:px-42 xl:px-84 overflow-hidden">
+        <div className={carouselClassName}>
           {(
             <>
               <button

@@ -13,6 +13,7 @@ export default function CarsSection() {
         <Carousel 
           items={CARS} 
           renderItem={(car) => <CarCard car={car} />}
+          height={155}
         />
     </section>
   );

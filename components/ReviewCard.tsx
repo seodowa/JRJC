@@ -33,7 +33,7 @@ export default function ReviewCard({ review }: { review: Review }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 relative max-w-xs">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 relative min-w-sm max-w-sm max-h-80 md:min-w-md md:max-w-md lg:min-w-lg lg:max-w-lg">
       {/* Header - User Info */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
@@ -82,7 +82,7 @@ export default function ReviewCard({ review }: { review: Review }) {
       )}
 
       {/* Review Text */}
-      <p className="text-gray-700 leading-relaxed mb-4">{review.comment}</p>
+      <p className="text-gray-700 leading-relaxed mb-4 text-ellipsis text-nowrap overflow-hidden">{review.comment}</p>
 
 
       {/* Car Name (if available) */}
@@ -109,9 +109,7 @@ export default function ReviewCard({ review }: { review: Review }) {
           </span>
         </button>
 
-        {review.updatedAt && review.updatedAt !== review.createdAt && (
-          <span className="text-xs text-gray-400 italic">Edited</span>
-        )}
+        
       </div>
     </div>
   )
