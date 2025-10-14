@@ -12,10 +12,9 @@ interface CarouselProps<T> {
   height: number 
 }
 
-export default function Carousel<T>( { items, renderItem, itemsPerView = 1, height = 100 }: CarouselProps<T> ) {
+export default function Carousel<T>( { items, renderItem, itemsPerView = 1, height = 400 }: CarouselProps<T> ) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const maxIndex = Math.max(0, items.length - itemsPerView);
-    const carouselClassName = `relative h-${height} flex items-center justify-center`;
 
     const nextSlide = () => {
         setCurrentIndex(prev => (prev >= maxIndex ? 0 : prev + 1))
@@ -30,8 +29,8 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1, heig
     }
 
     return (
-      <div className="w-full px-3 sm:px-21 lg:px-42 xl:px-84 overflow-hidden">
-        <div className={carouselClassName}>
+      <div className="w-full  sm:px-21 lg:px-42 xl:px-84 overflow-hidden">
+        <div className="relative flex items-center justify-center" style={ {height: height} }>
           {(
             <>
               <button
@@ -98,7 +97,7 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1, heig
           </div>
 
           {(
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex space-x-2">
               {items.map((_, index) => (
                 <button
                   key={index}

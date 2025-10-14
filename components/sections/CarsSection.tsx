@@ -6,6 +6,7 @@ import Carousel from "../Carousel";
 import { CARS } from "@/lib/data/cars";
 
 export default function CarsSection() {
+  const CAROUSEL_HEIGHT = 38 * 16; // rem * 16 = px
   
   return (
     <section id="cars" className="min-h-screen relative bg-gradient-to-b from-main-color to-secondary-50 flex flex-col items-center pt-16">
@@ -13,7 +14,7 @@ export default function CarsSection() {
         <Carousel 
           items={CARS} 
           renderItem={(car) => <CarCard car={car} />}
-          height={155}
+          height={CAROUSEL_HEIGHT}
         />
     </section>
   );

@@ -33,7 +33,7 @@ export default function ReviewCard({ review }: { review: Review }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 relative min-w-sm max-w-sm max-h-80 md:min-w-md md:max-w-md lg:min-w-lg lg:max-w-lg">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 relative min-w-xs max-w-xs max-h-80 md:min-w-md md:max-w-md lg:min-w-lg lg:max-w-lg">
       {/* Header - User Info */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
