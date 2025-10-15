@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/app/(admin)/services/auth/auth';
 import { toast } from "@/components/toast/use-toast";
+import { UserProvider } from '@/app/(admin)/context/UserContext';
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -72,7 +73,9 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           handleLogout={handleLogout}
         />
         <main className="flex-1 w-full max-w-screen mx-auto p-4 sm:p-6 md:p-8 text-gray-800 overflow-y-auto">
-            {children}
+            <UserProvider user={user}>
+                {children}
+            </UserProvider>
         </main>
       </div>
     </div>
