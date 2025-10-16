@@ -20,7 +20,7 @@ export const REVIEWS: Review[] = [
     {
         id: 2,
         userName: "seodowa",
-        rating: 5,
+        rating: 4,
         title: "test",
         comment: "yo gurt",
         createdAt: new Date(),

@@ -1,15 +1,17 @@
 "use client"
 
 import { Review } from "@/types"
-import { Star, ThumbsUp, Flag, MoreVertical } from "lucide-react"
+import { Star, ThumbsUp } from "lucide-react"
 import { useState } from "react"
 
 // Review Card Component
-export default function ReviewCard({ review }: { review: Review }) {
+export default function ReviewCardFull({ review }: { review: Review }) {
   const [helpfulCount, setHelpfulCount] = useState(review.helpful)
   const [hasVotedHelpful, setHasVotedHelpful] = useState(false)
 
-  const handleHelpful = () => {
+  const handleHelpful = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
     if (!hasVotedHelpful) {
       setHelpfulCount(count => count + 1)
       setHasVotedHelpful(true)
@@ -33,7 +35,10 @@ export default function ReviewCard({ review }: { review: Review }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 relative min-w-xs max-w-xs max-h-80 md:min-w-md md:max-w-md lg:min-w-lg lg:max-w-lg">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer 
+                      transition-shadow p-6 relative min-w-xs max-w-xs md:min-w-md 
+                      md:max-w-md lg:min-w-lg lg:max-w-lg">
+
       {/* Header - User Info */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center">
@@ -53,8 +58,6 @@ export default function ReviewCard({ review }: { review: Review }) {
             </div>
           </div>
         </div>
-
-        
       </div>
 
       {/* Rating & Date */}
@@ -80,18 +83,20 @@ export default function ReviewCard({ review }: { review: Review }) {
       {review.title && (
         <h5 className="font-semibold text-gray-900 mb-2 text-lg">{review.title}</h5>
       )}
-
+      
       {/* Review Text */}
-      <p className="text-gray-700 leading-relaxed mb-4 text-ellipsis text-nowrap overflow-hidden">{review.comment}</p>
-
+      <p className="text-gray-700 leading-relaxed mb-4">{review.comment}</p>
 
       {/* Car Name (if available) */}
-      {review.car?.model && (
-        <div className="mb-4 px-3 py-2 bg-gray-50 rounded-lg inline-block">
-          <span className="text-sm text-gray-600">Reviewed: </span>
-          <span className="text-sm font-medium text-gray-900">{review.car?.brand} {review.car?.model}</span>
-        </div>
-      )}
+      <div className="mb-4 flex flex-col items-start justify-between md:justify-between">
+        {review.car?.model && (
+          <div className="px-3 py-2 bg-gray-50 rounded-lg inline-block">
+            <span className="text-sm text-gray-600">Reviewed: </span>
+            <span className="text-sm font-medium text-gray-900">{review.car?.brand} {review.car?.model}</span>
+          </div>
+        )}
+
+      </div>
 
       {/* Footer - Actions */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -108,8 +113,6 @@ export default function ReviewCard({ review }: { review: Review }) {
             Helpful {helpfulCount > 0 && `(${helpfulCount})`}
           </span>
         </button>
-
-        
       </div>
     </div>
   )

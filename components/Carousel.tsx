@@ -29,7 +29,7 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1, heig
     }
 
     return (
-      <div className="w-full  sm:px-21 lg:px-42 xl:px-84 overflow-hidden">
+      <div className="w-full sm:px-21 lg:px-42 xl:px-84 overflow-hidden">
         <div className="relative flex items-center justify-center" style={ {height: height} }>
           {(
             <>
