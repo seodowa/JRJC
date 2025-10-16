@@ -1,13 +1,11 @@
-'use client'; // This remains a client component for now to avoid cascading server/client issues.
+'use client';
 
 import React from 'react';
-import { OngoingBooking } from '@/types';
+import { useBookings } from '@/hooks/useBookings';
 
-interface BookingsProps {
-  bookings: OngoingBooking[];
-}
+const Bookings = () => {
+  const { bookings, loading, error } = useBookings({ Booking_Status_ID: 3 });
 
-const Bookings = ({ bookings }: BookingsProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -18,14 +16,17 @@ const Bookings = ({ bookings }: BookingsProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-2xl font-bold mb-4 flex-shrink-0">Ongoing Bookings</h2>
+      <h2 className="text-2xl font-bold mb-2 flex-shrink-0">Ongoing Bookings</h2>
       
       <div className="overflow-y-auto flex-grow">
-        {bookings.length === 0 && (
+        {loading && <p>Loading bookings...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
+        {!loading && !error && bookings.length === 0 && (
           <p className="text-gray-500">No ongoing bookings at the moment.</p>
         )}
 
-        {bookings.length > 0 && (
+        {!loading && !error && bookings.length > 0 && (
           <div className="space-y-4">
             {bookings.map((booking) => (
               <div key={booking.Booking_ID} className="p-3 bg-gray-50 rounded-lg">
