@@ -21,6 +21,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         const res = await fetch('/api/auth/session');
         if (res.ok) {
           const data = await res.json();
+          console.log('User data from session:', data.user);
           setUser(data.user);
         }
       } catch (error) {
