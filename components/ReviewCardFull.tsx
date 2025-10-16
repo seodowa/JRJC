@@ -35,9 +35,7 @@ export default function ReviewCardFull({ review }: { review: Review }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer 
-                      transition-shadow p-6 relative min-w-xs max-w-xs md:min-w-md 
-                      md:max-w-md lg:min-w-lg lg:max-w-lg">
+    <div className="bg-transparent transition-shadow p-6 relative">
 
       {/* Header - User Info */}
       <div className="flex items-start justify-between mb-4">

@@ -26,13 +26,13 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-99"
         >
           <X size={24} />
         </button>
         
         {/* Content passed into the modal */}
-        <div className="p-8">
+        <div className="p-4">
           {children}
         </div>
       </div>
