@@ -143,3 +143,31 @@ export const fetchBookedDates = async (carModelId: number) => {
 
   return data || [];
 };
+
+export const fetchBookings = async (filters: Record<string, any> = {}) => {
+  let query = supabase
+    .from('Booking_Details')
+    .select(`
+      Booking_ID,
+      Booking_Start_Date_Time,
+      Booking_End_Date_Time,
+      Duration,
+      Location,
+      Customer:Customer_ID (
+        First_Name,
+        Last_Name
+      )
+    `);
+
+  // Apply all filters from the filters object
+  query = query.match(filters);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching bookings:', error);
+    throw new Error('Failed to fetch bookings.');
+  }
+
+  return data || [];
+};
