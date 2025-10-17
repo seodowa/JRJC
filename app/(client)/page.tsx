@@ -8,9 +8,15 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <HeroSection />
-      <CarsSection />
-      <ReviewsSection />
-      <AboutSection />
+      <div id="cars">
+        <CarsSection />
+      </div>
+      <div id="reviews">
+        <ReviewsSection />
+      </div>
+      <div id="about-us">
+        <AboutSection />
+      </div>
       <Footer />
     </div>
   );

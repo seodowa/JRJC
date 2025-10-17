@@ -4,7 +4,13 @@ import HamburgerIcon from "./icons/HamburgerIcon";
 import CloseIcon from "./icons/CloseIcon";
 
 export default function NavigationBar() {
-    const navigation = ["Booking Tracker", "Cars", "Reviews", "About Us"];
+    // Mapping of navigation item names to their corresponding anchor IDs
+    const navigationLinks = {
+        "Booking Tracker": "#", // Assuming this doesn't scroll to a section
+        "Cars": "#cars",
+        "Reviews": "#reviews",
+        "About Us": "#about-us",
+    };
 
     return (
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
@@ -37,10 +43,10 @@ export default function NavigationBar() {
                     <label htmlFor="sidebar-active" className="md:hidden">
                         <CloseIcon />
                     </label>
-                    {navigation.map(
-                        (item) => (
-                            <a key={item} href="#" className="text-lg px-5 2xl:px-12 py-5 h-auto w-full flex hover:text-hover-color
-                                                              md:w-auto md:h-full md:py-0 md:items-center">{item}</a>
+                    {Object.entries(navigationLinks).map(
+                        ([name, href]) => (
+                            <a key={name} href={href} className="text-lg px-5 2xl:px-12 py-5 h-auto w-full flex hover:text-hover-color
+                                                              md:w-auto md:h-full md:py-0 md:items-center">{name}</a>
                         )
                     )}
                     <a href="book" className="text-lg font-bold text-[#3674B5] px-5 py-5 h-auto w-full flex hover:text-hover-color
