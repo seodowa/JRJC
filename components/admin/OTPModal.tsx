@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import AsyncButton from '@/components/AsyncButton';
 import CloseIcon from "@/components/icons/CloseIcon";
 import OTPVerificationIcon from '@/components/icons/OTPVerificationIcon';
-import CheckmarkIcon from '@/components/icons/CheckmarkIcon';
+import CheckmarkButtonIcon from '@/components/icons/CheckmarkButtonIcon';
 
 interface OtpModalProps {
     isOpen: boolean;
@@ -120,7 +120,7 @@ const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmit
                                     onChange={(e) => setTrustDevice(e.target.checked)}
                                 />
                                 <span className="w-5 h-5 border-2 border-gray-300 rounded-sm grid place-items-center peer-checked:bg-[#8BFFF1] peer-checked:border-[#8BFFF1]">
-                                    {trustDevice && <CheckmarkIcon className="w-3 h-3" />}
+                                    {trustDevice && <CheckmarkButtonIcon className="w-3 h-3" />}
                                 </span>
                                 <span className="ml-2 block text-sm text-gray-900">
                                     Trust this device for 30 days

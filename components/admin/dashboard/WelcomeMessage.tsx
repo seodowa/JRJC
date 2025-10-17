@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { useUser } from '@/app/(admin)/context/UserContext';
 
-const WelcomeMessage = () => {
-  const user = useUser();
+interface WelcomeMessageProps {
+  user: { username: string } | null;
+}
 
+const WelcomeMessage = ({ user }: WelcomeMessageProps) => {
   return (
     <>
       <h2 className="text-2xl font-bold">Welcome back, {user?.username || 'Admin'}!</h2>
