@@ -88,3 +88,47 @@ export const fetchSpecificCarPricing = async ( car_id: number ): Promise<CarPric
     throw error;
   }
 }
+
+export const fetchSpecificCar = async (car_id: number): Promise<Car> => {
+  const supabase = createClient();
+  
+  try {
+    const { data: carData, error: carsError } = await supabase
+      .from("Car_Models")
+      .select(`
+        *,
+        Transmission_Types (
+          Name
+        ),
+        Manufacturer (
+          Manufacturer_Name
+        ),
+        Fuel_Types (
+          Fuel
+        )
+      `).eq("Model_ID", car_id);
+    
+    if (carsError) {
+      throw new Error(carsError.message);
+    }
+
+    const transformedCar: Car[] = carData.map( car => (
+      {
+          id: car.Model_ID,
+          brand: car.Manufacturer?.Manufacturer_Name,
+          model: car.Model_Name,
+          year: car.Year_Model,
+          transmission: car.Transmission_Types?.Name || "Unknown",
+          fuelType: car.Fuel_Types?.Fuel || "Unknown",
+          seats: car.Number_Of_Seats,
+          available: car.Available || true
+      }
+    ))
+
+    return transformedCar[0];
+
+  } catch (error) {
+    console.error("Error fetching car prices: ", error);
+    throw error;
+  }
+}

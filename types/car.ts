@@ -12,8 +12,8 @@ export interface Car {
   model: string
   brand: string
   year: number
-  price: CarPricing[]
-  image: string
+  price?: CarPricing[]
+  image?: string
   transmission: 'Manual' | 'Automatic' 
   seats: number
   fuelType: 'Gasoline' | 'Hybrid' | 'Diesel'

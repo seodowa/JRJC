@@ -9,6 +9,4 @@ export interface Review {
   car?: Car          // Which car this is for
   helpful: number
   createdAt: Date         // When posted
-  updatedAt: Date
-  verified: boolean       // Is this real?
 }

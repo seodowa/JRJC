@@ -33,11 +33,14 @@ export default function ReviewsSection() {
     <section id="reviews" className="min-h-screen relative bg-secondary-50 flex flex-col items-center pt-40">
         <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl py-4 text-center">Customer Reviews</h1>
         <div className="flex justify-center items-start w-screen">
-          <Carousel 
+          {REVIEWS.length > 0 && (
+            <Carousel 
               items={REVIEWS} 
               renderItem={(review) => <ReviewCardPreview review={review} onCardClick={handleCardClick} />}
               height={CAROUSEL_HEIGHT}
-          />
+            />
+          )}
+          
           {/* The Modal Component */}
           <Modal isOpen={isModalOpen} onClose={closeModal}>
             {selectedReview && (
@@ -46,6 +49,10 @@ export default function ReviewsSection() {
               <ReviewCardFull review={selectedReview} />
             )}
           </Modal>
+
+          {REVIEWS.length <= 0 && (
+            <p className="font-main-font pt-16 text-xl md:text-2xl">No reviews yet. Be the first to leave a review.</p>
+          )}
         </div>
     </section>
   );
