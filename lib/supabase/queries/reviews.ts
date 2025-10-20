@@ -16,7 +16,7 @@ export const fetchReviews = async (): Promise<Review[]> => {
         }
 
         const transformedReviews: Review[] = await Promise.all(reviewsData?.map(async (review) => {
-            const carReviewed: Car = await fetchSpecificCar(review.car_id);
+            const carReviewed: Car | undefined = review.car_id ? await fetchSpecificCar(review.car_id) : undefined;
 
             return ({
                 id: review.id,
@@ -24,7 +24,7 @@ export const fetchReviews = async (): Promise<Review[]> => {
                 rating: review.rating,
                 title: review.title,
                 comment: review.comment,
-                car: carReviewed || null,
+                car: carReviewed || undefined,
                 helpful: review.helpful_count,
                 createdAt: review.created_at
             })

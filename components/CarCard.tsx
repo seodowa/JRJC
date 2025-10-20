@@ -1,9 +1,9 @@
 import { Car } from "@/types";
 
 export default function CarCard( { car }: { car:Car } ) {
-    const LOCATION_1_PRICE_INDEX = 0;
-    const LOCATION_2_PRICE_INDEX = 1;
-    const LOCATION_3_PRICE_INDEX = 2;
+    const CAR_PRICE_LOCATION_1 = car.price?.at(0);
+    const CAR_PRICE_LOCATION_2 = car.price?.at(1);
+    const CAR_PRICE_LOCATION_3 = car.price?.at(2);
     const P_TEXT_SIZE = "text-sm";
 
     // Helper function to get price properties safely
@@ -24,16 +24,16 @@ export default function CarCard( { car }: { car:Car } ) {
                 <p className={P_TEXT_SIZE}>{`Fuel Type: ${car.fuelType}`}</p>
                 <p className={P_TEXT_SIZE}>{`${car.seats} Seats`}</p>
 
-                <h2 className="pt-2">{getLocation(car.price[LOCATION_1_PRICE_INDEX])}</h2>
-                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(car.price[LOCATION_1_PRICE_INDEX], 'Price_12_Hours')}/12hrs`}</p>
-                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(car.price[LOCATION_1_PRICE_INDEX], 'Price_24_Hours')}/24hrs`}</p>
+                <h2 className="pt-2">{getLocation(CAR_PRICE_LOCATION_1)}</h2>
+                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(CAR_PRICE_LOCATION_1, 'Price_12_Hours')}/12hrs`}</p>
+                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(CAR_PRICE_LOCATION_1, 'Price_24_Hours')}/24hrs`}</p>
 
-                <h2 className="pt-2">{getLocation(car.price[LOCATION_2_PRICE_INDEX])}</h2>
-                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(car.price[LOCATION_2_PRICE_INDEX], 'Price_12_Hours')}/12hrs`}</p>
-                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(car.price[LOCATION_2_PRICE_INDEX], 'Price_24_Hours')}/24hrs`}</p>
+                <h2 className="pt-2">{getLocation(CAR_PRICE_LOCATION_2)}</h2>
+                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(CAR_PRICE_LOCATION_2, 'Price_12_Hours')}/12hrs`}</p>
+                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(CAR_PRICE_LOCATION_2, 'Price_24_Hours')}/24hrs`}</p>
 
-                <h2 className="pt-2">{getLocation(car.price[LOCATION_3_PRICE_INDEX])}</h2>
-                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(car.price[LOCATION_3_PRICE_INDEX], 'Price_24_Hours')}/24hrs`}</p>
+                <h2 className="pt-2">{getLocation(CAR_PRICE_LOCATION_3)}</h2>
+                <p className={P_TEXT_SIZE}>{`₱${getPriceProperty(CAR_PRICE_LOCATION_3, 'Price_24_Hours')}/24hrs`}</p>
 
                 <h2 className="pt-2">{`+₱300 Carwash Fee`}</h2>
             </div>
