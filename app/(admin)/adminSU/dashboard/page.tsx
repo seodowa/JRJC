@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-md";
 
   // All server-side logic is now in this single function call
-  const { user, ongoingBookings, allDashboardData } = await getDashboardPageData();
+  const { user, allDashboardData } = await getDashboardPageData();
 
   return (
     <div className="p-2 md:p-4 min-h-screen">
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
                 <WelcomeMessage user={user} />
               </div>
               <div className={`${cardBaseStyle} flex-grow h-96 overflow-y-auto`}>
-                <Bookings bookings={ongoingBookings} />
+                <Bookings />
               </div>
             </div>
 

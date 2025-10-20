@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBookings } from '@/lib/supabase/queries/booking';
-import { OngoingBooking } from '@/types';
+import { Booking } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 
 export const useBookings = (filters: Record<string, any> = {}) => {
-  const [bookings, setBookings] = useState<OngoingBooking[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updateTrigger, setUpdateTrigger] = useState(0);
@@ -17,7 +17,7 @@ export const useBookings = (filters: Record<string, any> = {}) => {
     try {
       const parsedFilters = JSON.parse(filtersJSON);
       const data = await fetchBookings(parsedFilters);
-      setBookings(data as OngoingBooking[]);
+      setBookings(data as Booking[]);
     } catch (err) {
       setError('Failed to load bookings.');
       console.error(err);

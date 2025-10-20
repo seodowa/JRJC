@@ -14,6 +14,7 @@ export async function getDashboardPageData() {
     return {
       user: session?.user || null,
       ongoingBookings: [],
+      allDashboardData: [],
     };
   }
 

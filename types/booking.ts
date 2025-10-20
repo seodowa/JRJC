@@ -1,4 +1,4 @@
-export interface OngoingBooking {
+export interface Booking {
   Booking_ID: number;
   Booking_Start_Date_Time: string;
   Booking_End_Date_Time: string;

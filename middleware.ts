@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get("session")?.value;
 
   if (!sessionCookie) {
-    // No session — redirect to login
+    // No session — redirect to the login page
     return NextResponse.redirect(new URL('/adminSU', request.url));
   }
 
