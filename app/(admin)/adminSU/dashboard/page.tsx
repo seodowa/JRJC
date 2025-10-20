@@ -1,8 +1,9 @@
 // This is a Server Component
 import { getDashboardPageData } from '@/lib/supabase/queries/dashboard';
+import { getOngoingBookings } from '@/lib/supabase/queries/ongoingBookings';
 import WelcomeMessage from '@/components/admin/dashboard/WelcomeMessage';
 import Bookings from '@/components/admin/dashboard/Bookings';
-import Calendar from '@/components/admin/dashboard/Calendar';
+import CustomCalendar from '@/components/admin/dashboard/CustomCalendar';
 import RecentFeedback from '@/components/admin/dashboard/RecentFeedback';
 import Cars from '@/components/admin/dashboard/Cars';
 import { RealtimeRefresher } from '@/components/admin/dashboard/RealtimeRefresher';
@@ -10,8 +11,14 @@ import { RealtimeRefresher } from '@/components/admin/dashboard/RealtimeRefreshe
 export default async function DashboardPage() {
   const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-md";
 
-  // All server-side logic is now in this single function call
-  const { user, allDashboardData } = await getDashboardPageData();
+  // Fetch all data in parallel
+  const [
+    { user },
+    ongoingBookings
+  ] = await Promise.all([
+    getDashboardPageData(),
+    getOngoingBookings()
+  ]);
 
   return (
     <div className="p-2 md:p-4 min-h-screen">
@@ -35,20 +42,20 @@ export default async function DashboardPage() {
             </div>
 
             {/* Calendar */}
-            <div className={`md:col-span-2 ${cardBaseStyle} max-h-[500px] overflow-y-auto`}>
-              <Calendar data={allDashboardData} />
+            <div className={`md:col-span-2 ${cardBaseStyle} max-h-136 overflow-y-auto`}>
+              <CustomCalendar bookings={ongoingBookings} />
             </div>
           </div>
 
           {/* Bottom row: Recent Feedback */}
           <div className={`${cardBaseStyle} max-h-96 overflow-y-auto`}>
-            <RecentFeedback data={allDashboardData} />
+            <RecentFeedback />
           </div>
         </div>
 
         {/* Right column: Cars */}
         <div className={`xl:col-span-1 ${cardBaseStyle} max-h-[90vh] overflow-y-auto`}>
-          <Cars data={allDashboardData} />
+          <Cars />
         </div>
 
       </div>
