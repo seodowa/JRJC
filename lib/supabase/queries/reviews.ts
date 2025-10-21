@@ -25,7 +25,7 @@ export const fetchReviews = async (): Promise<Review[]> => {
                 title: review.title,
                 comment: review.comment,
                 car: carReviewed || undefined,
-                helpful: review.helpful_count,
+                helpfulCount: review.helpful_count,
                 createdAt: review.created_at
             })
         })) || [];

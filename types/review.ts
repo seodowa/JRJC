@@ -7,6 +7,10 @@ export interface Review {
   title: string
   comment: string
   car?: Car          // Which car this is for
-  helpful: number
+  helpfulCount: number
   createdAt: Date         // When posted
+}
+
+export interface ReviewForDisplay extends Review {
+  isHelpful: boolean
 }

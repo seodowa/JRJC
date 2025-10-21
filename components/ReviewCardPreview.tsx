@@ -1,24 +1,20 @@
 "use client"
 
-import { Review } from "@/types"
+import { Review, ReviewForDisplay } from "@/types"
 import { Star, ThumbsUp } from "lucide-react"
 import { useState } from "react"
 
-// Review Card Component
-export default function ReviewCardPreview({ review, onCardClick }: { review: Review, onCardClick: (review: Review) => void }) {
-  const [helpfulCount, setHelpfulCount] = useState(review.helpful)
-  const [hasVotedHelpful, setHasVotedHelpful] = useState(false)
+interface ReviewCardPreviewProps {
+  review: ReviewForDisplay;
+  onCardClick: (review: ReviewForDisplay) => void;
+  onToggleHelpful: (id: number) => void;
+}
 
+// Review Card Component
+export default function ReviewCardPreview({ review, onCardClick, onToggleHelpful }: ReviewCardPreviewProps) {
   const handleHelpful = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-
-    if (!hasVotedHelpful) {
-      setHelpfulCount(count => count + 1)
-      setHasVotedHelpful(true)
-    } else {
-      setHelpfulCount(count => count - 1)
-      setHasVotedHelpful(false)
-    }
+    onToggleHelpful(review.id);
   }
 
   const getTimeAgo = (date: Date) => {
@@ -97,14 +93,14 @@ export default function ReviewCardPreview({ review, onCardClick }: { review: Rev
         <button 
           onClick={handleHelpful}
           className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-            hasVotedHelpful 
+            review.isHelpful 
               ? 'bg-secondary-100 text-darker-color ' 
               : 'hover:bg-gray-100 text-gray-600'
           }`}
         >
-          <ThumbsUp size={18} className={hasVotedHelpful ? 'fill-current' : ''} />
+          <ThumbsUp size={18} className={review.isHelpful ? 'fill-current' : ''} />
           <span className="text-sm font-medium">
-            Helpful {helpfulCount > 0 && `(${helpfulCount})`}
+            Helpful {review.helpfulCount > 0 && `(${review.helpfulCount})`}
           </span>
         </button>
         
