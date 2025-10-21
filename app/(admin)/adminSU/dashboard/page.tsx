@@ -1,5 +1,6 @@
 // This is a Server Component
-import { getDashboardPageData } from '@/lib/supabase/queries/dashboard';
+import { getDashboardCars } from '@/lib/supabase/queries/dashboardCars';
+import { getUser } from '@/lib/supabase/queries/user';
 import { getOngoingBookings } from '@/lib/supabase/queries/ongoingBookings';
 import WelcomeMessage from '@/components/admin/dashboard/WelcomeMessage';
 import Bookings from '@/components/admin/dashboard/Bookings';
@@ -12,11 +13,9 @@ export default async function DashboardPage() {
   const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-md";
 
   // Fetch all data in parallel
-  const [
-    { user },
-    ongoingBookings
-  ] = await Promise.all([
-    getDashboardPageData(),
+  const [cars, user, ongoingBookings] = await Promise.all([
+    getDashboardCars(),
+    getUser(),
     getOngoingBookings()
   ]);
 
@@ -55,7 +54,7 @@ export default async function DashboardPage() {
 
         {/* Right column: Cars */}
         <div className={`xl:col-span-1 ${cardBaseStyle} max-h-[90vh] overflow-y-auto`}>
-          <Cars />
+          <Cars cars={cars} />
         </div>
 
       </div>

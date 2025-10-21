@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
-import { DashboardData } from '@/types/dashboard';
+import { Booking } from '@/types/booking';
 
-export async function getOngoingBookings(): Promise<DashboardData[]> {
+export async function getOngoingBookings(): Promise<Booking[]> {
   const supabase = await createClient();
 
   const { data: bookingsData, error: bookingsError } = await supabase
@@ -70,5 +70,5 @@ export async function getOngoingBookings(): Promise<DashboardData[]> {
     };
   });
 
-  return (bookings as DashboardData[]) || [];
+  return (bookings as Booking[]) || [];
 }

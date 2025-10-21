@@ -2,10 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
-import { DashboardData } from '@/types';
+import { Booking } from '@/types/booking';
 
 interface CustomCalendarProps {
-  bookings: DashboardData[];
+  bookings: Booking[];
 }
 
 const ChevronLeftIcon = () => (
@@ -25,7 +25,7 @@ const CustomCalendar = ({ bookings }: CustomCalendarProps) => {
 
   const { dailyLayouts, maxSlots } = useMemo(() => {
     // Create a map of all bookings grouped by date for efficient lookup
-    const bookingsByDate = new Map<string, DashboardData[]>();
+    const bookingsByDate = new Map<string, Booking[]>();
     bookings.forEach(booking => {
       let current = dayjs(booking.Booking_Start_Date_Time);
       const end = dayjs(booking.Booking_End_Date_Time);
@@ -86,7 +86,7 @@ const CustomCalendar = ({ bookings }: CustomCalendarProps) => {
 
     // Create the layout for only the visible days using the global slot map
     const layouts = new Map<string, {
-        booking: DashboardData;
+        booking: Booking;
         slot: number;
         connectsToPrev: boolean;
         connectsToNext: boolean;
