@@ -6,7 +6,7 @@ import { useState } from "react"
 
 interface ReviewCardPreviewProps {
   review: ReviewForDisplay;
-  onCardClick: (review: ReviewForDisplay) => void;
+  onCardClick: (id: number) => void;
   onToggleHelpful: (id: number) => void;
 }
 
@@ -34,7 +34,7 @@ export default function ReviewCardPreview({ review, onCardClick, onToggleHelpful
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer 
                       transition-shadow p-6 relative min-w-xs max-w-xs md:min-w-md 
                       md:max-w-md lg:min-w-lg lg:max-w-lg"
-         onClick={() => onCardClick(review)}
+         onClick={() => onCardClick(review.id)}
     >
 
       {/* Header - User Info */}

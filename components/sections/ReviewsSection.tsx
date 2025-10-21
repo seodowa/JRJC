@@ -14,7 +14,7 @@ export default function ReviewsSection() {
   const [reviews, setReviews] = useState<Review[]>(REVIEWS);
   const [helpfulMap, setHelpfulMap] = useState<Record<number, boolean>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReview, setSelectedReview] = useState<ReviewForDisplay | null>(null);
+  const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
 
   const handleToggleHelpful = (clickedId: number) => {
     const id = clickedId; 
@@ -42,16 +42,20 @@ export default function ReviewsSection() {
   }, [reviews, helpfulMap]); // Dependencies
 
   // Function to open the modal with the correct review data
-  const handleCardClick = (review: ReviewForDisplay) => {
-    setSelectedReview(review);
+  const handleCardClick = (id: number) => {
+    setSelectedReviewId(id);
     setIsModalOpen(true);
   };
 
   // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedReview(null);
+    setSelectedReviewId(null);
   };
+
+  const selectedReview = reviewsForDisplay.find(
+    review => review.id === selectedReviewId
+  )
 
   return (
     <section id="reviews" className="min-h-screen relative bg-secondary-50 flex flex-col items-center pt-40">
@@ -68,8 +72,6 @@ export default function ReviewsSection() {
           {/* The Modal Component */}
           <Modal isOpen={isModalOpen} onClose={closeModal}>
             {selectedReview && (
-              // We render a non-truncated version of the card inside the modal
-              // Or you can create a dedicated "FullReview" component for a custom layout
               <ReviewCardFull review={selectedReview} onToggleHelpful={handleToggleHelpful} />
             )}
           </Modal>
