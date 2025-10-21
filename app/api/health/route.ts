@@ -6,7 +6,7 @@ export async function GET() {
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
   
   const healthChecks = {
-    database: { status: 'unknown', error: null },
+    database: { status: 'unknown', error: '' },
     auth_endpoints: {}
   };
 
@@ -19,7 +19,7 @@ export async function GET() {
 
     healthChecks.database = dbError 
       ? { status: 'error', error: dbError.message }
-      : { status: 'healthy', error: null };
+      : { status: 'healthy', error: '' };
 
     // 2. Test All Auth Endpoints
     healthChecks.auth_endpoints = {
