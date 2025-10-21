@@ -305,7 +305,7 @@ const BookingPage: React.FC = () => {
     return { returnDate, returnTime };
   };
 
-  const { returnDate, returnTime } = calculateReturnTime();
+  const {  returnTime } = calculateReturnTime();
 
   useEffect(() => {
     const loadCars = async () => {
@@ -514,7 +514,7 @@ const BookingPage: React.FC = () => {
                     onRangeError={setDateRangeError}
                     minDate={dayjs()}
                   />
-                  
+              
                   {/* Show range error in BookingPage if needed */}
                   {dateRangeError && (
                     <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -622,7 +622,7 @@ const BookingPage: React.FC = () => {
                         <span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}
                       </div>
                       <div>
-                        <span className="font-medium">Return:</span> {formatDate(returnDate)} at {returnTime}
+                        <span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {returnTime}
                       </div>
                       <div>
                         <span className="font-medium">Duration:</span> {rentalInfo.duration}
