@@ -42,7 +42,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Calendar */}
-            <div className={`md:col-span-2 ${cardBaseStyle} max-h-136 overflow-y-auto`}>
+            <div className={`md:col-span-2 ${cardBaseStyle} max-h-136 overflow-y-hidden`}>
               <CustomCalendar bookings={ongoingBookings} />
             </div>
           </div>

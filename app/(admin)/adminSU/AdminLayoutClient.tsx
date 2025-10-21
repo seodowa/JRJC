@@ -23,13 +23,16 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           const data = await res.json();
           console.log('User data from session:', data.user);
           setUser(data.user);
+        } else {
+          setUser(null);
         }
       } catch (error) {
         console.error('Failed to fetch session', error);
+        setUser(null);
       }
     };
     fetchSession();
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
       try {
@@ -73,7 +76,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           setIsUserMenuOpen={setIsUserMenuOpen}
           handleLogout={handleLogout}
         />
-        <main className="flex-1 w-full max-w-screen mx-auto p-4 sm:p-6 md:p-8 text-gray-800 overflow-y-auto">
+        <main className="flex-1 w-full max-w-screen mx-auto sm:p-4 md:p-4 text-gray-800 overflow-y-hidden">
             <UserProvider user={user}>
                 {children}
             </UserProvider>

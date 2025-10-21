@@ -6,6 +6,8 @@ import {BookingsIcon, CarsIcon, DashboardIcon, ReviewsIcon} from "@/components/i
 import {LogoutIcon, SettingsIcon} from "@/components/icons/AdminHeaderIcons";
 import AsyncButton from "@/components/AsyncButton";
 
+import LoadingSpinner from "./LoadingSpinner";
+
 interface AdminSidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (isCollapsed: boolean) => void;
@@ -32,7 +34,11 @@ const AdminSidebar = ({ isCollapsed, user, handleLogout }: AdminSidebarProps) =>
         <div className="flex flex-col items-center my-8">
             <div className="w-36 h-36 rounded-full bg-gray-300 mb-4"></div>
             <div>
-                <span className="font-bold text-2xl justify-self-center">{user?.username || 'Admin'}</span>
+                {user ? (
+                    <span className="font-bold text-2xl justify-self-center">{user.username}</span>
+                ) : (
+                    <LoadingSpinner />
+                )}
             </div>
         </div>
       <nav className="flex-grow">
