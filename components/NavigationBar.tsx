@@ -6,7 +6,7 @@ import CloseIcon from "./icons/CloseIcon";
 export default function NavigationBar() {
     // Mapping of navigation item names to their corresponding anchor IDs
     const navigationLinks = {
-        "Booking Tracker": "#", // Assuming this doesn't scroll to a section
+        "Booking Tracker": "/tracker", // Assuming this doesn't scroll to a section
         "Cars": "#cars",
         "Reviews": "#reviews",
         "About Us": "#about-us",
@@ -16,7 +16,7 @@ export default function NavigationBar() {
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
                            bg-[rgba(255,255,255,0.15)] md:backdrop-blur-lg z-50 overflow-hidden">
             <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50 font-main-font">
-                <p className="mr-auto">JRJC</p>
+                <a className="mr-auto" href="/">JRJC</a>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">
                     <HamburgerIcon />
