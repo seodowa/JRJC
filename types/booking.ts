@@ -15,3 +15,37 @@ export interface Booking {
   Transmission_Type: string; // varchar
   Manufacturer_Name: string; // varchar
 }
+
+export interface BookingData {
+  personalInfo: {
+    firstName: string;
+    lastName: string;
+    suffix: string;
+    email: string;
+    mobileNumber: string;
+  };
+  rentalInfo: {
+    area: string;
+    startDate: string;
+    endDate: string;
+    selfDrive: string;
+    duration: string;
+    time: string;
+  };
+  paymentInfo: {
+    referenceNumber: string;
+  };
+  selectedCar: number | null;
+  totalPayment: number;
+  bookingFee: number;
+  carWashFee: number;
+  initialPayment: number;
+}
+
+export interface BookingStatus {
+  customerFirstName: string
+  customerLastName: string
+  carManufacturer: string
+  carModelName: string
+  bookingStatus: string
+}

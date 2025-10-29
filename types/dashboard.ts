@@ -1,4 +1,4 @@
-export interface DashboardCar {
+export interface DashboardData {
     Model_ID: number;
     Model_Name: string;
     Year_Model: number;

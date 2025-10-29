@@ -1,31 +1,6 @@
 // utils/supabase/booking.ts
 import { createClient } from "@/utils/supabase/client";
-
-export interface BookingData {
-  personalInfo: {
-    firstName: string;
-    lastName: string;
-    suffix: string;
-    email: string;
-    mobileNumber: string;
-  };
-  rentalInfo: {
-    area: string;
-    startDate: string;
-    endDate: string;
-    selfDrive: string;
-    duration: string;
-    time: string;
-  };
-  paymentInfo: {
-    referenceNumber: string;
-  };
-  selectedCar: number | null;
-  totalPayment: number;
-  bookingFee: number;
-  carWashFee: number;
-  initialPayment: number;
-}
+import { BookingData, BookingStatus } from "@/types";
 
 const supabase = createClient();
 
@@ -171,3 +146,47 @@ export const fetchBookings = async (filters: Record<string, any> = {}) => {
 
   return data || [];
 };
+
+export const fetchBookingStatus = async (uuid: string) => {
+  try {
+    const { data, error } = await supabase
+    .from("Booking_Details")
+    .select(`
+      Customer (
+        First_Name,
+        Last_Name
+      ),
+      Car_Models (
+        Manufacturer (
+          Manufacturer_Name
+        ),
+        Model_Name
+      ),
+      Booking_Status (
+        Name
+      )
+    `)
+    .eq("Booking_ID", uuid)
+    .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const transformedData: BookingStatus = {
+      customerFirstName: data.Customer.First_Name,
+      customerLastName: data.Customer.Last_Name,
+      carManufacturer: data.Car_Models.Manufacturer.Manufacturer_Name,
+      carModelName: data.Car_Models.Model_Name,
+      bookingStatus: data.Booking_Status.Name
+    };
+
+    return transformedData;
+  } catch(error) {
+    console.error("Error fetching booking status:", error);
+  }
+}
