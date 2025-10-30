@@ -1,6 +1,25 @@
 import AdminLoginForm from "../../../components/admin/AdminLoginForm";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { decrypt } from "@/lib";
 
-export default function AdminSU() {
+export default async function AdminSU() {
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  let session;
+
+  if (sessionCookie) {
+    try {
+      session = await decrypt(sessionCookie);
+    } catch (error) {
+      // Invalid session, show login page
+    }
+  }
+
+  if (session && new Date() < new Date(session.expires)) {
+    redirect("/adminSU/dashboard");
+  }
+
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center justify-center relative
