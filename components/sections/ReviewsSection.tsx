@@ -9,6 +9,7 @@ import { Review, ReviewForDisplay } from "@/types";
 import ReviewCardPreview from "../ReviewCardPreview";
 import ReviewCardFull from "../ReviewCardFull";
 import { LoadingSpinner } from "../LoadingSpinner";
+import { updateHelpfulCount } from "@/lib/supabase/mutations/updateReview";
 
 export default function ReviewsSection() {
   const CAROUSEL_HEIGHT = 25 * 16; // rem * 16 = px
@@ -20,6 +21,7 @@ export default function ReviewsSection() {
 
   const handleToggleHelpful = (clickedId: number) => {
     const id = clickedId; 
+    const currentCount = reviews.filter(review => review.id === id)[0].helpfulCount
 
     setHelpfulMap(currentMap => {
       return {
@@ -27,6 +29,32 @@ export default function ReviewsSection() {
         [id]: !currentMap[id] 
       };
     });
+
+    if (!helpfulMap[id]) {
+      updateHelpfulCount(id, currentCount+1)
+      setReviews(reviews.map((review) => {
+        if (review.id === id) {
+          return {
+            ...review,
+            helpfulCount: currentCount+1
+          }
+        }
+        
+        return review;
+      }))
+    } else {
+      updateHelpfulCount(id, currentCount-1)
+      setReviews(reviews.map((review) => {
+        if (review.id === id) {
+          return {
+            ...review,
+            helpfulCount: currentCount-1
+          }
+        }
+        
+        return review;
+      }))
+    }
   };
 
   // Function to open the modal with the correct review data
