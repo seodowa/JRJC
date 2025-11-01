@@ -1,7 +1,7 @@
 // This is a Server Component
-import { getDashboardCars } from '@/lib/supabase/queries/dashboardCars';
-import { getUser } from '@/lib/supabase/queries/user';
-import { getOngoingBookings } from '@/lib/supabase/queries/ongoingBookings';
+import { fetchDashboardCars } from '@/lib/supabase/queries/fetchDashboardCars';
+import { fetchUser } from '@/lib/supabase/queries/fetchUser';
+import { fetchOngoingBookings } from '@/lib/supabase/queries/fetchOngoingBookings';
 import WelcomeMessage from '@/components/admin/dashboard/WelcomeMessage';
 import Bookings from '@/components/admin/dashboard/Bookings';
 import CustomCalendar from '@/components/admin/dashboard/CustomCalendar';
@@ -14,9 +14,9 @@ export default async function DashboardPage() {
 
   // Fetch all data in parallel
   const [cars, user, ongoingBookings] = await Promise.all([
-    getDashboardCars(),
-    getUser(),
-    getOngoingBookings()
+    fetchDashboardCars(),
+    fetchUser(),
+    fetchOngoingBookings()
   ]);
 
   return (

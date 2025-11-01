@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { Car, Review } from "@/types";
-import { fetchSpecificCar } from "./cars";
+import { fetchSpecificCar } from "./fetchCars";
 
 
 export const fetchReviews = async (): Promise<Review[]> => {

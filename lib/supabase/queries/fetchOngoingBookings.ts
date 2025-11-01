@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { Booking } from '@/types/booking';
 
-export async function getOngoingBookings(): Promise<Booking[]> {
+export async function fetchOngoingBookings(): Promise<Booking[]> {
   const supabase = await createClient();
 
   const { data: bookingsData, error: bookingsError } = await supabase

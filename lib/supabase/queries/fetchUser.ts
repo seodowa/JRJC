@@ -1,6 +1,6 @@
 import { getSession } from '@/lib';
 
-export async function getUser() {
+export async function fetchUser() {
   const session = await getSession();
   return session?.user || null;
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { fetchBookingStatus } from "@/lib/supabase/queries/booking";
+import { fetchBookingStatus } from "@/lib/supabase/queries/fetchBooking";
 import { BookingStatus } from "@/types";
 import { useEffect, useRef, useState } from "react";
 

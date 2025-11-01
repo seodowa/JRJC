@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchBookings } from '@/lib/supabase/queries/booking';
+import { fetchBookings } from '@/lib/supabase/queries/fetchBooking';
 import { Booking } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 

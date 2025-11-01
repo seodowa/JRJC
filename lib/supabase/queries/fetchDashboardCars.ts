@@ -1,8 +1,8 @@
 
 import { createClient } from '@/utils/supabase/server';
-import { DashboardCar } from '@/types/dashboard';
+import { DashboardData } from '@/types/dashboard';
 
-export async function getDashboardCars(): Promise<DashboardCar[]> {
+export async function fetchDashboardCars(): Promise<DashboardData[]> {
   const supabase = await createClient();
 
   const { data: carsData, error: carsError } = await supabase
@@ -66,5 +66,5 @@ export async function getDashboardCars(): Promise<DashboardCar[]> {
     };
   }));
 
-  return (cars as DashboardCar[]) || [];
+  return (cars as DashboardData[]) || [];
 }
