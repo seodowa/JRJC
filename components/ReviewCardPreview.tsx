@@ -19,7 +19,7 @@ export default function ReviewCardPreview({ review, onCardClick, onToggleHelpful
 
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg hover:cursor-pointer 
-                      transition-shadow p-6 relative min-w-xs max-w-xs md:min-w-md 
+                     p-6 relative min-w-xs max-w-xs md:min-w-md transition-transform hover:scale-105
                       md:max-w-md lg:min-w-lg lg:max-w-lg"
          onClick={() => onCardClick(review.id)}
     >

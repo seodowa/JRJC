@@ -12,7 +12,7 @@ export default function HeroSection() {
             <h1 className="font-extrabold text-8xl text-[#578FCA]">JRJC</h1>
             <h3 className="pt-2 pb-9 text-2xl">Car Rental Services</h3>
             <a href="book" className="bg-secondary-100 py-2 md:py-3 px-16 md:px-16 
-                                  text-2xl md:text-3xl text-white rounded-full 
+                                  text-2xl md:text-3xl text-white rounded-full transition-transform hover:scale-110
                                   shadow-md">Book Now</a>
           </div>
        </div>
