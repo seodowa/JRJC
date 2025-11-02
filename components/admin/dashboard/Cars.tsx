@@ -1,8 +1,9 @@
 import React from 'react';
-import { DashboardCar } from '@/types/dashboard';
+
+import {DashboardCarData} from "@/types";
 
 interface CarsProps {
-  cars: DashboardCar[];
+  cars: DashboardCarData[];
 }
 
 const Cars: React.FC<CarsProps> = ({ cars }) => {
