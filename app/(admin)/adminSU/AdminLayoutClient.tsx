@@ -76,7 +76,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           setIsUserMenuOpen={setIsUserMenuOpen}
           handleLogout={handleLogout}
         />
-        <main className="flex-1 w-full max-w-screen mx-auto sm:p-4 md:p-4 text-gray-800 overflow-y-hidden">
+        <main className="flex-1 w-full max-w-screen mx-auto sm:p-4 md:p-8 text-gray-800 md:overflow-y-hidden sm:overflow-y-auto">
             <UserProvider user={user}>
                 {children}
             </UserProvider>
