@@ -2,42 +2,47 @@
 import { useState } from 'react'
 import { Star, X } from 'lucide-react'
 import { useReviewSubmission } from '@/hooks/useReviewSubmissions'
+import { CARS } from '@/lib/data/cars'
 
 interface ReviewFormData {
     name: string
     rating: number
     title: string
     body: string
+    carId?: number
 }
 
 interface WriteReviewProps {
     carName?: string
     carId?: number
     onClose?: () => void
+    allowCarSelection?: boolean
 }
 
 export default function ComposeReviewPage({
-    carName = "Tesla Model 3",
+    carName,
     carId,
-    onClose
+    onClose,
+    allowCarSelection = true
 }: WriteReviewProps) {
     const [formData, setFormData] = useState<ReviewFormData>({
         name: '',
         rating: 0,
         title: '',
-        body: ''
+        body: '',
+        carId: carId
     })
     const [hoveredRating, setHoveredRating] = useState(0)
     const [errors, setErrors] = useState<Partial<Record<keyof ReviewFormData, string>>>({})
     const [submitSuccess, setSubmitSuccess] = useState(false)
 
     const { submitReview, isSubmitting, error: submissionError } = useReviewSubmission({
-        carId,
+        carId: formData.carId,
         onSuccess: () => {
             setSubmitSuccess(true)
-            console.log('Review submitted successfully', formData)
+            console.log('Review submitted successfully', getSelectedCarName())
             setTimeout(() => {
-                setFormData({ name: '', rating: 0, title: '', body: '' })
+                setFormData({ name: '', rating: 0, title: '', body: '', carId: carId })
                 setSubmitSuccess(false)
                 onClose?.()
             }, 2000)
@@ -52,9 +57,18 @@ export default function ComposeReviewPage({
         setErrors(prev => ({ ...prev, rating: undefined }))
     }
 
-    const handleChange = (field: keyof ReviewFormData, value: string) => {
+    const handleChange = (field: keyof ReviewFormData, value: string | number | undefined) => {
         setFormData(prev => ({ ...prev, [field]: value }))
         setErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+
+    const getSelectedCarName = () => {
+        if (carName) return carName
+        if (formData.carId) {
+            const car = CARS.find(c => c.id === formData.carId)
+            return car ? `${car.year} ${car.brand} ${car.model}` : undefined
+        }
+        return undefined
     }
 
     const validate = (): boolean => {
@@ -92,8 +106,8 @@ export default function ComposeReviewPage({
                 <div className="mb-6 main-w-2xl">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Write a Review</h2>
-                        {carName && (
-                            <p className="text-gray-600 mt-1">Reviewing: <span className="font-medium">{carName}</span></p>
+                        {getSelectedCarName() && (
+                            <p className="text-gray-600 mt-1">Reviewing: <span className="font-medium">{getSelectedCarName()}</span></p>
                         )}
                     </div>
                     {onClose && (
@@ -122,6 +136,32 @@ export default function ComposeReviewPage({
 
                 {/* Form */}
                 <form className="space-y-6 max-w-xl">
+                    {/* Car Selection Field */}
+                    {allowCarSelection && !carId && (
+                        <div>
+                            <label htmlFor="carId" className="block text-sm font-medium text-gray-700 mb-1">
+                                Select Car <span className="text-gray-500">(Optional)</span>
+                            </label>
+                            <select
+                                id="carId"
+                                value={formData.carId || ''}
+                                onChange={(e) => handleChange('carId', e.target.value ? Number(e.target.value) : undefined)}
+                                className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                disabled={isSubmitting}
+                            >
+                                <option value="">General Review (No specific car)</option>
+                                {CARS.map((car) => (
+                                    <option key={car.id} value={car.id}>
+                                        {car.year} {car.brand} {car.model}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Choose a car to review, or leave blank for a general review
+                            </p>
+                        </div>
+                    )}
+
                     {/* Name Field */}
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
