@@ -1,7 +1,7 @@
 'use client'
-
 import { useState } from 'react'
 import { Star, X } from 'lucide-react'
+import { useReviewSubmission } from '@/hooks/useReviewSubmissions'
 
 interface ReviewFormData {
     name: string
@@ -12,13 +12,13 @@ interface ReviewFormData {
 
 interface WriteReviewProps {
     carName?: string
-    onSubmit?: (data: ReviewFormData) => Promise<void>
+    carId?: number
     onClose?: () => void
 }
 
 export default function ComposeReviewPage({
     carName = "Tesla Model 3",
-    onSubmit,
+    carId,
     onClose
 }: WriteReviewProps) {
     const [formData, setFormData] = useState<ReviewFormData>({
@@ -28,9 +28,24 @@ export default function ComposeReviewPage({
         body: ''
     })
     const [hoveredRating, setHoveredRating] = useState(0)
-    const [errors, setErrors] = useState<Partial<ReviewFormData>>({})
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Partial<Record<keyof ReviewFormData, string>>>({})
     const [submitSuccess, setSubmitSuccess] = useState(false)
+
+    const { submitReview, isSubmitting, error: submissionError } = useReviewSubmission({
+        carId,
+        onSuccess: () => {
+            setSubmitSuccess(true)
+            console.log('Review submitted successfully', formData)
+            setTimeout(() => {
+                setFormData({ name: '', rating: 0, title: '', body: '' })
+                setSubmitSuccess(false)
+                onClose?.()
+            }, 2000)
+        },
+        onError: (error) => {
+            console.error('Review submission failed:', error)
+        }
+    })
 
     const handleStarClick = (rating: number) => {
         setFormData(prev => ({ ...prev, rating }))
@@ -43,67 +58,36 @@ export default function ComposeReviewPage({
     }
 
     const validate = (): boolean => {
-        const newErrors: Partial<ReviewFormData> = {}
-
+        const newErrors: Partial<Record<keyof ReviewFormData, string>> = {}
         if (!formData.name.trim()) {
             newErrors.name = 'Name is required'
         }
-
         if (formData.rating === 0) {
             newErrors.rating = 'Please select a rating'
         }
-
         if (!formData.title.trim()) {
             newErrors.title = 'Title is required'
         }
-
         if (!formData.body.trim()) {
             newErrors.body = 'Review text is required'
         } else if (formData.body.trim().length < 10) {
             newErrors.body = 'Review must be at least 10 characters'
         }
-
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-
         if (!validate()) return
-
-        setIsSubmitting(true)
-
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500))
-
-            if (onSubmit) {
-                await onSubmit(formData)
-            }
-
-            // Success
-            setSubmitSuccess(true)
-
-            // Reset form after 2 seconds
-            setTimeout(() => {
-                setFormData({ name: '', rating: 0, title: '', body: '' })
-                setSubmitSuccess(false)
-                if (onClose) onClose()
-            }, 2000)
-
-        } catch (error) {
-            alert('Failed to submit review. Please try again.')
-        } finally {
-            setIsSubmitting(false)
-        }
+        await submitReview(formData)
     }
 
     const displayRating = hoveredRating || formData.rating
 
     return (
         <div className='w-full min-h-screen -mt-12 bg-secondary-50 py-16 overflow-y-auto'>
-            <div className="w-full max-w-2xl mx-auto bg-transparent rounded-lg px-8 ">
+            <div className="w-full max-w-2xl mx-auto bg-transparent rounded-lg px-8">
                 {/* Header */}
                 <div className="mb-6 main-w-2xl">
                     <div>
@@ -129,6 +113,13 @@ export default function ComposeReviewPage({
                     </div>
                 )}
 
+                {/* Error Message */}
+                {submissionError && (
+                    <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded">
+                        <p className="text-red-800 font-medium">✗ {submissionError}</p>
+                    </div>
+                )}
+
                 {/* Form */}
                 <form className="space-y-6 max-w-xl">
                     {/* Name Field */}
@@ -141,8 +132,9 @@ export default function ComposeReviewPage({
                             type="text"
                             value={formData.name}
                             onChange={(e) => handleChange('name', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-400'
-                                }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                errors.name ? 'border-red-500' : 'border-gray-400'
+                            }`}
                             placeholder="Enter your name"
                             disabled={isSubmitting}
                         />
@@ -169,10 +161,11 @@ export default function ComposeReviewPage({
                                 >
                                     <Star
                                         size={32}
-                                        className={`${star <= displayRating
+                                        className={`${
+                                            star <= displayRating
                                                 ? 'text-yellow-400 fill-current'
                                                 : 'text-gray-400'
-                                            } transition-colors`}
+                                        } transition-colors`}
                                     />
                                 </button>
                             ))}
@@ -197,8 +190,9 @@ export default function ComposeReviewPage({
                             type="text"
                             value={formData.title}
                             onChange={(e) => handleChange('title', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.title ? 'border-red-500' : 'border-gray-400'
-                                }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                errors.title ? 'border-red-500' : 'border-gray-400'
+                            }`}
                             placeholder="Summarize your experience"
                             maxLength={100}
                             disabled={isSubmitting}
@@ -227,8 +221,9 @@ export default function ComposeReviewPage({
                             value={formData.body}
                             onChange={(e) => handleChange('body', e.target.value)}
                             rows={6}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${errors.body ? 'border-red-500' : 'border-gray-400'
-                                }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+                                errors.body ? 'border-red-500' : 'border-gray-400'
+                            }`}
                             placeholder="Share details of your experience..."
                             maxLength={500}
                             disabled={isSubmitting}
@@ -253,10 +248,11 @@ export default function ComposeReviewPage({
                             type="button"
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            className={`flex-1 py-3 px-6 hover:cursor-pointer rounded-lg font-semibold text-white transition-colors ${isSubmitting
+                            className={`flex-1 py-3 px-6 hover:cursor-pointer rounded-lg font-semibold text-white transition-colors ${
+                                isSubmitting
                                     ? 'bg-blue-400 cursor-not-allowed'
                                     : 'bg-blue-600 hover:bg-blue-700'
-                                }`}
+                            }`}
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center justify-center">
@@ -297,4 +293,3 @@ export default function ComposeReviewPage({
         </div>
     )
 }
-
