@@ -22,13 +22,13 @@ export default async function DashboardPage() {
   return (
     <div className="p-2 md:p-4 min-h-screen">
       <RealtimeRefresher />
-      <div className="grid grid-cols-1 xl:grid-cols-3 xl:gap-6 space-y-6 xl:space-y-0">
+      <div className="grid grid-cols-1 xl:grid-cols-3 xl:gap-6 space-y-6 xl:space-y-0 xl:items-stretch">
 
         {/* Main content area (Left) */}
         <div className="xl:col-span-2 flex flex-col gap-6">
 
           {/* Top row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-shrink-0">
 
             {/* Welcome & Bookings Column */}
             <div className="md:col-span-1 flex flex-col gap-6">
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Bottom row: Recent Feedback */}
-          <div className={`${cardBaseStyle} max-h-96 overflow-y-auto`}>
+          <div className={`${cardBaseStyle} flex-grow overflow-y-auto`}>
             <RecentFeedback />
           </div>
         </div>

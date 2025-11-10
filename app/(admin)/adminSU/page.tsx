@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { decrypt } from "@/lib";
 
 export default async function AdminSU() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session")?.value;
   let session;
 
