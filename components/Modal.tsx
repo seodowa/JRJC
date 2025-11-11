@@ -20,13 +20,13 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     >
       {/* Modal content - stop propagation to prevent closing when clicking inside */}
       <div 
-        className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full m-4"
+        className="relative bg-transparent rounded-xl max-w-2xl w-full m-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition-colors z-99"
+          className="absolute top-7 right-7 text-gray-400 hover:text-gray-800 hover:cursor-pointer transition-colors z-99"
         >
           <X size={24} />
         </button>

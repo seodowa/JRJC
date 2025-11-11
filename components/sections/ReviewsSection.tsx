@@ -122,9 +122,6 @@ export default function ReviewsSection() {
         )
   }
 
-  console.log(TOP_FIVE_REVIEWS)
-
-
   return (
     <section id="reviews" className="min-h-screen relative bg-secondary-50 flex flex-col items-center pt-40">
         <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl py-4 text-center">Customer Reviews</h1>

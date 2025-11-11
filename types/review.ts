@@ -12,5 +12,5 @@ export interface Review {
 }
 
 export interface ReviewForDisplay extends Review {
-  isHelpful: boolean
+  isHelpful?: boolean
 }

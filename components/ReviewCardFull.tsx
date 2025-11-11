@@ -7,18 +7,20 @@ import { getTimeAgo } from "@/utils/dateUtils"
 
 interface ReviewCardFullProps {
   review: ReviewForDisplay;
-  onToggleHelpful: (id: number) => void;
+  onToggleHelpful?: (id: number) => void;
 }
 
 // Review Card Component
 export default function ReviewCardFull({ review, onToggleHelpful }: ReviewCardFullProps) {
   const handleHelpful = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onToggleHelpful(review.id);
+
+    if (onToggleHelpful)
+      onToggleHelpful(review.id);
   }
 
   return (
-    <div className="bg-transparent transition-shadow p-6 relative">
+    <div className="bg-white transition-shadow shadow-md p-6 relative rounded-xl">
 
       {/* Header - User Info */}
       <div className="flex items-start justify-between mb-4">
