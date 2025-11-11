@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { Star, X } from 'lucide-react'
 import { useReviewSubmission } from '@/hooks/useReviewSubmissions'
 import { CARS } from '@/lib/data/cars'
+import { toast } from 'sonner'
+import { redirect } from 'next/navigation'
 
 interface ReviewFormData {
     name: string
@@ -41,14 +43,18 @@ export default function ComposeReviewPage({
         onSuccess: () => {
             setSubmitSuccess(true)
             console.log('Review submitted successfully', getSelectedCarName())
+          
+            setFormData({ name: '', rating: 0, title: '', body: '', carId: carId })
+
             setTimeout(() => {
-                setFormData({ name: '', rating: 0, title: '', body: '', carId: carId })
                 setSubmitSuccess(false)
                 onClose?.()
-            }, 2000)
+                redirect("/#reviews")
+            }, 1000)
         },
         onError: (error) => {
             console.error('Review submission failed:', error)
+       
         }
     })
 
@@ -120,19 +126,6 @@ export default function ComposeReviewPage({
                     )}
                 </div>
 
-                {/* Success Message */}
-                {submitSuccess && (
-                    <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded">
-                        <p className="text-green-800 font-medium">✓ Review submitted successfully!</p>
-                    </div>
-                )}
-
-                {/* Error Message */}
-                {submissionError && (
-                    <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded">
-                        <p className="text-red-800 font-medium">✗ {submissionError}</p>
-                    </div>
-                )}
 
                 {/* Form */}
                 <form className="space-y-6 max-w-xl">
@@ -282,6 +275,20 @@ export default function ComposeReviewPage({
                         </div>
                     </div>
 
+                    {/* Success Message */}
+                    {submitSuccess && (
+                        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded">
+                            <p className="text-green-800 font-medium">✓ Review submitted successfully!</p>
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {submissionError && (
+                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded">
+                            <p className="text-red-800 font-medium">✗ {submissionError}</p>
+                        </div>
+                    )}
+
                     {/* Submit Buttons */}
                     <div className="flex gap-3 pt-4">
                         <button
@@ -317,6 +324,7 @@ export default function ComposeReviewPage({
                             </button>
                         )}
                     </div>
+
                 </form>
 
                 {/* Guidelines */}
