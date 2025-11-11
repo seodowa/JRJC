@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchReviews } from '@/lib/supabase/queries/fetchReviews';
+import { fetchAllReviews } from '@/lib/supabase/queries/fetchReviews';
 import { Review } from '@/types';
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -52,7 +52,7 @@ const RecentFeedback = () => {
     const getReviews = async () => {
       setLoading(true);
       try {
-        let fetchedReviews = await fetchReviews();
+        let fetchedReviews = await fetchAllReviews();
         
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
