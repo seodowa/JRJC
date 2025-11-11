@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { Star, X } from 'lucide-react'
 import { useReviewSubmission } from '@/hooks/useReviewSubmissions'
 import { CARS } from '@/lib/data/cars'
-import { toast } from 'sonner'
 import { redirect } from 'next/navigation'
 
 interface ReviewFormData {

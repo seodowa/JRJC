@@ -1,7 +1,7 @@
 "use client";
 
 import "@/app/globals.css";
-import { REVIEWS } from "@/lib/data/reviews";
+import { TOP_FIVE_REVIEWS } from "@/lib/data/reviews";
 import Carousel from "../Carousel";
 import Modal from "../Modal";
 import { useEffect, useMemo, useState } from "react";
@@ -10,11 +10,10 @@ import ReviewCardPreview from "../ReviewCardPreview";
 import ReviewCardFull from "../ReviewCardFull";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { updateHelpfulCount } from "@/lib/supabase/mutations/updateReview";
-import WriteReview from "../ComposeReview";
 
 export default function ReviewsSection() {
   const CAROUSEL_HEIGHT = 25 * 16; // rem * 16 = px
-  const [reviews, setReviews] = useState<Review[]>(REVIEWS);
+  const [reviews, setReviews] = useState<Review[]>(TOP_FIVE_REVIEWS);
   const [isFullReviewModalOpen, setisFullReviewModalOpen] = useState(false);
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
@@ -123,11 +122,14 @@ export default function ReviewsSection() {
         )
   }
 
+  console.log(TOP_FIVE_REVIEWS)
+
+
   return (
     <section id="reviews" className="min-h-screen relative bg-secondary-50 flex flex-col items-center pt-40">
         <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl py-4 text-center">Customer Reviews</h1>
         <div className="flex justify-center items-start w-screen">
-          {REVIEWS.length > 0 && (
+          {TOP_FIVE_REVIEWS.length > 0 && (
             <Carousel 
               items={reviewsForDisplay} 
               renderItem={(review) => <ReviewCardPreview review={review} onCardClick={handleCardClick} onToggleHelpful={handleToggleHelpful} />}
@@ -142,7 +144,7 @@ export default function ReviewsSection() {
             )}
           </Modal>
 
-          {REVIEWS.length <= 0 && (
+          {TOP_FIVE_REVIEWS.length <= 0 && (
             <p className="font-main-font pt-16 text-xl md:text-2xl">No reviews yet. Be the first to leave a review.</p>
           )}
 

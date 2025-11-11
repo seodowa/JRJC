@@ -1,3 +1,4 @@
-import { fetchReviews } from "../supabase/queries/fetchReviews";
+import { fetchAllReviews, fetchTopFiveReviews } from "../supabase/queries/fetchReviews";
 
-export const REVIEWS = await fetchReviews();
+export const TOP_FIVE_REVIEWS = await fetchTopFiveReviews();
+export const ALL_REVIEWS = await fetchAllReviews();
