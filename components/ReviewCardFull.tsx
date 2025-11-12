@@ -3,21 +3,27 @@
 import { ReviewForDisplay } from "@/types"
 import { Star, ThumbsUp } from "lucide-react"
 import { getTimeAgo } from "@/utils/dateUtils"
+import { useEffect, useState } from "react";
 
 
 interface ReviewCardFullProps {
   review: ReviewForDisplay;
-  onToggleHelpful?: (id: number) => void;
+  onToggleHelpful: (id: number) => void;
 }
 
 // Review Card Component
 export default function ReviewCardFull({ review, onToggleHelpful }: ReviewCardFullProps) {
+  const [timeAgo, setTimeAgo] = useState<string>('')
+  
   const handleHelpful = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    if (onToggleHelpful)
-      onToggleHelpful(review.id);
+    onToggleHelpful(review.id);
   }
+
+  useEffect(() => {
+    setTimeAgo(getTimeAgo(new Date(review.createdAt)))
+  }, [review.createdAt])
 
   return (
     <div className="bg-white transition-shadow shadow-md p-6 relative rounded-xl">
@@ -51,7 +57,7 @@ export default function ReviewCardFull({ review, onToggleHelpful }: ReviewCardFu
           ))}
           <span className="ml-2 font-semibold text-gray-900">{review.rating}.0</span>
         </div>
-        <span className="text-sm text-gray-500">{getTimeAgo(new Date(review.createdAt))}</span>
+        <span className="text-sm text-gray-500">{timeAgo}</span>
       </div>
 
       {/* Review Title */}

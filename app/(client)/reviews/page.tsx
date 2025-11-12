@@ -1,29 +1,85 @@
 "use client"
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ALL_REVIEWS } from "@/lib/data/reviews";
 import { ChevronDown, Filter, Star } from "lucide-react";
 import ReviewCardFull from "@/components/ReviewCardFull";
+import { Review } from "@/types";
+import { updateHelpfulCount } from "@/lib/supabase/mutations/updateReview";
 
 const ReviewsPage = () => {
   const [sortBy, setSortBy] = useState<'recent' | 'helpful'>('recent')
   const [filterRating, setFilterRating] = useState<number | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [reviews, setReviews] = useState<Review[]>(ALL_REVIEWS)
+  const [helpfulMap, setHelpfulMap] = useState<Record<number, boolean>>({});
+  const [mounted, setMounted] = useState(false) 
+
+  const handleToggleHelpful = (clickedId: number) => {
+    const id = clickedId; 
+    const currentCount = reviews.filter(review => review.id === id)[0].helpfulCount
+
+    setHelpfulMap(currentMap => {
+      return {
+        ...currentMap,
+        [id]: !currentMap[id] 
+      };
+    });
+
+    if (!helpfulMap[id]) {
+      updateHelpfulCount(id, currentCount+1)
+      setReviews(reviews.map((review) => {
+        if (review.id === id) {
+          return {
+            ...review,
+            helpfulCount: currentCount+1
+          }
+        }
+        
+        return review;
+      }))
+    } else {
+      updateHelpfulCount(id, currentCount-1)
+      setReviews(reviews.map((review) => {
+        if (review.id === id) {
+          return {
+            ...review,
+            helpfulCount: currentCount-1
+          }
+        }
+        
+        return review;
+      }))
+    }
+  };
+
+   // This hook creates the final array for your UI
+  const reviewsForDisplay = useMemo(() => {
+    // Loop over the server data
+    return reviews.map(review => {
+      return {
+        ...review,
+        // Create the 'isHelpful' prop on the fly
+        // by looking it up in the client state map
+        isHelpful: helpfulMap[review.id] || false
+      };
+    });
+  }, [reviews, helpfulMap]); // Dependencies
 
   // Calculate rating statistics
   const ratingStats = useMemo(() => {
     const stats = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
-    ALL_REVIEWS.forEach(review => {
+    reviewsForDisplay.forEach(review => {
       stats[review.rating as keyof typeof stats]++
     })
-    const total = ALL_REVIEWS.length
-    const average = ALL_REVIEWS.reduce((sum, r) => sum + r.rating, 0) / total
+    const total = reviewsForDisplay.length
+    const average = reviewsForDisplay.reduce((sum, r) => sum + r.rating, 0) / total
     return { stats, total, average }
-  }, [])
+  }, [reviewsForDisplay])
 
   // Filter and sort reviews
   const filteredReviews = useMemo(() => {
-    let filtered = [...ALL_REVIEWS]
+    let filtered = [...reviewsForDisplay]
 
     // Filter by rating
     if (filterRating !== null) {
@@ -38,7 +94,66 @@ const ReviewsPage = () => {
     }
 
     return filtered
-  }, [sortBy, filterRating])
+  }, [sortBy, filterRating, reviewsForDisplay])
+
+
+  // 3. This NEW effect runs *only* on the client, *after* hydration
+  useEffect(() => {
+    // Now, load the state from localStorage
+    try {
+      const storedMap = localStorage.getItem('helpfulVotes');
+      if (storedMap) {
+        const parsed = JSON.parse(storedMap)
+        setHelpfulMap(parsed);
+        setReviews(prevReviews => 
+          prevReviews.map(review => {
+            if (parsed[review.id] && !helpfulMap[review.id]) {
+              // User had voted before, increment count
+              return { ...review, helpfulCount: review.helpfulCount }
+            }
+            return review
+          })
+        )
+      }
+    } catch (error) {
+      console.error('Failed to parse helpful votes', error);
+    }
+
+    setMounted(true)
+  }, []); // Empty array runs ONCE on mount
+
+
+  useEffect(() => {
+    if (!mounted) return
+    try {
+        // Convert the object into a JSON string and save it
+        localStorage.setItem('helpfulVotes', JSON.stringify(helpfulMap));
+      } catch (error) {
+        console.error('Failed to save helpful votes to localStorage', error);
+      }
+  }, [helpfulMap]); // The dependency array
+
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-main-color -mt-12 pt-12">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-12 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/2 mb-8"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className="lg:col-span-1 bg-gray-200 h-96 rounded"></div>
+              <div className="lg:col-span-3 space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-gray-200 h-48 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-main-color -mt-12 pt-12">
@@ -178,7 +293,7 @@ const ReviewsPage = () => {
             {filteredReviews.length > 0 ? (
               <div className="space-y-6">
                 {filteredReviews.map(review => (
-                  <ReviewCardFull key={review.id} review={review} />
+                  <ReviewCardFull key={review.id} review={review} onToggleHelpful={handleToggleHelpful}/>
                 ))}
               </div>
             ) : (
