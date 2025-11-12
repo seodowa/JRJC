@@ -32,7 +32,7 @@ const ReviewsPage = () => {
 
     // Sort
     if (sortBy === 'recent') {
-      filtered.sort((a, b) => (b.createdAt - a.createdAt))
+      filtered.sort((a, b) => (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()))
     } else if (sortBy === 'helpful') {
       filtered.sort((a, b) => b.helpfulCount - a.helpfulCount)
     }
@@ -54,7 +54,7 @@ const ReviewsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Filters */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+            <div className="bg-white rounded-lg shadow-md p-6 sticky top-16">
               {/* Mobile Filter Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
