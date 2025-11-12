@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.57.4",
     "@types/nodemailer": "^7.0.2",
     "dayjs": "^1.11.18",
+    "framer-motion": "^12.23.24",
     "jose": "^6.1.0",
     "lucide": "^0.544.0",
     "lucide-react": "^0.544.0",

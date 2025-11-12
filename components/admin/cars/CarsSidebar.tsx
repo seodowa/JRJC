@@ -9,7 +9,6 @@ interface CarsSidebarProps {
 const CarsSidebar = ({ cars }: CarsSidebarProps) => {
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Manage Cars</h2>
       <AsyncButton
         href="/adminSU/cars/new" 
         className="bg-white text-black px-4 py-4 rounded-xl hover:bg-[#A1E3F9] w-full block text-center mb-4 border border-gray-300"

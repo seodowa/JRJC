@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Car } from "@/types";
 import DeleteCarButton from "./DeleteCarButton";
+import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon"; // Import the new icon
 
 interface AdminCarCardProps {
   car: Car;
@@ -12,14 +13,18 @@ const AdminCarCard = ({ car }: AdminCarCardProps) => {
   return (
     <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 border border-gray-300 rounded-lg p-4 shadow-sm">
       {/* Image */}
-      <div className="w-full md:w-[250px] flex-shrink-0">
-        <Image
-          src={car.image || "/images/kentb_car.webp"} // Placeholder image
-          alt={`${car.brand} ${car.model}`}
-          width={250}
-          height={250}
-          className="object-cover rounded-lg w-full h-full"
-        />
+      <div className="w-full md:w-[250px] flex-shrink-0 flex items-center justify-center bg-gray-100 rounded-lg"> {/* Added flex, items-center, justify-center, bg-gray-100 */}
+        {car.image ? (
+          <Image
+            src={car.image}
+            alt={`${car.brand} ${car.model}`}
+            width={250}
+            height={250}
+            className="object-cover rounded-lg w-full h-full"
+          />
+        ) : (
+          <CarPlaceholderIcon className="w-32 h-32 text-gray-400" /> // Render the SVG icon
+        )}
       </div>
 
       {/* Details */}
@@ -42,7 +47,9 @@ const AdminCarCard = ({ car }: AdminCarCardProps) => {
         {car.price?.map((priceInfo) => (
           <div key={priceInfo.Location} className="mb-3">
             <p className="font-semibold">{priceInfo.Location}:</p>
-            <p>₱{priceInfo.Price_12_Hours}/12hrs</p>
+            {priceInfo.Location !== "Outside Region 10" && (
+                <p>₱{priceInfo.Price_12_Hours}/12hrs</p>
+            )}
             <p>₱{priceInfo.Price_24_Hours}/24hrs</p>
           </div>
         ))}
