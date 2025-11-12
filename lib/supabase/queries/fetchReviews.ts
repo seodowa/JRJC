@@ -46,7 +46,8 @@ export const fetchTopFiveReviews = async (): Promise<Review[]> => {
         .from("Reviews")
         .select("*")
         .eq("rating", 5)
-        .order("created_at", {ascending: false});
+        .order("created_at", {ascending: false})
+        .limit(5);
 
         if (reviewsError) {
             throw new Error(reviewsError.message);
