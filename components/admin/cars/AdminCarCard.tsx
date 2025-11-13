@@ -1,15 +1,44 @@
 // components/admin/cars/AdminCarCard.tsx
+'use client';
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Car } from "@/types";
-import DeleteCarButton from "./DeleteCarButton";
+import AsyncButton from "@/components/AsyncButton";
+import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon"; // Import the new icon
 
 interface AdminCarCardProps {
   car: Car;
+  onEditCar: (car: Car) => void;
 }
 
-const AdminCarCard = ({ car }: AdminCarCardProps) => {
+const AdminCarCard = ({ car, onEditCar }: AdminCarCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    // TODO: Implement actual delete logic
+    // This will involve:
+    // 1. Calling a server action or API route to delete the car from the database.
+    // 2. Handling success (e.g., refreshing the page or removing the item from the list).
+    // 3. Handling errors.
+    console.log(`Placeholder: Deleting car with ID: ${car.id}`);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setIsDeleting(false);
+    setIsModalOpen(false);
+    // Maybe show a toast notification here.
+    alert(`Placeholder: Deleted car with ID: ${car.id}`);
+  };
+
   return (
     <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 border border-gray-300 rounded-lg p-4 shadow-sm">
       {/* Image */}
@@ -35,10 +64,18 @@ const AdminCarCard = ({ car }: AdminCarCardProps) => {
         <p>Seats: {car.seats}</p>
         
         <div className="mt-4 flex gap-2">
-          <Link href={`/adminSU/cars/edit/${car.id}`} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+          <AsyncButton
+            onClick={() => onEditCar(car)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
             Edit
-          </Link>
-          <DeleteCarButton carId={car.id} />
+          </AsyncButton>
+          <AsyncButton 
+            onClick={handleDeleteClick}
+            className="bg-red-400 text-white px-4 py-2 rounded-md hover:bg-red-600"
+          >
+            Delete
+          </AsyncButton>
         </div>
       </div>
 
@@ -54,6 +91,16 @@ const AdminCarCard = ({ car }: AdminCarCardProps) => {
           </div>
         ))}
       </div>
+
+      {/* ConfirmationModal for deletion */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete the car "${car.brand} ${car.model} (${car.year})"? This action cannot be undone.`}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

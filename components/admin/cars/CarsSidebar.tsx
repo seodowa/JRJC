@@ -1,17 +1,19 @@
 // components/admin/cars/CarsSidebar.tsx
+import Link from "next/link";
 import { Car } from "@/types";
 import AsyncButton from "@/components/AsyncButton";
 
 interface CarsSidebarProps {
   cars: Car[];
+  onAddNewCar: () => void;
 }
 
-const CarsSidebar = ({ cars }: CarsSidebarProps) => {
+const CarsSidebar = ({ cars, onAddNewCar }: CarsSidebarProps) => {
   return (
     <div>
       <AsyncButton
-        href="/adminSU/cars/new" 
-        className="bg-white text-black px-4 py-4 rounded-xl hover:bg-[#A1E3F9]/90 w-full block text-center mb-4 border border-gray-400"
+        onClick={onAddNewCar}
+        className="bg-white text-black px-4 py-4 rounded-xl hover:bg-[#A1E3F9] w-full block text-center mb-4 border border-gray-400"
       >
         + Add a new car
       </AsyncButton>
