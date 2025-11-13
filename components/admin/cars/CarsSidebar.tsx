@@ -11,17 +11,17 @@ const CarsSidebar = ({ cars }: CarsSidebarProps) => {
     <div>
       <AsyncButton
         href="/adminSU/cars/new" 
-        className="bg-white text-black px-4 py-4 rounded-xl hover:bg-[#A1E3F9] w-full block text-center mb-4 border border-gray-300"
+        className="bg-white text-black px-4 py-4 rounded-xl hover:bg-[#A1E3F9]/90 w-full block text-center mb-4 border border-gray-400"
       >
         + Add a new car
       </AsyncButton>
       <nav>
         <ul>
           {cars.map((car) => (
-            <li key={car.id} className="border-y border-gray-300">
+            <li key={car.id} className="border-y border-gray-400">
               <a 
                 href={`#car-id-${car.id}`} 
-                className="block p-4 hover:bg-gray-200 whitespace-nowrap overflow-hidden text-ellipsis text-sm text-center"
+                className="block p-4 hover:bg-gray-200 whitespace-nowrap overflow-hidden text-black text-sm text-center"
               >
                 {`${car.brand} ${car.model} ${car.year}`}
               </a>

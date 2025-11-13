@@ -2,12 +2,12 @@
 import { createClient } from "@/utils/supabase/client";
 import { Car, CarPricing } from "@/types";
 
-export const fetchCars = async (): Promise<Car[]> => {
+export const fetchCars = async (query?: string): Promise<Car[]> => {
   const supabase = createClient();
   
   try {
     const { data: carsData, error: carsError } = await supabase
-      .from("Car_Models")
+      .rpc('search_cars', { search_term: query || '' })
       .select(`
         *,
         Transmission_Types (
@@ -24,8 +24,6 @@ export const fetchCars = async (): Promise<Car[]> => {
     if (carsError) {
       throw new Error(carsError.message);
     }
-
-    
 
     // Transform the data to match the Car type
     const transformedCars: Car[] = await Promise.all(carsData?.map(async (car) => {

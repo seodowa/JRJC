@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { GridViewIcon, ListViewIcon } from "@/components/icons/ViewToggleIcons";
 
 interface ViewToggleProps {
@@ -8,23 +9,35 @@ interface ViewToggleProps {
 }
 
 const ViewToggle = ({ view, setView }: ViewToggleProps) => {
-    const isGridView = view === 'grid';
-
     return (
         <div className="flex items-center gap-x-2 rounded-full bg-gray-200 p-1">
             <button
-                className={`p-2 rounded-full ${!isGridView ? "bg-white" : ""}`}
+                className="relative p-2 rounded-full"
                 aria-label="List View"
                 onClick={() => setView('list')}
             >
-                <ListViewIcon className="w-5 h-5" />
+                {view === 'list' && (
+                    <motion.div
+                        layoutId="view-toggle-active"
+                        className="absolute inset-0 bg-white rounded-full"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                )}
+                <ListViewIcon className="relative z-10 w-5 h-5" />
             </button>
             <button
-                className={`p-2 rounded-full ${isGridView ? "bg-white" : ""}`}
+                className="relative p-2 rounded-full"
                 aria-label="Grid View"
                 onClick={() => setView('grid')}
             >
-                <GridViewIcon className="w-5 h-5" />
+                {view === 'grid' && (
+                    <motion.div
+                        layoutId="view-toggle-active"
+                        className="absolute inset-0 bg-white rounded-full"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                )}
+                <GridViewIcon className="relative z-10 w-5 h-5" />
             </button>
         </div>
     );
