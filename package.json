@@ -14,6 +14,7 @@
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.4",
     "@types/nodemailer": "^7.0.2",
+    "@types/react-color": "^3.0.13",
     "dayjs": "^1.11.18",
     "framer-motion": "^12.23.24",
     "jose": "^6.1.0",
@@ -22,10 +23,12 @@
     "next": "15.5.3",
     "nodemailer": "^7.0.6",
     "react": "19.1.0",
+    "react-color": "^2.19.3",
     "react-datepicker": "^8.7.0",
     "react-dom": "19.1.0",
     "sonner": "^1.5.0",
-    "use-debounce": "^10.0.6"
+    "use-debounce": "^10.0.6",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
@@ -33,6 +36,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

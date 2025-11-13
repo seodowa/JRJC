@@ -40,7 +40,8 @@ export const fetchCars = async (query?: string): Promise<Car[]> => {
           image: car.image,
           price: carPricing,
           seats: car.Number_Of_Seats,
-          available: car.Available || true
+          available: car.Available || true,
+          color: car.color_code
         }
       )
     })) || [];
@@ -119,7 +120,8 @@ export const fetchSpecificCar = async (car_id: number): Promise<Car> => {
           transmission: car.Transmission_Types?.Name || "Unknown",
           fuelType: car.Fuel_Types?.Fuel || "Unknown",
           seats: car.Number_Of_Seats,
-          available: car.Available || true
+          available: car.Available || true,
+          color: car.color_code
       }
     ))
 

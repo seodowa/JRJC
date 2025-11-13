@@ -13,8 +13,7 @@ interface ManageCarsPageProps {
 }
 
 const ManageCarsPage = async ({ searchParams }: ManageCarsPageProps) => {
-    const query = searchParams?.q || '';
-    const view = searchParams?.view || 'list';
+    const { q: query = '', view = 'list' } = searchParams || {};
     
     const cars = await fetchCars(query);
 

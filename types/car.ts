@@ -18,6 +18,7 @@ export interface Car {
   seats: number
   fuelType: 'Gasoline' | 'Hybrid' | 'Diesel'
   available: boolean
+  color?: string
 }
 
 export interface CarFilters {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Car } from '@/types';
 import { createCar, updateCar } from '@/lib/supabase/mutations/cars';
+import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes } from '@/lib/supabase/queries/fetchDropdownData';
 import AsyncButton from '@/components/AsyncButton';
 import CloseIcon from '@/components/icons/CloseIcon';
 import CarPlaceholderIcon from '@/components/icons/CarPlaceholderIcon';
@@ -34,10 +35,26 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [brands, setBrands] = useState<string[]>([]);
+  const [transmissionTypes, setTransmissionTypes] = useState<string[]>([]);
+  const [fuelTypes, setFuelTypes] = useState<string[]>([]);
+
   const isEditMode = !!carToEdit;
 
   useEffect(() => {
     if (isOpen) {
+      const loadDropdownData = async () => {
+        const [brandsData, transmissionsData, fuelTypesData] = await Promise.all([
+          fetchManufacturers(),
+          fetchTransmissionTypes(),
+          fetchFuelTypes(),
+        ]);
+        setBrands(brandsData);
+        setTransmissionTypes(transmissionsData);
+        setFuelTypes(fuelTypesData);
+      };
+      loadDropdownData();
+
       if (isEditMode && carToEdit) {
         setFormData(carToEdit);
         setImagePreview(carToEdit.image || null);
@@ -95,18 +112,11 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
     e.preventDefault();
     setIsSubmitting(true);
 
-    // In a real app, you'd handle image upload here and get back a URL
-    // For this placeholder, we'll just use the preview if it's a new file
-    let finalData = { ...formData };
-    if (imageFile) {
-      finalData.image = imagePreview; // Placeholder for uploaded URL
-    }
-
     try {
       if (isEditMode && carToEdit) {
-        await updateCar(carToEdit.id, finalData);
+        await updateCar(carToEdit.id, formData, imageFile);
       } else {
-        await createCar(finalData);
+        await createCar(formData, imageFile);
       }
       // Optionally, trigger a refresh of the car list here
       onClose();
@@ -155,7 +165,10 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
             <div className="space-y-4">
               <div>
                 <label htmlFor="brand" className="block text-sm font-medium text-gray-700">Brand</label>
-                <input type="text" name="brand" id="brand" value={formData.brand || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                <select name="brand" id="brand" value={formData.brand || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                  <option value="" disabled>Select a brand</option>
+                  {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
+                </select>
               </div>
               <div>
                 <label htmlFor="model" className="block text-sm font-medium text-gray-700">Model</label>
@@ -164,21 +177,27 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
               <div>
                 <label htmlFor="transmission" className="block text-sm font-medium text-gray-700">Transmission</label>
                 <select name="transmission" id="transmission" value={formData.transmission || 'Automatic'} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                  <option>Automatic</option>
-                  <option>Manual</option>
+                  {transmissionTypes.map(type => <option key={type} value={type}>{type}</option>)}
                 </select>
               </div>
               <div>
                 <label htmlFor="fuelType" className="block text-sm font-medium text-gray-700">Fuel Type</label>
                 <select name="fuelType" id="fuelType" value={formData.fuelType || 'Gasoline'} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                  <option>Gasoline</option>
-                  <option>Diesel</option>
-                  <option>Electric</option>
+                  {fuelTypes.map(type => <option key={type} value={type}>{type}</option>)}
                 </select>
               </div>
               <div className="flex items-center gap-4">
                 <label className="block text-sm font-medium text-gray-700">Color:</label>
-                <button type="button" onClick={() => setIsColorPickerOpen(true)} className="w-10 h-10 rounded-full border border-gray-400" style={{ backgroundColor: formData.color }} />
+                <button 
+                  type="button" 
+                  onClick={() => setIsColorPickerOpen(true)} 
+                  className="w-10 h-10 rounded-full border border-gray-400 flex items-center justify-center overflow-hidden" 
+                  style={{ backgroundColor: formData.color && formData.color !== '#000000' ? formData.color : '#e0e0e0' }} // Default gray if no color or black
+                >
+                  {(!formData.color || formData.color === '#000000') && (
+                    <span className="text-xs text-gray-600">N/A</span> // Placeholder text
+                  )}
+                </button>
               </div>
             </div>
 
@@ -225,6 +244,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
         isOpen={isColorPickerOpen}
         onClose={() => setIsColorPickerOpen(false)}
         onSelectColor={handleSelectColor}
+        initialColor={formData.color}
       />
     </>
   );

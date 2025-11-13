@@ -1,69 +1,145 @@
 // lib/supabase/mutations/cars.ts
 import { Car } from '@/types';
+import { createClient } from '@/utils/supabase/client';
 
-/**
- * Placeholder function to create a new car.
- * In a real application, this would interact with your database (e.g., Supabase).
- * @param carData - The data for the new car.
- */
-export const createCar = async (carData: Partial<Car>): Promise<{ success: true; data: Car }> => {
-  console.log('--- Creating Car (Placeholder) ---');
-  console.log('Received data:', carData);
+const supabase = createClient();
 
-  // Simulate an API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
+const handleImageUpload = async (imageFile: File) => {
+  const formData = new FormData();
+  formData.append('file', imageFile);
 
-  // Simulate a successful response with a new ID and default values
-  const newCar: Car = {
-    id: Math.floor(Math.random() * 10000),
-    brand: carData.brand || 'Unknown Brand',
-    model: carData.model || 'Unknown Model',
-    year: carData.year || new Date().getFullYear(),
-    transmission: carData.transmission || 'Automatic',
-    fuelType: carData.fuelType || 'Gasoline',
-    seats: carData.seats || 5,
-    image: carData.image || null,
-    price: carData.price || [],
-    // Add other fields from the Car type as needed
-  };
+  const response = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  });
 
-  console.log('Simulated new car:', newCar);
-  console.log('---------------------------------');
-  
-  // In a real scenario, you would return the data from the database.
-  return { success: true, data: newCar };
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Image upload failed');
+  }
+
+  const { publicUrl } = await response.json();
+  return publicUrl;
 };
 
-/**
- * Placeholder function to update an existing car.
- * In a real application, this would interact with your database.
- * @param carId - The ID of the car to update.
- * @param carData - The new data for the car.
- */
-export const updateCar = async (carId: number, carData: Partial<Car>): Promise<{ success: true; data: Car }> => {
-  console.log(`--- Updating Car (Placeholder) ---`);
-  console.log(`Car ID: ${carId}`);
-  console.log('Received data:', carData);
+export const createCar = async (carData: Partial<Car>, imageFile: File | null) => {
+  let imageUrl = carData.image || null;
 
-  // Simulate an API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  if (imageFile) {
+    imageUrl = await handleImageUpload(imageFile);
+  }
 
-  // Simulate updating the data
-  const updatedCar: Car = {
-    id: carId,
-    brand: carData.brand || 'Unknown Brand',
-    model: carData.model || 'Unknown Model',
-    year: carData.year || new Date().getFullYear(),
-    transmission: carData.transmission || 'Automatic',
-    fuelType: carData.fuelType || 'Gasoline',
-    seats: carData.seats || 5,
-    image: carData.image || null,
-    price: carData.price || [],
-    // This is just a simulation. In a real app, you'd merge with existing data.
+  // Get Manufacturer ID
+  const { data: manufacturerData, error: manufacturerError } = await supabase
+    .from('Manufacturer')
+    .select('Manufacturer_ID')
+    .eq('Manufacturer_Name', carData.brand)
+    .single();
+
+  if (manufacturerError || !manufacturerData) {
+    throw new Error(`Invalid manufacturer: ${carData.brand}. ${manufacturerError?.message}`);
+  }
+
+  // Get Fuel Type ID
+  const { data: fuelTypeData, error: fuelTypeError } = await supabase
+    .from('Fuel_Types')
+    .select('Fuel_Type_ID')
+    .eq('Fuel', carData.fuelType)
+    .single();
+
+  if (fuelTypeError || !fuelTypeData) {
+    throw new Error(`Invalid fuel type: ${carData.fuelType}. ${fuelTypeError?.message}`);
+  }
+
+  // Get Transmission Type ID
+  const { data: transmissionData, error: transmissionError } = await supabase
+    .from('Transmission_Types')
+    .select('Transmission_ID')
+    .eq('Name', carData.transmission)
+    .single();
+
+  if (transmissionError || !transmissionData) {
+    throw new Error(`Invalid transmission type: ${carData.transmission}. ${transmissionError?.message}`);
+  }
+
+  const { data, error } = await supabase
+    .from('Car_Models')
+    .insert([
+      {
+        Model_Name: carData.model,
+        Manufacturer_ID: manufacturerData.Manufacturer_ID,
+        Year_Model: carData.year,
+        Transmission_ID: transmissionData.Transmission_ID,
+        Fuel_Type_ID: fuelTypeData.Fuel_Type_ID,
+        Number_Of_Seats: carData.seats,
+        color_code: carData.color,
+        image: imageUrl,
+      },
+    ])
+    .select();
+
+  if (error) {
+    throw new Error(`Failed to create car: ${error.message}`);
+  }
+
+  return data;
+};
+
+export const updateCar = async (carId: number, carData: Partial<Car>, imageFile: File | null) => {
+  const updatePayload: { [key: string]: any } = {
+    Model_Name: carData.model,
+    Year_Model: carData.year,
+    Number_Of_Seats: carData.seats,
+    color_code: carData.color,
   };
 
-  console.log('Simulated updated car:', updatedCar);
-  console.log('----------------------------------');
+  if (imageFile) {
+    const imageUrl = await handleImageUpload(imageFile);
+    updatePayload.image = imageUrl;
+  }
 
-  return { success: true, data: updatedCar };
+  // Get Manufacturer ID if brand is provided
+  if (carData.brand) {
+    const { data: manufacturerData, error: manufacturerError } = await supabase
+      .from('Manufacturer')
+      .select('Manufacturer_ID')
+      .eq('Manufacturer_Name', carData.brand)
+      .single();
+    if (manufacturerError || !manufacturerData) throw new Error(`Invalid manufacturer: ${carData.brand}. ${manufacturerError?.message}`);
+    updatePayload.Manufacturer_ID = manufacturerData.Manufacturer_ID;
+  }
+
+  // Get Fuel Type ID if fuelType is provided
+  if (carData.fuelType) {
+    const { data: fuelTypeData, error: fuelTypeError } = await supabase
+      .from('Fuel_Types')
+      .select('Fuel_Type_ID')
+      .eq('Fuel', carData.fuelType)
+      .single();
+    if (fuelTypeError || !fuelTypeData) throw new Error(`Invalid fuel type: ${carData.fuelType}. ${fuelTypeError?.message}`);
+    updatePayload.Fuel_Type_ID = fuelTypeData.Fuel_Type_ID;
+  }
+
+  // Get Transmission Type ID if transmission is provided
+  if (carData.transmission) {
+    const { data: transmissionData, error: transmissionError } = await supabase
+      .from('Transmission_Types')
+      .select('Transmission_ID')
+      .eq('Name', carData.transmission)
+      .single();
+    if (transmissionError || !transmissionData) throw new Error(`Invalid transmission type: ${carData.transmission}. ${transmissionError?.message}`);
+    updatePayload.Transmission_ID = transmissionData.Transmission_ID;
+  }
+
+  const { data, error } = await supabase
+    .from('Car_Models')
+    .update(updatePayload)
+    .eq('Model_ID', carId)
+    .select();
+
+  if (error) {
+    throw new Error(`Failed to update car: ${error.message}`);
+  }
+
+  return data;
 };
