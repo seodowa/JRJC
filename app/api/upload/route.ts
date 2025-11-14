@@ -1,24 +1,15 @@
 
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { decrypt } from '@/lib';
+import { getSession } from '@/lib';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: Request) {
   // 1. Authenticate the user
-  const sessionCookie = cookies().get('session')?.value;
-  if (!sessionCookie) {
+  const session = await getSession();
+  if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const decryptedSession = await decrypt(sessionCookie);
-    if (!decryptedSession?.user) {
-      throw new Error("Invalid session.");
-    }
-  } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized: Invalid session' }, { status: 401 });
   }
 
   // 2. Handle the file upload

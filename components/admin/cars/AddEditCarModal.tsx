@@ -65,7 +65,11 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'year' || name === 'seats') {
+      setFormData(prev => ({ ...prev, [name]: value === '' ? null : Number(value) }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handlePriceChange = (location: string, type: 'Price_12_Hours' | 'Price_24_Hours', value: string) => {
@@ -101,6 +105,12 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
     }
   };
 
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setImageFile(null);
+    setFormData(prev => ({ ...prev, image: null }));
+  };
+
   const handleSelectColor = (color: string) => {
     setFormData(prev => ({ ...prev, color }));
   };
@@ -115,7 +125,6 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
       } else {
         await createCar(formData, imageFile);
       }
-      router.refresh();
       onClose();
     } catch (error) {
       console.error('Failed to save car:', error);
@@ -153,6 +162,15 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
                 )}
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
               </div>
+              {imagePreview && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="mt-2 px-3 py-1 text-sm text-red-600 bg-red-100 rounded-md hover:bg-red-200"
+                >
+                  Remove Image
+                </button>
+              )}
             </div>
 
             {/* Column 2: Details */}
@@ -167,6 +185,14 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
               <div>
                 <label htmlFor="model" className="block text-sm font-medium text-gray-700">Model</label>
                 <input type="text" name="model" id="model" value={formData.model || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+              </div>
+              <div>
+                <label htmlFor="year" className="block text-sm font-medium text-gray-700">Year Model</label>
+                <input type="number" name="year" id="year" value={formData.year || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g. 2023" />
+              </div>
+              <div>
+                <label htmlFor="seats" className="block text-sm font-medium text-gray-700">Number of Car Seats</label>
+                <input type="number" name="seats" id="seats" value={formData.seats || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g. 5" />
               </div>
               <div>
                 <label htmlFor="transmission" className="block text-sm font-medium text-gray-700">Transmission</label>

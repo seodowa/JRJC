@@ -77,6 +77,43 @@ export async function PUT(req: Request) {
         if (!fuelId) missing.push(`fuel type '${fuelType}'`);
         return NextResponse.json({ error: `Could not find required IDs for: ${missing.join(', ')}.` }, { status: 400 });
     }
+    
+    // --- Start of Image Deletion Logic ---
+    if (carId) { // Only for updates
+        // Fetch the existing car to get the old image URL
+        const { data: existingCar, error: fetchError } = await supabaseAdmin
+            .from('Car_Models')
+            .select('image')
+            .eq('Model_ID', carId)
+            .single();
+
+        if (fetchError) {
+            console.error(`Could not fetch existing car for image comparison: ${fetchError.message}`);
+        }
+
+        const oldImageUrl = existingCar?.image;
+        const newImageUrl = image; // from carData
+
+        if (oldImageUrl && oldImageUrl !== newImageUrl) {
+            try {
+                const filePath = new URL(oldImageUrl).pathname.split('/images/')[1];
+                
+                if (filePath) {
+                    const { error: deleteError } = await supabaseAdmin
+                        .storage
+                        .from('images')
+                        .remove([filePath]);
+
+                    if (deleteError) {
+                        console.error(`Failed to delete old image from storage: ${deleteError.message}`);
+                    }
+                }
+            } catch (e) {
+                console.error('Error processing old image deletion:', e);
+            }
+        }
+    }
+    // --- End of Image Deletion Logic ---
 
     // 4. Construct Payload for Car_Models table
     const carModelPayload = {
@@ -179,6 +216,16 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: 'Missing car ID' }, { status: 400 });
         }
 
+        const { data: carToDelete, error: fetchError } = await supabaseAdmin
+            .from('Car_Models')
+            .select('image')
+            .eq('Model_ID', carId)
+            .single();
+
+        if (fetchError) {
+            console.warn(`Could not fetch car to delete its image. Continuing deletion...`);
+        }
+
         // 3. Delete related pricing data first
         const { error: pricingError } = await supabaseAdmin
             .from('Car_Pricing')
@@ -197,6 +244,23 @@ export async function DELETE(req: Request) {
 
         if (carError) {
             throw new Error(`Failed to delete car: ${carError.message}`);
+        }
+
+        if (carToDelete?.image) {
+            try {
+                const filePath = new URL(carToDelete.image).pathname.split('/images/')[1];
+                if (filePath) {
+                    const { error: deleteImageError } = await supabaseAdmin
+                        .storage
+                        .from('images')
+                        .remove([filePath]);
+                    if (deleteImageError) {
+                        console.error(`Failed to delete image for car ${carId}: ${deleteImageError.message}`);
+                    }
+                }
+            } catch (e) {
+                console.error(`Error processing image deletion for car ${carId}:`, e);
+            }
         }
 
         return NextResponse.json({ message: 'Car deleted successfully' });
