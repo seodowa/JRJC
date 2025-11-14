@@ -6,14 +6,16 @@ import LoadingSpinner from "@/components/admin/LoadingSpinner";
 export const dynamic = 'force-dynamic';
 
 interface ManageCarsPageProps {
-    searchParams?: {
+    searchParams: Promise<{
         q?: string;
         view?: 'list' | 'grid';
-    };
+    }>;
 }
 
 const ManageCarsPage = async ({ searchParams }: ManageCarsPageProps) => {
-    const { q: query = '', view = 'list' } = searchParams || {};
+    const resolvedSearchParams = await searchParams;
+    const query = resolvedSearchParams?.q || '';
+    const view = resolvedSearchParams?.view || 'list';
     
     const cars = await fetchCars(query);
 

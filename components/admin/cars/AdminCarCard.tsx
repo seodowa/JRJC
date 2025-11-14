@@ -8,6 +8,9 @@ import { Car } from "@/types";
 import AsyncButton from "@/components/AsyncButton";
 import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon"; // Import the new icon
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/toast/use-toast';
+import { deleteCar } from '@/lib/supabase/mutations/cars';
 
 interface AdminCarCardProps {
   car: Car;
@@ -17,6 +20,8 @@ interface AdminCarCardProps {
 const AdminCarCard = ({ car, onEditCar }: AdminCarCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleDeleteClick = () => {
     setIsModalOpen(true);
@@ -24,19 +29,23 @@ const AdminCarCard = ({ car, onEditCar }: AdminCarCardProps) => {
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
-    // TODO: Implement actual delete logic
-    // This will involve:
-    // 1. Calling a server action or API route to delete the car from the database.
-    // 2. Handling success (e.g., refreshing the page or removing the item from the list).
-    // 3. Handling errors.
-    console.log(`Placeholder: Deleting car with ID: ${car.id}`);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsDeleting(false);
-    setIsModalOpen(false);
-    // Maybe show a toast notification here.
-    alert(`Placeholder: Deleted car with ID: ${car.id}`);
+    try {
+      await deleteCar(car.id);
+      toast({
+        title: "Success",
+        description: "Car deleted successfully.",
+      });
+      router.refresh();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete car.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsModalOpen(false);
+    }
   };
 
   return (

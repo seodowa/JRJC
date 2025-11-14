@@ -9,8 +9,9 @@ import ViewToggle from "@/components/admin/cars/ViewToggle";
 import CarGridView from "@/components/admin/cars/CarGridView";
 import CarListView from "@/components/admin/cars/CarListView";
 import SearchIcon from "@/components/icons/SearchIcon";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddEditCarModal from "@/components/admin/cars/AddEditCarModal";
+import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes, fetchLocations } from '@/lib/supabase/queries/fetchDropdownData';
 
 interface CarsPageClientProps {
   cars: Car[];
@@ -25,6 +26,25 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [carToEdit, setCarToEdit] = useState<Car | null>(null);
+  const [dropdownData, setDropdownData] = useState({
+    brands: [] as string[],
+    transmissionTypes: [] as string[],
+    fuelTypes: [] as string[],
+    locations: [] as string[],
+  });
+
+  useEffect(() => {
+    const loadDropdownData = async () => {
+      const [brands, transmissionTypes, fuelTypes, locations] = await Promise.all([
+        fetchManufacturers(),
+        fetchTransmissionTypes(),
+        fetchFuelTypes(),
+        fetchLocations(),
+      ]);
+      setDropdownData({ brands, transmissionTypes, fuelTypes, locations });
+    };
+    loadDropdownData();
+  }, []);
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
@@ -34,8 +54,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
       params.set('q', '');
     }
     router.replace(`${pathname}?${params.toString()}`);
-    router.refresh();
-  }, 300);
+  }, 800);
 
   const handleViewChange = (newView: 'list' | 'grid') => {
     const params = new URLSearchParams(searchParams);
@@ -57,6 +76,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCarToEdit(null);
+    router.refresh();
   };
 
   const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-md";
@@ -67,6 +87,10 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         carToEdit={carToEdit}
+        brands={dropdownData.brands}
+        transmissionTypes={dropdownData.transmissionTypes}
+        fuelTypes={dropdownData.fuelTypes}
+        locations={dropdownData.locations}
       />
       <main className="relative flex flex-col md:flex-row gap-4 h-full">
         {/* List View Sidebar */}

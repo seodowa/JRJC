@@ -42,3 +42,17 @@ export const fetchFuelTypes = async () => {
     return [];
   }
 };
+
+export const fetchLocations = async () => {
+    const supabase = createClient();
+    try {
+        const { data, error } = await supabase
+            .from("Location")
+            .select("location_name");
+        if (error) throw new Error(error.message);
+        return data.map(item => item.location_name);
+    } catch (error) {
+        console.error("Error fetching locations:", error);
+        return [];
+    }
+};

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Car } from '@/types';
 import { createCar, updateCar } from '@/lib/supabase/mutations/cars';
-import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes } from '@/lib/supabase/queries/fetchDropdownData';
 import AsyncButton from '@/components/AsyncButton';
 import CloseIcon from '@/components/icons/CloseIcon';
 import CarPlaceholderIcon from '@/components/icons/CarPlaceholderIcon';
@@ -14,6 +14,10 @@ interface AddEditCarModalProps {
   isOpen: boolean;
   onClose: () => void;
   carToEdit?: Car | null;
+  brands: string[];
+  transmissionTypes: string[];
+  fuelTypes: string[];
+  locations: string[];
 }
 
 const initialFormData = {
@@ -27,7 +31,16 @@ const initialFormData = {
   price: [],
 };
 
-const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carToEdit }) => {
+const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  carToEdit,
+  brands,
+  transmissionTypes,
+  fuelTypes,
+  locations,
+}) => {
+  const router = useRouter();
   const [formData, setFormData] = useState<Partial<Car>>(initialFormData);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -35,26 +48,10 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [brands, setBrands] = useState<string[]>([]);
-  const [transmissionTypes, setTransmissionTypes] = useState<string[]>([]);
-  const [fuelTypes, setFuelTypes] = useState<string[]>([]);
-
   const isEditMode = !!carToEdit;
 
   useEffect(() => {
     if (isOpen) {
-      const loadDropdownData = async () => {
-        const [brandsData, transmissionsData, fuelTypesData] = await Promise.all([
-          fetchManufacturers(),
-          fetchTransmissionTypes(),
-          fetchFuelTypes(),
-        ]);
-        setBrands(brandsData);
-        setTransmissionTypes(transmissionsData);
-        setFuelTypes(fuelTypesData);
-      };
-      loadDropdownData();
-
       if (isEditMode && carToEdit) {
         setFormData(carToEdit);
         setImagePreview(carToEdit.image || null);
@@ -118,7 +115,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
       } else {
         await createCar(formData, imageFile);
       }
-      // Optionally, trigger a refresh of the car list here
+      router.refresh();
       onClose();
     } catch (error) {
       console.error('Failed to save car:', error);
@@ -129,9 +126,6 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({ isOpen, onClose, carT
   };
 
   if (!isOpen) return null;
-
-  // Assuming locations are static for now. In a real app, this might come from props or a hook.
-  const locations = ["Inside CDO", "Outside CDO", "Outside Region 10"];
 
   return (
     <>

@@ -1,145 +1,94 @@
 // lib/supabase/mutations/cars.ts
 import { Car } from '@/types';
-import { createClient } from '@/utils/supabase/client';
 
-const supabase = createClient();
+// In lib/supabase/mutations/cars.ts
 
-const handleImageUpload = async (imageFile: File) => {
-  const formData = new FormData();
-  formData.append('file', imageFile);
+const handleApiRequest = async (
+    endpoint: string,
+    method: 'POST' | 'PUT',
+    body: any,
+    imageFile: File | null
+) => {
+    let imageUrl = body.carData.image || null;
 
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData,
-  });
+    // 1. If there's a new image, upload it first
+    if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Image upload failed');
-  }
+        const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        });
 
-  const { publicUrl } = await response.json();
-  return publicUrl;
+        if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            throw new Error(errorData.error || 'Image upload failed');
+        }
+        const { publicUrl } = await uploadResponse.json();
+        imageUrl = publicUrl;
+    }
+
+    // 2. Add the final image URL to the payload
+    body.carData.image = imageUrl;
+
+    // 3. Call the new admin car API route
+    const apiResponse = await fetch(endpoint, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+
+    // --- NEW ROBUST ERROR HANDLING ---
+    if (!apiResponse.ok) {
+        // If we get a 404, the server hasn't found the API route.
+        if (apiResponse.status === 404) {
+            throw new Error(`API route not found at ${endpoint}. Please restart your dev server.`);
+        }
+
+        // Try to parse a JSON error, but provide a fallback
+        try {
+            const errorData = await apiResponse.json();
+            throw new Error(errorData.error || 'Failed to save car');
+        } catch (parseError) {
+            // The error response itself wasn't JSON
+            throw new Error(`An unknown server error occurred (Status ${apiResponse.status}).`);
+        }
+    }
+    // --- END OF NEW ROBUST ERROR HANDLING ---
+
+    return apiResponse.json();
 };
 
 export const createCar = async (carData: Partial<Car>, imageFile: File | null) => {
-  let imageUrl = carData.image || null;
-
-  if (imageFile) {
-    imageUrl = await handleImageUpload(imageFile);
-  }
-
-  // Get Manufacturer ID
-  const { data: manufacturerData, error: manufacturerError } = await supabase
-    .from('Manufacturer')
-    .select('Manufacturer_ID')
-    .eq('Manufacturer_Name', carData.brand)
-    .single();
-
-  if (manufacturerError || !manufacturerData) {
-    throw new Error(`Invalid manufacturer: ${carData.brand}. ${manufacturerError?.message}`);
-  }
-
-  // Get Fuel Type ID
-  const { data: fuelTypeData, error: fuelTypeError } = await supabase
-    .from('Fuel_Types')
-    .select('Fuel_Type_ID')
-    .eq('Fuel', carData.fuelType)
-    .single();
-
-  if (fuelTypeError || !fuelTypeData) {
-    throw new Error(`Invalid fuel type: ${carData.fuelType}. ${fuelTypeError?.message}`);
-  }
-
-  // Get Transmission Type ID
-  const { data: transmissionData, error: transmissionError } = await supabase
-    .from('Transmission_Types')
-    .select('Transmission_ID')
-    .eq('Name', carData.transmission)
-    .single();
-
-  if (transmissionError || !transmissionData) {
-    throw new Error(`Invalid transmission type: ${carData.transmission}. ${transmissionError?.message}`);
-  }
-
-  const { data, error } = await supabase
-    .from('Car_Models')
-    .insert([
-      {
-        Model_Name: carData.model,
-        Manufacturer_ID: manufacturerData.Manufacturer_ID,
-        Year_Model: carData.year,
-        Transmission_ID: transmissionData.Transmission_ID,
-        Fuel_Type_ID: fuelTypeData.Fuel_Type_ID,
-        Number_Of_Seats: carData.seats,
-        color_code: carData.color,
-        image: imageUrl,
-      },
-    ])
-    .select();
-
-  if (error) {
-    throw new Error(`Failed to create car: ${error.message}`);
-  }
-
-  return data;
+    return handleApiRequest(
+        '/api/admin/cars',
+        'POST',
+        { carData },
+        imageFile
+    );
 };
 
 export const updateCar = async (carId: number, carData: Partial<Car>, imageFile: File | null) => {
-  const updatePayload: { [key: string]: any } = {
-    Model_Name: carData.model,
-    Year_Model: carData.year,
-    Number_Of_Seats: carData.seats,
-    color_code: carData.color,
-  };
+    return handleApiRequest(
+        '/api/admin/cars',
+        'PUT',
+        { carId, carData },
+        imageFile
+    );
+};
 
-  if (imageFile) {
-    const imageUrl = await handleImageUpload(imageFile);
-    updatePayload.image = imageUrl;
-  }
+export const deleteCar = async (carId: number) => {
+    const response = await fetch(`/api/admin/cars?id=${carId}`, {
+        method: 'DELETE',
+    });
 
-  // Get Manufacturer ID if brand is provided
-  if (carData.brand) {
-    const { data: manufacturerData, error: manufacturerError } = await supabase
-      .from('Manufacturer')
-      .select('Manufacturer_ID')
-      .eq('Manufacturer_Name', carData.brand)
-      .single();
-    if (manufacturerError || !manufacturerData) throw new Error(`Invalid manufacturer: ${carData.brand}. ${manufacturerError?.message}`);
-    updatePayload.Manufacturer_ID = manufacturerData.Manufacturer_ID;
-  }
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete car');
+    }
 
-  // Get Fuel Type ID if fuelType is provided
-  if (carData.fuelType) {
-    const { data: fuelTypeData, error: fuelTypeError } = await supabase
-      .from('Fuel_Types')
-      .select('Fuel_Type_ID')
-      .eq('Fuel', carData.fuelType)
-      .single();
-    if (fuelTypeError || !fuelTypeData) throw new Error(`Invalid fuel type: ${carData.fuelType}. ${fuelTypeError?.message}`);
-    updatePayload.Fuel_Type_ID = fuelTypeData.Fuel_Type_ID;
-  }
-
-  // Get Transmission Type ID if transmission is provided
-  if (carData.transmission) {
-    const { data: transmissionData, error: transmissionError } = await supabase
-      .from('Transmission_Types')
-      .select('Transmission_ID')
-      .eq('Name', carData.transmission)
-      .single();
-    if (transmissionError || !transmissionData) throw new Error(`Invalid transmission type: ${carData.transmission}. ${transmissionError?.message}`);
-    updatePayload.Transmission_ID = transmissionData.Transmission_ID;
-  }
-
-  const { data, error } = await supabase
-    .from('Car_Models')
-    .update(updatePayload)
-    .eq('Model_ID', carId)
-    .select();
-
-  if (error) {
-    throw new Error(`Failed to update car: ${error.message}`);
-  }
-
-  return data;
+    return response.json();
 };

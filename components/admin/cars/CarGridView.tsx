@@ -8,6 +8,9 @@ import PlusIcon from "@/components/icons/PlusIcon";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon";
 import { useState } from "react";
 import ConfirmationModal from "@/components/admin/ConfirmationModal";
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/toast/use-toast';
+import { deleteCar } from '@/lib/supabase/mutations/cars';
 
 interface CarGridViewProps {
   cars: Car[];
@@ -33,6 +36,8 @@ const itemVariants = {
 const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleDeleteClick = (car: Car) => {
     setCarToDelete(car);
@@ -46,13 +51,23 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
     if (!carToDelete) return;
 
     setIsDeleting(true);
-    // TODO: Implement actual delete logic
-    console.log(`Placeholder: Deleting car with ID: ${carToDelete.id}`);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsDeleting(false);
-    setCarToDelete(null);
-    alert(`Placeholder: Deleted car with ID: ${carToDelete.id}`);
+    try {
+      await deleteCar(carToDelete.id);
+      toast({
+        title: "Success",
+        description: "Car deleted successfully.",
+      });
+      router.refresh();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete car.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setCarToDelete(null);
+    }
   };
 
   return (
