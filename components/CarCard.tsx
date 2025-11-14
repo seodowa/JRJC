@@ -8,10 +8,12 @@ export default function CarCard( { car }: { car:Car } ) {
 
     // Helper function to get price properties safely
     const getPriceProperty = (priceObj: any, property: string) => {
+        if (!priceObj) return 0;
         return priceObj[property] || priceObj[property.toLowerCase()] || priceObj[property.toUpperCase()] || 0;
     };
 
     const getLocation = (priceObj: any) => {
+        if (!priceObj) return "N/A";
         return priceObj.Location || priceObj.location || "Unknown Location";
     };
 

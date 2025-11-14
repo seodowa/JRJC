@@ -18,6 +18,12 @@ export const fetchCars = async (query?: string): Promise<Car[]> => {
         ),
         Fuel_Types (
           Fuel
+        ),
+        Car_Pricing (
+          *,
+          Location (
+            location_name
+          )
         )
       `);
     
@@ -25,26 +31,29 @@ export const fetchCars = async (query?: string): Promise<Car[]> => {
       throw new Error(carsError.message);
     }
 
-    // Transform the data to match the Car type
-    const transformedCars: Car[] = await Promise.all(carsData?.map(async (car) => {
-      const carPricing: CarPricing[] = await fetchSpecificCarPricing( car.Model_ID );
+    // Transform the data to match the Car type, now with pricing included
+    const transformedCars: Car[] = carsData?.map(car => {
+      const carPricing: CarPricing[] = car.Car_Pricing?.map((price: any) => ({
+        Car_ID: price.Car_ID,
+        Location: price.Location?.location_name,
+        Price_12_Hours: price.Price_12_Hours,
+        Price_24_Hours: price.Price_24_Hours
+      })) || [];
 
-      return (
-        {
-          id: car.Model_ID,
-          brand: car.Manufacturer?.Manufacturer_Name,
-          model: car.Model_Name,
-          year: car.Year_Model,
-          transmission: car.Transmission_Types?.Name || "Unknown",
-          fuelType: car.Fuel_Types?.Fuel || "Unknown",
-          image: car.image,
-          price: carPricing,
-          seats: car.Number_Of_Seats,
-          available: car.Available || true,
-          color: car.color_code
-        }
-      )
-    })) || [];
+      return {
+        id: car.Model_ID,
+        brand: car.Manufacturer?.Manufacturer_Name,
+        model: car.Model_Name,
+        year: car.Year_Model,
+        transmission: car.Transmission_Types?.Name || "Unknown",
+        fuelType: car.Fuel_Types?.Fuel || "Unknown",
+        image: car.image,
+        price: carPricing,
+        seats: car.Number_Of_Seats,
+        available: car.Available || true,
+        color: car.color_code
+      };
+    }) || [];
 
     return transformedCars;
     

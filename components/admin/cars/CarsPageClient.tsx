@@ -60,7 +60,6 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
     const params = new URLSearchParams(searchParams);
     params.set('view', newView);
     router.replace(`${pathname}?${params.toString()}`);
-    router.refresh();
   };
 
   const handleOpenAddModal = () => {

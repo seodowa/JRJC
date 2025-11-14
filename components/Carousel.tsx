@@ -4,15 +4,14 @@ import { useState, ReactNode } from "react"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import React from "react";
 
-// <T> makes it work with any type
-interface CarouselProps<T> {
-  items: T[]                                
-  renderItem: (item: T, index: number) => ReactNode
-  itemsPerView?: number
-  height: number 
+interface CarouselProps {
+  children: React.ReactNode;
+  itemsPerView?: number;
+  height: number;
 }
 
-export default function Carousel<T>( { items, renderItem, itemsPerView = 1, height = 400 }: CarouselProps<T> ) {
+export default function Carousel({ children, itemsPerView = 1, height = 400 }: CarouselProps) {
+    const items = React.Children.toArray(children);
     const [currentIndex, setCurrentIndex] = useState(0);
     const maxIndex = Math.max(0, items.length - itemsPerView);
 
@@ -90,7 +89,7 @@ export default function Carousel<T>( { items, renderItem, itemsPerView = 1, heig
                     pointerEvents: isVisible ? 'auto' : 'none'
                   }}
                 >
-                  {renderItem(item, index)}
+                  {item}
                 </div>
               )
             })}
