@@ -216,50 +216,46 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: 'Missing car ID' }, { status: 400 });
         }
 
-        const { data: carToDelete, error: fetchError } = await supabaseAdmin
+        // We still fetch the car to get the image URL for deletion later
+        const { data: carToSoftDelete, error: fetchError } = await supabaseAdmin
             .from('Car_Models')
             .select('image')
             .eq('Model_ID', carId)
             .single();
 
-        if (fetchError) {
-            console.warn(`Could not fetch car to delete its image. Continuing deletion...`);
+        if (fetchError || !carToSoftDelete) {
+            // If the car doesn't exist, we can't proceed.
+            return NextResponse.json({ error: 'Car not found.' }, { status: 404 });
         }
 
-        // 3. Delete related pricing data first
-        const { error: pricingError } = await supabaseAdmin
-            .from('Car_Pricing')
-            .delete()
-            .eq('Car_ID', carId);
-
-        if (pricingError) {
-            throw new Error(`Failed to delete car pricing: ${pricingError.message}`);
-        }
-
-        // 4. Delete the car model
+        // 3. Soft delete the car model by updating the 'is_deleted' flag
         const { error: carError } = await supabaseAdmin
             .from('Car_Models')
-            .delete()
+            .update({ is_deleted: true })
             .eq('Model_ID', carId);
 
         if (carError) {
-            throw new Error(`Failed to delete car: ${carError.message}`);
+            // This could still fail due to RLS or other issues, but not the FK violation.
+            throw new Error(`Failed to soft-delete car: ${carError.message}`);
         }
 
-        if (carToDelete?.image) {
+        // 4. Delete the associated image from storage to save space
+        if (carToSoftDelete.image) {
             try {
-                const filePath = new URL(carToDelete.image).pathname.split('/images/')[1];
+                const filePath = new URL(carToSoftDelete.image).pathname.split('/images/')[1];
                 if (filePath) {
                     const { error: deleteImageError } = await supabaseAdmin
                         .storage
                         .from('images')
                         .remove([filePath]);
                     if (deleteImageError) {
-                        console.error(`Failed to delete image for car ${carId}: ${deleteImageError.message}`);
+                        // Log this error but don't fail the whole operation,
+                        // as the main goal (soft delete) was successful.
+                        console.error(`Failed to delete image for soft-deleted car ${carId}: ${deleteImageError.message}`);
                     }
                 }
             } catch (e) {
-                console.error(`Error processing image deletion for car ${carId}:`, e);
+                console.error(`Error processing image deletion for soft-deleted car ${carId}:`, e);
             }
         }
 

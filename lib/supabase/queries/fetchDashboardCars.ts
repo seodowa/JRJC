@@ -14,13 +14,15 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
       Year_Model,
       color_code,
       status,
+      is_deleted,
       Transmission_Types (
         Name
       ),
       Manufacturer (
         Manufacturer_Name
       )
-    `);
+    `)
+    .eq('is_deleted', false);
 
   if (carsError) {
     console.error('Error fetching cars:', carsError);

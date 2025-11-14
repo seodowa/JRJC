@@ -105,7 +105,8 @@ export const fetchSpecificCar = async (car_id: number): Promise<Car> => {
         Fuel_Types (
           Fuel
         )
-      `).eq("Model_ID", car_id);
+      `).eq("Model_ID", car_id)
+      .eq('is_deleted', false);
     
     if (carsError) {
       throw new Error(carsError.message);
