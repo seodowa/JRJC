@@ -127,11 +127,16 @@ export default function ReviewsSection() {
         <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl py-4 text-center">Customer Reviews</h1>
         <div className="flex justify-center items-start w-screen">
           {TOP_FIVE_REVIEWS.length > 0 && (
-            <Carousel 
-              items={reviewsForDisplay} 
-              renderItem={(review) => <ReviewCardPreview review={review} onCardClick={handleCardClick} onToggleHelpful={handleToggleHelpful} />}
-              height={CAROUSEL_HEIGHT}
-            />
+            <Carousel height={CAROUSEL_HEIGHT}>
+              {reviewsForDisplay.map((review) => (
+                <ReviewCardPreview 
+                  key={review.id} 
+                  review={review} 
+                  onCardClick={handleCardClick} 
+                  onToggleHelpful={handleToggleHelpful} 
+                />
+              ))}
+            </Carousel>
           )}
           
           {/* The Modal Component */}
