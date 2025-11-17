@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { TAdminBooking } from '@/types/adminBooking';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
-import SearchBar from '@/components/admin/SearchBar'; // Assuming a generic SearchBar component exists
+import SearchBar from '@/components/admin/SearchBar';
 import BookingsTableView from './BookingsTableView';
-import AsyncButton from "@/components/AsyncButton"; // To be created
+import AsyncButton from "@/components/AsyncButton";
+import BookingTabs from './BookingTabs'; // Import the new BookingTabs component
 
 type BookingsPageClientProps = {
   bookings: TAdminBooking[];
@@ -14,6 +15,7 @@ type BookingsPageClientProps = {
 
 const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('All'); // State for active tab
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -27,6 +29,23 @@ const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
     }
     replace(`${pathname}?${params.toString()}`);
   }, 300);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
+  const filteredBookings = useMemo(() => {
+    if (activeTab === 'All') {
+      return bookings;
+    }
+    // Assuming status values match tab names or can be mapped
+    return bookings.filter((booking) => {
+      if (activeTab === 'To be Approved') {
+        return booking.status === 'Pending'; // Assuming 'Pending' for 'To be Approved'
+      }
+      return booking.status === activeTab;
+    });
+  }, [bookings, activeTab]);
 
   return (
     <div className="max-h-screen p-4 sm:p-6 lg:p-8 bg-white rounded-lg shadow-md">
@@ -50,14 +69,13 @@ const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
           <AsyncButton className="px-4 py-2 bg-blue-500 text-white rounded-md">Start</AsyncButton>
         </div>
       </div>
-      <div className="flex -mb-6">
-        <AsyncButton className="px-15 border-1 border-black rounded-t-xl">All</AsyncButton>
-        <AsyncButton className="px-15 border-1 border-black rounded-t-xl">To be Approved</AsyncButton>
-        <AsyncButton className="px-15 border-1 border-black rounded-t-xl">Approved</AsyncButton>
-        <AsyncButton className="px-15 border-1 border-black rounded-t-xl">Ongoing</AsyncButton>
-      </div>
-        <div>
-            <BookingsTableView bookings={bookings} selectedBookings={selectedBookings} setSelectedBookings={setSelectedBookings} />
+      <BookingTabs
+        tabs={['All', 'To be Approved', 'Approved', 'Ongoing']}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
+      <div className="border-t border-gray-200 pt-4"> {/* Added padding top to separate from tabs */}
+            <BookingsTableView bookings={filteredBookings} selectedBookings={selectedBookings} setSelectedBookings={setSelectedBookings} />
         </div>
     </div>
   );
