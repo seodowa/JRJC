@@ -61,37 +61,76 @@ const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
     return bookings.filter((booking) => booking.status === activeTab);
   }, [bookings, activeTab]);
 
+  const isAllSelected = useMemo(() => {
+    const allFilteredBookingIds = filteredBookings.map((booking) => booking.bookingId);
+    return selectedBookings.length === allFilteredBookingIds.length && selectedBookings.every(id => allFilteredBookingIds.includes(id));
+  }, [selectedBookings, filteredBookings]);
+
+  const handleSelectAll = () => {
+    const allFilteredBookingIds = filteredBookings.map((booking) => booking.bookingId);
+    if (isAllSelected) {
+      // If all are currently selected, deselect all
+      setSelectedBookings([]);
+    } else {
+      // Otherwise, select all filtered bookings
+      setSelectedBookings(allFilteredBookingIds);
+    }
+  };
+
   return (
-    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 bg-white rounded-lg shadow-md">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Bookings</h1>
         {/* Add refresh button here */}
       </div>
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-4">
-          <SearchBar
+            <SearchBar
             placeholder="Search by name or booking ID..."
             onChange={(e) => handleSearch(e.target.value)}
             className="w-80"
           />
-          <AsyncButton className="px-4 py-2 bg-gray-200 rounded-md">Select All</AsyncButton>
-          <AsyncButton className="px-4 py-2 bg-gray-200 rounded-md">Manual Book</AsyncButton>
+          <AsyncButton onClick={handleSelectAll} className="border-1 border-gray-300 p-2 bg-[#A1E3F9] rounded-lg text-white
+                                                            hover:bg-blue-400">
+            {isAllSelected ? 'Deselect' : 'Select All'}
+          </AsyncButton>
+          <AsyncButton className="border border-gray-300 p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400">Walk-in Book</AsyncButton>
         </div>
         <div className="flex items-center space-x-2">
-          <AsyncButton className="px-4 py-2 bg-red-500 text-white rounded-md">Decline</AsyncButton>
-          <AsyncButton className="px-4 py-2 bg-green-500 text-white rounded-md">Approve</AsyncButton>
-          <AsyncButton className="px-4 py-2 bg-yellow-500 text-white rounded-md">Cancel</AsyncButton>
-          <AsyncButton className="px-4 py-2 bg-blue-500 text-white rounded-md">Start</AsyncButton>
+          <AsyncButton className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+                                    hover:bg-red-400 hover:text-white">
+              Decline
+          </AsyncButton>
+          <AsyncButton className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                                hover:bg-blue-300">
+              Approve
+          </AsyncButton>
+          <AsyncButton className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+                                  hover:bg-red-400 hover:text-white">
+              Cancel
+          </AsyncButton>
+          <AsyncButton className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                                hover:bg-blue-400">
+              Start
+          </AsyncButton>
         </div>
       </div>
-      <BookingTabs
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        tabs={bookingStatuses}
-      />
-      <div className="border-t border-gray-200 pt-4"> {/* Added padding top to separate from tabs */}
-            <BookingsTableView bookings={filteredBookings} selectedBookings={selectedBookings} setSelectedBookings={setSelectedBookings} />
+      <div className="relative">
+        <div className="mt-2">
+          <BookingTabs
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            tabs={bookingStatuses}
+          />
         </div>
+        <div className="relative z-10 bg-white">
+          <BookingsTableView
+            bookings={filteredBookings}
+            selectedBookings={selectedBookings}
+            setSelectedBookings={setSelectedBookings}
+          />
+        </div>
+      </div>
     </div>
   );
 };
