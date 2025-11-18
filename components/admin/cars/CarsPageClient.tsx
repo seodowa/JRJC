@@ -8,7 +8,7 @@ import CarsSidebar from "@/components/admin/cars/CarsSidebar";
 import ViewToggle from "@/components/admin/cars/ViewToggle";
 import CarGridView from "@/components/admin/cars/CarGridView";
 import CarListView from "@/components/admin/cars/CarListView";
-import SearchBar from "@/components/admin/SearchBar";
+import SearchBar from "@/components/SearchBar";
 import { useState, useEffect } from "react";
 import AddEditCarModal from "@/components/admin/cars/AddEditCarModal";
 import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes, fetchLocations } from '@/lib/supabase/queries/fetchDropdownData';
