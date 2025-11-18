@@ -68,10 +68,11 @@ const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
         {/* Add refresh button here */}
       </div>
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-4">
           <SearchBar
             placeholder="Search by name or booking ID..."
             onChange={(e) => handleSearch(e.target.value)}
+            className="w-80"
           />
           <AsyncButton className="px-4 py-2 bg-gray-200 rounded-md">Select All</AsyncButton>
           <AsyncButton className="px-4 py-2 bg-gray-200 rounded-md">Manual Book</AsyncButton>
