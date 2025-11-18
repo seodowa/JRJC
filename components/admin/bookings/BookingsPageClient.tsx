@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { TAdminBooking } from '@/types/adminBooking';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
@@ -16,9 +16,29 @@ type BookingsPageClientProps = {
 const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('All'); // State for active tab
+  const [bookingStatuses, setBookingStatuses] = useState<string[]>(['All']);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const response = await fetch('/api/admin/booking-statuses');
+        if (!response.ok) {
+          throw new Error('Failed to fetch booking statuses');
+        }
+        const statuses = await response.json();
+        setBookingStatuses(['All', ...statuses]);
+      } catch (error) {
+        console.error(error);
+        // Keep default hardcoded tabs as a fallback
+        setBookingStatuses(['All', 'Pending', 'Confirmed', 'Ongoing', 'Completed', 'Cancelled']);
+      }
+    };
+
+    fetchStatuses();
+  }, []);
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
@@ -38,17 +58,11 @@ const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
     if (activeTab === 'All') {
       return bookings;
     }
-    // Assuming status values match tab names or can be mapped
-    return bookings.filter((booking) => {
-      if (activeTab === 'To be Approved') {
-        return booking.status === 'Pending'; // Assuming 'Pending' for 'To be Approved'
-      }
-      return booking.status === activeTab;
-    });
+    return bookings.filter((booking) => booking.status === activeTab);
   }, [bookings, activeTab]);
 
   return (
-    <div className="max-h-screen p-4 sm:p-6 lg:p-8 bg-white rounded-lg shadow-md">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 bg-white rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Bookings</h1>
         {/* Add refresh button here */}
@@ -70,9 +84,9 @@ const BookingsPageClient = ({ bookings }: BookingsPageClientProps) => {
         </div>
       </div>
       <BookingTabs
-        tabs={['All', 'To be Approved', 'Approved', 'Ongoing']}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        tabs={bookingStatuses}
       />
       <div className="border-t border-gray-200 pt-4"> {/* Added padding top to separate from tabs */}
             <BookingsTableView bookings={filteredBookings} selectedBookings={selectedBookings} setSelectedBookings={setSelectedBookings} />

@@ -7,4 +7,5 @@ export type TAdminBooking = {
   customerName: string;
   carModel: string;
   status: string;
+  dateCreated: string;
 };

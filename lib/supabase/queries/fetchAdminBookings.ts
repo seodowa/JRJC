@@ -24,5 +24,18 @@ export const fetchAdminBookings = async (query: string): Promise<TAdminBooking[]
     customerName: booking.customer_name,
     carModel: booking.car_model,
     status: booking.status,
+    dateCreated: booking.date_created,
   }));
+};
+
+export const fetchBookingStatuses = async (): Promise<string[]> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('Booking_Status').select('Name');
+
+  if (error) {
+    console.error('Error fetching booking statuses:', error);
+    return [];
+  }
+
+  return data.map((status: any) => status.Name);
 };
