@@ -22,7 +22,7 @@ const AdminSidebar = ({ isCollapsed, user, handleLogout }: AdminSidebarProps) =>
       { href: '/adminSU/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
       { href: '/adminSU/manageBookings', label: 'Manage Bookings', icon: <BookingsIcon /> },
       { href: '/adminSU/manageCars', label: 'Manage Cars', icon: <CarsIcon /> },
-      { href: '/adminSU/reviews', label: 'See Reviews', icon: <ReviewsIcon /> },
+      { href: '/adminSU/adminReviews', label: 'See Reviews', icon: <ReviewsIcon /> },
       {href: '/adminSU/settings', label: 'Settings', icon: <SettingsIcon />},
   ];
 
