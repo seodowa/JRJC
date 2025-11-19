@@ -44,7 +44,7 @@ const ReviewsTableView = ({ reviews }: { reviews: Review[] }) => {
             {formatDate(review.createdAt)}
           </div>
           <div className="col-span-2 text-sm text-gray-500">
-            {review.car ? `${review.car.make} ${review.car.model} ${review.car.year}` : 'N/A'}
+            {review.car ? `${review.car.brand} ${review.car.model} ${review.car.year}` : 'N/A'}
           </div>
           <div className="col-span-2 text-sm text-gray-500">
             {review.helpfulCount}

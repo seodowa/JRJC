@@ -21,9 +21,10 @@ const StarRating = ({ rating }: { rating: number }) => (
 interface CustomStarSelectProps {
     selectedRating: number;
     onRatingChange: (rating: number) => void;
+    className?: string;
 }
 
-const CustomStarSelect = ({ selectedRating, onRatingChange }: CustomStarSelectProps) => {
+const CustomStarSelect = ({ selectedRating, onRatingChange, className }: CustomStarSelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleSelect = (rating: number) => {
@@ -32,18 +33,20 @@ const CustomStarSelect = ({ selectedRating, onRatingChange }: CustomStarSelectPr
     };
 
     return (
-        <div className="relative">
+        <div className={`relative ${className}`}>
             <button
                 type="button"
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="relative block w-full pl-3 pr-10 py-2 text-left text-base border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <div className="flex justify-between items-center">
+                <span className="block truncate">
                     {selectedRating > 0 ? <StarRating rating={selectedRating} /> : 'Rating'}
+                </span>
+                <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
                     <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
-                </div>
+                </span>
             </button>
             {isOpen && (
                 <div className="absolute mt-1 w-full rounded-md bg-white shadow-lg z-10 border">

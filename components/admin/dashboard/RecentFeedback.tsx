@@ -115,7 +115,7 @@ const RecentFeedback = () => {
                     <div>
                       <h3 className="font-bold text-lg">{review.title}</h3>
                       <p className="text-sm text-gray-600">By {review.userName}</p>
-                      <p className="text-sm text-gray-500">{review.car?.make} {review.car?.model}</p>
+                      <p className="text-sm text-gray-500">{review.car?.brand} {review.car?.model}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <div className="flex items-center">
