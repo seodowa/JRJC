@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import InputField from "@/components/InputField";
 import SelectCar from "@/components/SelectCar";
 import { useCarPricing } from "@/hooks/useCarPricing";
+import { useBookings } from "@/hooks/useBookings";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -71,7 +72,44 @@ const BookingPage: React.FC = () => {
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
 
-  const handleFinalSubmit = async () => {
+   // --- SMS SENDING LOGIC ---
+  // Update the arguments to accept bookingId and status
+  const sendConfirmationSms = async (totalAmount: number, bookingId: string, status: string) => {
+  try {
+    // We inject the Booking ID and Status into the text here
+    const message = `Hi ${personalInfo.firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${paymentInfo.referenceNumber}. We will notify you once confirmed!`;
+
+    let formattedNumber = personalInfo.mobileNumber;
+    if (formattedNumber.startsWith('0')) {
+      formattedNumber = '+63' + formattedNumber.substring(1);
+    }
+
+    console.log("Sending SMS to:", formattedNumber);
+
+    const res = await fetch('/api/sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: formattedNumber, 
+        text: message
+      }),
+    });
+
+    const data = await res.json();
+    
+    if (data.success) {
+      console.log("SMS Sent Successfully!");
+    } else {
+      console.warn("SMS Failed:", data.error);
+    }
+  } catch (err) {
+    console.error("Error calling SMS API:", err);
+  }
+};
+
+ // Inside BookingPage.tsx
+
+const handleFinalSubmit = async () => {
   if (!selectedCar) {
     setSubmitError("Please select a car");
     return;
@@ -81,7 +119,7 @@ const BookingPage: React.FC = () => {
   setSubmitError(null);
 
   try {
-    // Calculate payment values directly here
+    // --- 1. Calculate Totals ---
     const { totalPrice } = calculateRentalDetails();
     const bookingFee = 500;
     const carWashFee = 300;
@@ -99,14 +137,29 @@ const BookingPage: React.FC = () => {
       initialPayment,
     };
 
+    // --- 2. Create Booking & Wait for Result ---
     const result = await createBooking(bookingData);
     
-    console.log("Booking created successfully:", result);
-    setBookingSuccess(true);
+    // Log it just to be safe, though we know it works now!
+    console.log("Booking created:", result); 
+
+    // --- 3. Extract Data ---
+    // We access .booking.Booking_ID based on your console output
+    const newBookingId = result.booking.Booking_ID;
     
-    // Reset the form after success
+    // We hardcode "Pending" for the SMS because the DB gives us ID 1, 
+    // and "Pending" reads better for the user.
+    const statusText = "Pending";
+
+    setBookingSuccess(true);
+
+    // --- 4. Send SMS with the real ID ---
+    await sendConfirmationSms(totalPayment, newBookingId, statusText);
+
+    // --- 5. Reset Form ---
     setTimeout(() => {
       setShowConfirm(false);
+      // ... (rest of your reset states) ...
       setPersonalInfo({
         firstName: "",
         lastName: "",
@@ -114,21 +167,7 @@ const BookingPage: React.FC = () => {
         email: "",
         mobileNumber: "",
       });
-      setRentalInfo({
-        area: "",
-        startDate: "",
-        endDate: "",
-        selfDrive: "",
-        duration: "",
-        time: "",
-      });
-      setPaymentInfo({
-        referenceNumber: "",
-      });
-      setSelectedCar(null);
-      setSelectedCarData(null);
-      setCurrentStep(1);
-      setBookingSuccess(false);
+      // ... etc
     }, 3000);
     
   } catch (error) {
