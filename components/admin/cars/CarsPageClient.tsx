@@ -117,7 +117,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
             {/* Sticky Top Bar for Grid View */}
             {view === 'grid' && (
                 <motion.div
-                    className="sticky top-0 bg-white py-2 px-6 z-40 flex items-center justify-between"
+                    className="sticky top-0 bg-white py-2 px-6 z-10 flex items-center justify-between"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -153,7 +153,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
             {/* Sticky Bottom Bar for Grid View */}
             {view === 'grid' && (
                 <motion.div
-                    className="sticky bottom-0 bg-white px-4 z-40 flex justify-center"
+                    className="sticky bottom-0 bg-white px-4 z-10 flex justify-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

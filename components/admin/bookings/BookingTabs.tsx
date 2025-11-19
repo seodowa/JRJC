@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import AsyncButton from "@/components/AsyncButton";
 
 type BookingTabsProps = {
   tabs: string[];
@@ -10,9 +11,9 @@ type BookingTabsProps = {
 
 const BookingTabs = ({ tabs, activeTab, onTabChange }: BookingTabsProps) => {
   return (
-    <div className="flex -mb-0.5">
+    <div className="flex -mb-0.25">
       {tabs.map((tab) => (
-        <button
+        <AsyncButton
           key={tab}
           className={`
             px-10 py-2 text-sm font-medium
@@ -26,7 +27,7 @@ const BookingTabs = ({ tabs, activeTab, onTabChange }: BookingTabsProps) => {
           onClick={() => onTabChange(tab)}
         >
           {tab}
-        </button>
+        </AsyncButton>
       ))}
     </div>
   );

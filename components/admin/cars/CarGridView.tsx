@@ -102,8 +102,8 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
                   ) : (
                       <CarPlaceholderIcon className="w-32 h-32 text-gray-300" />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-white/80 z-20"></div> {/*White Gradient*/}
-                  <div className="absolute top-1 left-0 right-0 z-30 bg-opacity-50 p-2 rounded-t-lg flex justify-between items-end">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-white/80 z-5"></div> {/*White Gradient*/}
+                  <div className="absolute top-1 left-0 right-0 z-5 bg-opacity-50 p-2 rounded-t-lg flex justify-between items-end">
                       <div className="text-left">
                           <h1 className="absolute top-1 font-bold text-black text-lg">{`${car.brand} ${car.model} ${car.year} (${car.transmission})`}</h1>
                       </div>
@@ -121,13 +121,13 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
                   </div>
                   <AsyncButton
                     onClick={() => onEditCar(car)}
-                    className="absolute left-2 bottom-8 z-30 px-2 rounded-md bg-white/70 border-1 border-black/60 hover:bg-white text-black text-sm"
+                    className="absolute left-2 bottom-8 z-5 px-2 rounded-md bg-white/70 border-1 border-black/60 hover:bg-white text-black text-sm"
                   >
                       Edit
                   </AsyncButton>
                   <AsyncButton 
                     onClick={() => handleDeleteClick(car)}
-                    className="absolute left-2 bottom-2 z-30 px-2 rounded-md bg-red-400 border-1 border-black/60 hover:bg-red-600 text-black text-sm"
+                    className="absolute left-2 bottom-2 z-5 px-2 rounded-md bg-red-400 border-1 border-black/60 hover:bg-red-600 text-black text-sm"
                   >
                       Delete
                   </AsyncButton>

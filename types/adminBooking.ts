@@ -6,6 +6,8 @@ export type TAdminBooking = {
   location: string;
   customerName: string;
   carModel: string;
+  carManufacturer: string;
+  carYear: number;
   status: string;
   dateCreated: string;
 };
