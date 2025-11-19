@@ -49,5 +49,5 @@ export const useBookings = (filters: Record<string, any> = {}) => {
     };
   }, [supabase]);
 
-  return { bookings, loading, error };
+  return { bookings, loading, error,  };
 };
