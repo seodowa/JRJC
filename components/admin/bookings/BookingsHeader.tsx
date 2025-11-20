@@ -60,7 +60,9 @@ const BookingsHeader = ({
                                                             hover:bg-blue-400">
                     {isAllSelected ? 'Deselect' : 'Select All'}
                 </AsyncButton>
-                <AsyncButton className="border border-gray-300 p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400">Walk-in Book</AsyncButton>
+                <AsyncButton onClick={() => router.push('/adminSU/manageBookings/walk-inBooking')} className="border border-gray-300 p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400">
+                    Walk-in Book
+                </AsyncButton>
             </>
           )}
         </div>
