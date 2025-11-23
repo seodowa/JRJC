@@ -25,7 +25,12 @@ export default function SelectCar({
     scrollRef.current?.scrollBy({ left: distance, behavior: "smooth" });
   };
 
-  const selectedCarData = cars.find(car => car.id === selectedCar);
+  // Filter out cars that are in maintenance - status is an object
+  const availableCars = cars.filter(car => 
+    car.status?.status !== "In Maintenance"
+  );
+
+  const selectedCarData = availableCars.find(car => car.id === selectedCar);
 
   const handleCarSelect = (car: Car) => {
     setSelectedCar(car.id);
@@ -52,7 +57,6 @@ export default function SelectCar({
     };
   }, []);
 
- 
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Dropdown trigger */}
@@ -90,13 +94,16 @@ export default function SelectCar({
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10 p-4">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Select a car:</h3>
 
-          {cars.length === 0 && (
+          {availableCars.length === 0 && (
             <div className="text-center py-4">
-              <p className="text-sm text-gray-500">No car models available</p>
+              <p className="text-sm text-gray-500">No available cars</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {cars.length > 0 ? "All cars are currently in maintenance" : "No car models available"}
+              </p>
             </div>
           )}
 
-          {cars.length > 0 && (
+          {availableCars.length > 0 && (
             <div className="flex items-center">
               <button
                 type="button"
@@ -112,7 +119,7 @@ export default function SelectCar({
                 className="flex overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide flex-1"
                 style={{ scrollBehavior: "smooth" }}
               >
-                {cars.map((car) => (
+                {availableCars.map((car) => (
                   <div
                     key={`car-${car.id}`}
                     onClick={() => handleCarSelect(car)}
@@ -157,6 +164,7 @@ export default function SelectCar({
                 <div>
                   <p className="font-semibold">{`${selectedCarData.brand} ${selectedCarData.model} ${selectedCarData.year}`}</p>
                   <p className="text-sm text-gray-600">{selectedCarData.transmission} • {selectedCarData.fuelType}</p>
+                  <p className="text-xs text-gray-500">Status: {selectedCarData.status?.status}</p>
                 </div>
               </div>
             </div>
