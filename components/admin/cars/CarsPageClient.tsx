@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { motion, AnimatePresence } from "framer-motion";
-import { Car } from "@/types";
+import { Car, CarStatus } from "@/types";
 import CarsSidebar from "@/components/admin/cars/CarsSidebar";
 import ViewToggle from "@/components/admin/cars/ViewToggle";
 import CarGridView from "@/components/admin/cars/CarGridView";
@@ -15,11 +15,12 @@ import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes, fetchLocati
 
 interface CarsPageClientProps {
   cars: Car[];
+  carStatuses: CarStatus[];
   view: 'list' | 'grid';
   search: string;
 }
 
-const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) => {
+const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view, search }) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -142,9 +143,9 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, view, search }) =
                       transition={{ ease: "easeInOut", duration: 0.3 }}
                   >
                       {view === 'list' ? (
-                        <CarListView cars={cars} onEditCar={handleOpenEditModal} />
+                        <CarListView cars={cars} onEditCar={handleOpenEditModal} carStatuses={carStatuses} />
                       ) : (
-                        <CarGridView cars={cars} onAddNewCar={handleOpenAddModal} onEditCar={handleOpenEditModal} />
+                        <CarGridView cars={cars} onAddNewCar={handleOpenAddModal} onEditCar={handleOpenEditModal} carStatuses={carStatuses} />
                       )}
                   </motion.div>
               </AnimatePresence>

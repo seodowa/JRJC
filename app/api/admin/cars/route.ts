@@ -3,6 +3,19 @@ import { cookies } from 'next/headers';
 import { decrypt, getSession } from '@/lib';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 
+interface PriceItem {
+    Location: string;
+    Price_12_Hours: number | null;
+    Price_24_Hours: number | null;
+}
+
+interface MappedPrice {
+    Car_ID: number;
+    Location_ID: number;
+    Price_12_Hours: number | null;
+    Price_24_Hours: number | null;
+}
+
 // Helper functions to get specific IDs, corrected according to the provided schema
 const getManufacturerId = async (name: string): Promise<number | null> => {
   const { data, error } = await supabaseAdmin.from('Manufacturer').select('Manufacturer_ID').eq('Manufacturer_Name', name).single();
@@ -148,10 +161,10 @@ export async function PUT(req: Request) {
 
     // 6. Handle Pricing Data now that we have a definite carModelId
     if (price && price.length > 0) {
-        const locationNames = price.map((p: any) => p.Location).filter(Boolean);
+        const locationNames = price.map((p: PriceItem) => p.Location).filter(Boolean);
         const locationIdMap = await getLocationIds(locationNames);
 
-        const pricingPayload = price.map((p: any) => {
+        const pricingPayload = price.map((p: PriceItem) => {
             const locationId = locationIdMap.get(p.Location);
             if (!locationId) {
                 console.warn(`Skipping price for invalid location: ${p.Location}`);
@@ -163,7 +176,7 @@ export async function PUT(req: Request) {
                 Price_12_Hours: p.Price_12_Hours || null,
                 Price_24_Hours: p.Price_24_Hours || null,
             };
-        }).filter((p): p is NonNullable<typeof p> => p !== null);
+        }).filter((p: MappedPrice | null): p is MappedPrice => p !== null);
 
         // WORKAROUND: Replace upsert with delete-then-insert due to missing DB constraint
         if (pricingPayload.length > 0) {
@@ -266,3 +279,4 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+

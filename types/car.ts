@@ -7,6 +7,11 @@ export interface CarPricing {
     Price_24_Hours: number
 }
 
+export interface CarStatus {
+    id: number;
+    status: string;
+}
+
 export interface Car {
   id: number
   model: string
@@ -19,6 +24,7 @@ export interface Car {
   fuelType: 'Gasoline' | 'Hybrid' | 'Diesel'
   available: boolean
   color?: string
+  status: CarStatus | null
 }
 
 export interface CarFilters {

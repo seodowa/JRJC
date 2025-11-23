@@ -92,3 +92,20 @@ export const deleteCar = async (carId: number) => {
 
     return response.json();
 };
+
+export const updateCarStatus = async (carId: number, statusId: number) => {
+    const response = await fetch('/api/admin/cars/status', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ carId, statusId }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update car status');
+    }
+
+    return response.json();
+};

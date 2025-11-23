@@ -1,7 +1,9 @@
-import { fetchCars } from "@/lib/supabase/queries/fetchCars";
+import { fetchCars, fetchCarStatuses } from "@/lib/supabase/queries/fetchCars";
+import { fetchDisplayManageCars } from "@/lib/supabase/queries/fetchDisplayManageCars";
 import CarsPageClient from "@/components/admin/cars/CarsPageClient";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/admin/LoadingSpinner";
+import { Car } from "@/types";
 
 export const dynamic = 'force-dynamic';
 
@@ -17,11 +19,18 @@ const ManageCarsPage = async ({ searchParams }: ManageCarsPageProps) => {
     const query = resolvedSearchParams?.q || '';
     const view = resolvedSearchParams?.view || 'list';
     
-    const cars = await fetchCars(query);
+    let cars: Car[];
+    if (query) {
+        cars = await fetchCars(query);
+    } else {
+        cars = await fetchDisplayManageCars();
+    }
+    
+    const carStatuses = await fetchCarStatuses();
 
     return (
         <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><LoadingSpinner /></div>}>
-            <CarsPageClient cars={cars} view={view} search={query} />
+            <CarsPageClient cars={cars} carStatuses={carStatuses} view={view} search={query} />
         </Suspense>
     );
 };

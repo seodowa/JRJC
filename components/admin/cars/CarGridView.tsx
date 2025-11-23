@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Car } from "@/types";
+import { Car, CarStatus } from "@/types";
 import AsyncButton from "@/components/AsyncButton";
 import PlusIcon from "@/components/icons/PlusIcon";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon";
@@ -10,12 +10,13 @@ import { useState } from "react";
 import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/toast/use-toast';
-import { deleteCar } from '@/lib/supabase/mutations/cars';
+import { deleteCar, updateCarStatus } from '@/lib/supabase/mutations/cars';
 
 interface CarGridViewProps {
   cars: Car[];
   onAddNewCar: () => void;
   onEditCar: (car: Car) => void;
+  carStatuses: CarStatus[];
 }
 
 const containerVariants = {
@@ -33,7 +34,7 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 };
 
-const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
+const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewProps) => {
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -67,6 +68,23 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
     } finally {
       setIsDeleting(false);
       setCarToDelete(null);
+    }
+  };
+
+  const handleStatusChange = async (carId: number, statusId: number) => {
+    try {
+      await updateCarStatus(carId, statusId);
+      toast({
+        title: "Success",
+        description: "Car status updated successfully.",
+      });
+      router.refresh();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update car status.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -119,6 +137,19 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar }: CarGridViewProps) => {
                           ))}
                       </div>
                   </div>
+                  <div className="absolute right-2 bottom-2 z-5 flex items-center gap-2">
+                        <label htmlFor={`status-${car.id}`} className="font-semibold text-sm">Status:</label>
+                        <select
+                            id={`status-${car.id}`}
+                            value={car.status?.id || ''}
+                            onChange={(e) => handleStatusChange(car.id, parseInt(e.target.value))}
+                            className="text-sm rounded-md w-full max-w-[100px] text-black bg-white"
+                        >
+                            {carStatuses.map(status => (
+                                <option key={status.id} value={status.id}>{status.status}</option>
+                            ))}
+                        </select>
+                    </div>
                   <AsyncButton
                     onClick={() => onEditCar(car)}
                     className="absolute left-2 bottom-8 z-5 px-2 rounded-md bg-white/70 border-1 border-black/60 hover:bg-white text-black text-sm"

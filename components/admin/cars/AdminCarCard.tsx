@@ -3,21 +3,21 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Car } from "@/types";
 import AsyncButton from "@/components/AsyncButton";
 import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon"; // Import the new icon
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/toast/use-toast';
-import { deleteCar } from '@/lib/supabase/mutations/cars';
+import { deleteCar, updateCarStatus } from '@/lib/supabase/mutations/cars';
 
 interface AdminCarCardProps {
   car: Car;
   onEditCar: (car: Car) => void;
+  carStatuses: CarStatus[];
 }
 
-const AdminCarCard = ({ car, onEditCar }: AdminCarCardProps) => {
+const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -48,6 +48,23 @@ const AdminCarCard = ({ car, onEditCar }: AdminCarCardProps) => {
     }
   };
 
+  const handleStatusChange = async (carId: number, statusId: number) => {
+    try {
+      await updateCarStatus(carId, statusId);
+      toast({
+        title: "Success",
+        description: "Car status updated successfully.",
+      });
+      router.refresh();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update car status.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 border border-gray-300 rounded-lg p-4 shadow-sm">
       {/* Image */}
@@ -71,6 +88,19 @@ const AdminCarCard = ({ car, onEditCar }: AdminCarCardProps) => {
         <p>Transmission: {car.transmission}</p>
         <p>Fuel Type: {car.fuelType}</p>
         <p>Seats: {car.seats}</p>
+        <div className="mt-2 flex items-center gap-2">
+            <label htmlFor={`status-${car.id}`} className="font-semibold">Status:</label>
+            <select
+                id={`status-${car.id}`}
+                value={car.status?.id || ''}
+                onChange={(e) => handleStatusChange(car.id, parseInt(e.target.value))}
+                className="text-sm rounded-md w-full max-w-[150px] text-black bg-white"
+            >
+                {carStatuses.map(status => (
+                    <option key={status.id} value={status.id}>{status.status}</option>
+                ))}
+            </select>
+        </div>
         
         <div className="mt-4 flex gap-2">
           <AsyncButton

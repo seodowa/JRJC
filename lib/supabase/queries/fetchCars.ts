@@ -1,6 +1,6 @@
 // utils/supabase/carQueries.ts
 import { createClient } from "@/utils/supabase/client";
-import { Car, CarPricing } from "@/types";
+import { Car, CarPricing, CarStatus } from "@/types";
 
 export const fetchCars = async (query?: string): Promise<Car[]> => {
   const supabase = createClient();
@@ -18,6 +18,10 @@ export const fetchCars = async (query?: string): Promise<Car[]> => {
         ),
         Fuel_Types (
           Fuel
+        ),
+        Car_Status (
+            id,
+            status
         ),
         Car_Pricing (
           *,
@@ -51,7 +55,8 @@ export const fetchCars = async (query?: string): Promise<Car[]> => {
         price: carPricing,
         seats: car.Number_Of_Seats,
         available: car.Available || true,
-        color: car.color_code
+        color: car.color_code,
+        status: car.Car_Status ? { id: car.Car_Status.id, status: car.Car_Status.status } : null
       };
     }) || [];
 
@@ -131,7 +136,9 @@ export const fetchSpecificCar = async (car_id: number): Promise<Car> => {
           fuelType: car.Fuel_Types?.Fuel || "Unknown",
           seats: car.Number_Of_Seats,
           available: car.Available || true,
-          color: car.color_code
+          color: car.color_code,
+          price: undefined,
+          status: null
       }
     ))
 
@@ -142,3 +149,17 @@ export const fetchSpecificCar = async (car_id: number): Promise<Car> => {
     throw error;
   }
 }
+
+export const fetchCarStatuses = async (): Promise<CarStatus[]> => {
+    const supabase = createClient();
+    try {
+        const { data, error } = await supabase
+            .from("Car_Status")
+            .select("id, status");
+        if (error) throw new Error(error.message);
+        return data.map(d => ({ id: d.id, status: d.status })) as CarStatus[];
+    } catch (error) {
+        console.error("Error fetching car statuses:", error);
+        return [];
+    }
+};
