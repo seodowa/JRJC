@@ -36,7 +36,8 @@ const BookingsHeader = ({
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{view === 'history' ? 'Bookings History' : 'Manage Bookings'}</h1>
         {view === 'history' ? (
-          <AsyncButton onClick={() => router.back()} className="px-4 py-2 bg-gray-200 rounded-md">
+          <AsyncButton onClick={() => router.back()} className="px-4 py-2 bg-gray-200 rounded-md
+                                                                     hover:bg-[#A1E3F9]">
             Back
           </AsyncButton>
         ) : (
@@ -96,41 +97,7 @@ const BookingsHeader = ({
           />
         </div>
       )}
-      <table className="min-w-full text-gray-800 md:table table-fixed">
-        <thead className="rounded-lg border-y border-gray-200 text-sm font-normal">
-          <tr>
-            {showCheckboxes && (
-              <th scope="col" className="p-5 font-medium text-center w-[5%]">
-                {/* This is an empty header for the checkboxes in the content rows */}
-              </th>
-            )}
-            <th scope="col" className="p-3 font-medium text-left w-[15%]">
-              Name
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[15%]">
-              Booking ID
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
-              Date Booked
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
-              Booking Start
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
-              Booking End
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
-              Duration
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[15%]">
-              Car
-            </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
-              Status
-            </th>
-          </tr>
-        </thead>
-      </table>
+
     </div>
   );
 };

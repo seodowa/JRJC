@@ -20,6 +20,39 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
 
   return (
     <table className="min-w-full text-gray-800 md:table table-fixed">
+      <thead className="rounded-lg border-y border-gray-200 text-sm font-normal">
+          <tr>
+            {showCheckboxes && (
+              <th scope="col" className="p-5 font-medium text-center w-[5%]">
+                {/* This is an empty header for the checkboxes in the content rows */}
+              </th>
+            )}
+            <th scope="col" className="p-3 font-medium text-left w-[15%]">
+              Name
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[15%]">
+              Booking ID
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+              Date Booked
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+              Booking Start
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+              Booking End
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+              Duration
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[15%]">
+              Car
+            </th>
+            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+              Status
+            </th>
+          </tr>
+        </thead>
       <tbody className="bg-white">
         {bookings.map((booking) => (
           <tr
