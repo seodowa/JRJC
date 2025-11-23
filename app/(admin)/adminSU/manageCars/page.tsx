@@ -4,6 +4,7 @@ import CarsPageClient from "@/components/admin/cars/CarsPageClient";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/admin/LoadingSpinner";
 import { Car } from "@/types";
+import { RealtimeCarsRefresher } from "@/components/admin/cars/RealtimeCarsRefresher";
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,7 @@ const ManageCarsPage = async ({ searchParams }: ManageCarsPageProps) => {
 
     return (
         <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><LoadingSpinner /></div>}>
+            <RealtimeCarsRefresher />
             <CarsPageClient cars={cars} carStatuses={carStatuses} view={view} search={query} />
         </Suspense>
     );
