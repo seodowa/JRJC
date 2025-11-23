@@ -19,7 +19,10 @@ export async function fetchOngoingBookings(): Promise<Booking[]> {
         Model_Name,
         Year_Model,
         color_code,
-        status,
+        status_id,
+        Car_Status (
+            status
+        ),
         Transmission_Types (
           Name
         ),
@@ -64,7 +67,7 @@ export async function fetchOngoingBookings(): Promise<Booking[]> {
       Model_Name: carModel?.Model_Name || 'N/A',
       Year_Model: carModel?.Year_Model || 0,
       color_code: carModel?.color_code || '#808080', // Default to gray
-      Car_Status: carModel?.status || 'N/A',
+      Car_Status: carModel?.Car_Status?.status || 'N/A',
       Transmission_Type: transmission?.Name || 'N/A',
       Manufacturer_Name: manufacturer?.Manufacturer_Name || 'N/A',
     };

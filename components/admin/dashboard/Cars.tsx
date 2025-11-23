@@ -22,7 +22,7 @@ const Cars: React.FC<CarsProps> = ({ cars }) => {
       <div className="flex-grow space-y-4 max-h-[90vh] overflow-y-auto">
         {cars.map((car) => {
           const bgColor = car.color_code || '#808080';
-          const isAvailable = car.status === 'Parked';
+          const isAvailable = car.status_id === 1; // 1 for Parked
 
           return (
             <div
@@ -32,7 +32,7 @@ const Cars: React.FC<CarsProps> = ({ cars }) => {
             >
               <div className="flex-grow">
                 <p className="font-bold">{`${car.Manufacturer_Name} ${car.Model_Name} ${car.Year_Model} (${car.Transmission_Type})`}</p>
-                {car.status === 'Traveling' && car.bookingDetails && (
+                {car.status_id === 2 && car.bookingDetails && ( // 2 for Traveling
                   <div>
                     <p>{`Rented by: ${car.bookingDetails.Customer_Full_Name}`}</p>
                     <p>{`Duration: ${car.bookingDetails.Duration} hours, Location: ${car.bookingDetails.Location}`}</p>

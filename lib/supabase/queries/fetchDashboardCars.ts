@@ -13,7 +13,7 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
       Model_Name,
       Year_Model,
       color_code,
-      status,
+      status_id,
       is_deleted,
       Transmission_Types (
         Name
@@ -31,7 +31,7 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
 
   const cars = await Promise.all(carsData.map(async (car) => {
     let bookingDetails = null;
-    if (car.status === 'Traveling') {
+    if (car.status_id === 2) { // 2 is for 'Traveling'
       const { data: bookingData, error: bookingError } = await supabase
         .from('Booking_Details')
         .select(`

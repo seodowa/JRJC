@@ -33,7 +33,7 @@ export interface DashboardCarData {
     Model_Name: string;
     Year_Model: number;
     color_code: string;
-    status: string;
+    status_id: number;
     Transmission_Type: string;
     Manufacturer_Name: string;
     bookingDetails: {
