@@ -17,6 +17,7 @@ type BookingsHeaderProps = {
   onTabChange: (tab: string) => void;
   bookingStatuses: string[];
   showCheckboxes: boolean;
+  onApprove: () => void;
 };
 
 const BookingsHeader = ({
@@ -28,6 +29,7 @@ const BookingsHeader = ({
   onTabChange,
   bookingStatuses,
   showCheckboxes,
+  onApprove,
 }: BookingsHeaderProps) => {
   const router = useRouter();
 
@@ -73,7 +75,7 @@ const BookingsHeader = ({
                                     hover:bg-red-400 hover:text-white">
                   Decline
               </AsyncButton>
-              <AsyncButton className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+              <AsyncButton onClick={onApprove} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
                                 hover:bg-blue-300">
                   Approve
               </AsyncButton>
