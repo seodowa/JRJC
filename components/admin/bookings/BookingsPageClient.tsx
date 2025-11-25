@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { TAdminBooking } from '@/types/adminBooking';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
-import { createClient } from '@/utils/supabase/client'; // Import Supabase Client
+import { approveBookingsService } from '@/app/services/bookingService'; // Import the service
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
 
@@ -18,14 +18,13 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('All');
   const [bookingStatuses, setBookingStatuses] = useState<string[]>(['All']);
-  const [isProcessing, setIsProcessing] = useState(false); // Add loading state
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace, refresh } = useRouter(); // Destructure refresh
-  const supabase = createClient(); // Initialize Supabase
+  const { replace, refresh } = useRouter();
 
-  // ... (Your existing useEffect for statuses) ...
+  // ... (Existing useEffect for statuses - No changes)
   useEffect(() => {
     let statuses = initialStatuses;
     if (view !== 'history') {
@@ -36,7 +35,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     setBookingStatuses(['All', ...statuses.filter(s => s !== 'All')]);
   }, [initialStatuses, view]);
 
-  // ... (Your existing handleSearch) ...
+  // ... (Existing handleSearch - No changes)
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
@@ -51,7 +50,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     setActiveTab(tab);
   };
 
-  // ... (Your existing useMemos) ...
+  // ... (Existing useMemos - No changes)
   const filteredBookings = useMemo(() => {
     if (activeTab === 'All') {
       return bookings;
@@ -74,93 +73,44 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     }
   };
 
-  // --- NEW: Handle Approve Logic ---
-  // Inside BookingsPageClient.tsx
-
-const handleApprove = async () => {
-  if (selectedBookings.length === 0) {
-    alert("Please select at least one booking to approve.");
-    return;
-  }
-
-  if (!confirm(`Are you sure you want to approve ${selectedBookings.length} booking(s)?`)) return;
-
-  setIsProcessing(true);
-
-  try {
-    // 1. Identify the bookings to process
-    const bookingsToProcess = bookings.filter(b => selectedBookings.includes(b.bookingId));
-    
-    for (const booking of bookingsToProcess) {
-      
-      // A. Update Status in Database (2 = Confirmed/Approved)
-      const { error: updateError } = await supabase
-        .from('Booking_Details')
-        .update({ Booking_Status_ID: 2 }) 
-        .eq('Booking_ID', booking.bookingId);
-
-      if (updateError) {
-        console.error(`Failed to update booking ${booking.bookingId}`, updateError);
-        continue; 
-      }
-
-      // B. FETCH CONTACT INFO (The Fix)
-      // Since TAdminBooking doesn't have the phone number, we fetch it here.
-      const { data: customerData, error: fetchError } = await supabase
-        .from('Booking_Details')
-        .select(`
-          Customer (
-            Contact_Number,
-            First_Name
-          )
-        `)
-        .eq('Booking_ID', booking.bookingId)
-        .single();
-
-      if (fetchError) {
-        console.error("Could not fetch customer phone for SMS", fetchError);
-        continue;
-      }
-
-      // C. Prepare and Send SMS
-      // Note: Supabase returns nested objects. We use optional chaining (?.) to be safe.
-      // We check specifically for 'Customer' because of the join.
-      // Type assertion might be needed if TypeScript complains, or just use 'any' for quick fix
-      const customer = (customerData as any)?.Customer;
-      const phone = customer?.Contact_Number;
-      const firstName = customer?.First_Name || booking.customerName;
-
-      if (phone) {
-        let formattedNumber = phone;
-        // Ensure PH format
-        if (formattedNumber.startsWith('0')) formattedNumber = '+63' + formattedNumber.substring(1);
-
-        const message = `Hi ${firstName}, Good news! Your booking (ID: ${booking.bookingId}) has been APPROVED. See you soon!`;
-
-        await fetch('/api/sms', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to: formattedNumber, text: message })
-        });
-        
-        console.log(`SMS sent to ${firstName}`);
-      }
+  // --- UPDATED: Handle Approve using Service ---
+  const handleApprove = async () => {
+    if (selectedBookings.length === 0) {
+      alert("Please select at least one booking to approve.");
+      return;
     }
 
-    alert("Bookings approved successfully!");
-    setSelectedBookings([]); 
-    refresh(); 
+    if (!confirm(`Are you sure you want to approve ${selectedBookings.length} booking(s)?`)) return;
 
-  } catch (error) {
-    console.error("Error processing approval:", error);
-    alert("An error occurred while approving.");
-  } finally {
-    setIsProcessing(false);
-  }
-};
+    setIsProcessing(true);
+
+    try {
+      // Call the service
+      const results = await approveBookingsService(selectedBookings);
+      
+      // Check results
+      const successCount = results.filter(r => r.success).length;
+      const failCount = results.filter(r => !r.success).length;
+
+      if (failCount === 0) {
+        alert("All selected bookings approved successfully!");
+      } else {
+        alert(`${successCount} approved, but ${failCount} failed to update.`);
+      }
+      
+      setSelectedBookings([]); 
+      refresh(); // Reload page data
+
+    } catch (error) {
+      console.error("Critical error during approval:", error);
+      alert("An unexpected error occurred.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-full p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md">
+    <div className="flex flex-col h-full p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md relative">
       <BookingsHeader
         view={view}
         onSearch={handleSearch}
@@ -170,13 +120,16 @@ const handleApprove = async () => {
         onTabChange={handleTabChange}
         bookingStatuses={bookingStatuses}
         showCheckboxes={view !== 'history'}
-        onApprove={handleApprove} // <--- Pass the function here
+        onApprove={handleApprove} 
       />
       
-      {/* Optional: Show a loading overlay if processing */}
+      {/* Loading Overlay */}
       {isProcessing && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-           <div className="bg-white p-4 rounded-lg shadow-lg">Processing Approvals...</div>
+        <div className="absolute inset-0 bg-white/50 z-50 flex items-center justify-center rounded-3xl">
+           <div className="bg-white p-6 rounded-xl shadow-2xl border border-gray-100 flex flex-col items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+              <p className="text-gray-700 font-medium">Processing Approvals...</p>
+           </div>
         </div>
       )}
 
