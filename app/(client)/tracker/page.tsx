@@ -1,16 +1,18 @@
-"use client"
+'use client'
 
 import { fetchBookingStatus } from "@/lib/supabase/queries/fetchBooking";
 import { BookingStatus } from "@/types";
 import { useEffect, useRef, useState } from "react";
+import { cancelBookingService } from "@/app/services/bookingService"; // Import the service
 
 export default function BookingTrackerPage() {
     const [booking, setBooking] = useState<BookingStatus | null>(null);
     const [uuid, setUUID] = useState<string>("");
-    const [isLoading, setIsLoading] = useState(true);    
+    const [isLoading, setIsLoading] = useState(false); 
+    const [isCancelling, setIsCancelling] = useState(false); 
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-
+    
     const handleUUIDSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
@@ -18,71 +20,115 @@ export default function BookingTrackerPage() {
             setUUID(inputRef.current.value);
     }
 
+    // --- NEW: Handle Cancel Logic using Service ---
+    const handleCancel = async () => {
+        if (!booking || !uuid) return;
+
+        if (!confirm("Are you sure you want to cancel your booking? This action cannot be undone.")) return;
+
+        setIsCancelling(true);
+
+        try {
+            // Call the service instead of inline logic
+            const result = await cancelBookingService(uuid);
+
+            if (result.success) {
+                alert("Booking cancelled successfully.");
+                // Update local state to reflect change immediately
+                setBooking(prev => prev ? { ...prev, bookingStatus: "Cancelled" } : null);
+            } else {
+                throw result.error || new Error("Failed to cancel booking.");
+            }
+
+        } catch (err) {
+            console.error("Error cancelling booking:", err);
+            alert("Failed to cancel booking. Please try again or contact support.");
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
     const BookingStatusDisplay = () => {
         // 1. Handle Loading State
-        if (isLoading && inputRef.current) {
+        if (isLoading) {
             return <div>Loading booking details...</div>;
         }
 
         // 2. Handle Error State
         if (error) {
-            return <div>{error}</div>;
+            return <div className="text-red-500">{error}</div>;
         }
 
         // 3. Handle Success (Data Found)
-        // (You were missing this part!)
         if (booking) {
+            const canCancel = booking.bookingStatus !== 'Cancelled' && booking.bookingStatus !== 'Completed' && booking.bookingStatus !== 'Declined';
+
             return (
-            <>
-                <p>
-                <strong>Customer:</strong> {booking.customerFirstName} {booking.customerLastName}
-                </p>
-                <p>
-                <strong>Vehicle:</strong> {booking.carManufacturer} {booking.carModelName}
-                </p>
-                <p>
-                <strong>Status:</strong> {booking.bookingStatus}
-                </p>
-            </>
+                <div className="flex flex-col gap-2">
+                    <p>
+                        <strong>Customer:</strong> {booking.customerFirstName} {booking.customerLastName}
+                    </p>
+                    <p>
+                        <strong>Vehicle:</strong> {booking.carManufacturer} {booking.carModelName}
+                    </p>
+                    <p>
+                        <strong>Status:</strong> 
+                        <span className={`ml-2 px-2 py-1 rounded-md text-sm font-medium ${
+                            booking.bookingStatus === 'Confirmed' ? 'bg-green-100 text-green-800' :
+                            booking.bookingStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                            booking.bookingStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                        }`}>
+                            {booking.bookingStatus}
+                        </span>
+                    </p>
+
+                    {/* Show Cancel Button only if booking is active */}
+                    {canCancel && (
+                        <button 
+                            onClick={handleCancel}
+                            disabled={isCancelling}
+                            className="mt-6 bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600 disabled:bg-red-300 transition-colors"
+                        >
+                            {isCancelling ? 'Processing...' : 'Cancel Booking'}
+                        </button>
+                    )}
+                </div>
             );
         }
 
         // 4. Handle "Not Found" State
-        // This will only show if not loading, no error, and no booking
-        return <div>You can track your booking here.</div>;
-
+        return <div className="text-gray-500">You can track your booking here.</div>;
     }
 
     // --- Data Fetching ---
     useEffect(() => {
-        // Define an async helper function inside the effect
         const getStatus = async () => {
             try {
-                setIsLoading(true); // Start loading
-                setError(null); // Clear any previous errors
+                setIsLoading(true); 
+                setError(null); 
 
-                // Call your imported function
                 const data = await fetchBookingStatus(uuid);
                 
                 if (data) {
-                    setBooking(data); // Save the data to state
+                    setBooking(data); 
                 } else {
-                    setError("Booking not found."); // Handle the "not found" case
+                    setBooking(null);
+                    setError("Booking not found."); 
                 }
 
             } catch (err: any) {
-                setError(err.message); // Save the error to state
+                setError(err.message || "An error occurred"); 
+                setBooking(null);
             } finally {
-                setIsLoading(false); // Stop loading (in all cases)
+                setIsLoading(false); 
             }
         };
 
-        // Call the helper function
         if (uuid) {
             getStatus();
         }
-
-    }, [uuid]); // Re-run the effect if the uuid prop ever changes
+    }, [uuid]); 
 
 
     return (
