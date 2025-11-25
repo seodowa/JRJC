@@ -1,26 +1,16 @@
 "use client";
 
-import { useState } from 'react';
+import { useWalkInBooking } from "@/app/(admin)/adminSU/context/WalkInBookingContext";
 
 interface PersonalInformationFormProps {
   onNext: () => void;
 }
 
 const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    suffix: '',
-    email: '',
-    mobileNumber: '',
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { personalInfo, handleInputChange } = useWalkInBooking();
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md">
+    <div className="bg-white p-8 rounded-4xl shadow-md">
       <h2 className="text-xl font-bold mb-6">Personal Information</h2>
       <form>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -32,8 +22,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               type="text"
               name="firstName"
               id="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
+              value={personalInfo.firstName}
+              onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder="Enter your first name"
             />
@@ -46,8 +36,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               type="text"
               name="lastName"
               id="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
+              value={personalInfo.lastName}
+              onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder="Enter your last name"
             />
@@ -60,8 +50,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               type="text"
               name="suffix"
               id="suffix"
-              value={formData.suffix}
-              onChange={handleChange}
+              value={personalInfo.suffix}
+              onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
@@ -75,8 +65,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               type="email"
               name="email"
               id="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={personalInfo.email}
+              onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder="Enter your email address"
             />
@@ -89,8 +79,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               type="text"
               name="mobileNumber"
               id="mobileNumber"
-              value={formData.mobileNumber}
-              onChange={handleChange}
+              value={personalInfo.mobileNumber}
+              onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder="Enter your mobile number"
             />

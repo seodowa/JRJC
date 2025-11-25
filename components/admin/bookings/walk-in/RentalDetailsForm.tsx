@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import dayjs from 'dayjs';
+import SelectCar from '@/components/SelectCar';
+import BookingCalendar from '@/components/BookingCalendar';
+import { LocalizationProvider, MobileTimePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Dayjs } from 'dayjs';
+import { useWalkInBooking } from '@/app/(admin)/adminSU/context/WalkInBookingContext';
 
 interface RentalDetailsFormProps {
   onBack: () => void;
@@ -8,153 +15,274 @@ interface RentalDetailsFormProps {
 }
 
 const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
-  const [formData, setFormData] = useState({
-    model: '',
-    transmission: '',
-    fuelType: '',
-    area: '',
-    date: '',
-    time: '',
-    selfDrive: '',
-    duration: '',
-  });
+  const {
+    rentalInfo,
+    handleRentalInputChange,
+    selectedCar,
+    setSelectedCar,
+    selectedCarData,
+    setSelectedCarData,
+    cars,
+    pricingData,
+    loading,
+    error,
+    selectedTime,
+    setSelectedTime,
+    setRentalInfo,
+    dateRangeError,
+    setDateRangeError,
+    formatDate,
+    formatTime,
+    calculateRentalDetails,
+    calculateReturnTime
+  } = useWalkInBooking();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const {
+    hours,
+    days,
+    totalPrice,
+    twelveHourPrice,
+    twentyFourHourPrice,
+    multiDayPrice,
+    show12HourOption,
+    show24HourOption
+  } = calculateRentalDetails();
+
+  const { returnTime } = calculateReturnTime();
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md mt-8">
+    <div className="bg-white p-8 rounded-4xl shadow-md mt-8">
       <h2 className="text-xl font-bold mb-6">Rental Details</h2>
-      <form>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label htmlFor="model" className="block text-sm font-medium text-gray-700">
-              Model: *
-            </label>
+      <form onSubmit={(e) => { e.preventDefault(); onNext(); }}>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <SelectCar 
+                selectedCar={selectedCar} 
+                setSelectedCar={setSelectedCar}
+                onCarSelect={setSelectedCarData}
+                cars={cars}
+              />              
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Transmission
+              </label>
+              <input
+                type="text"
+                disabled
+                value={selectedCarData?.transmission || "—"}
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Area <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="area"
+                value={rentalInfo.area}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+                disabled={loading}
+              >
+                <option value="">Select area</option>
+                {pricingData.map((area) => (
+                  <option key={area.Location} value={area.Location}>
+                    {area.Location}
+                  </option>
+                ))}
+              </select>
+              
+              {!selectedCar && !loading && (
+                <div className="text-sm text-gray-500 mt-1">Please select a car first</div>
+              )}
+              {loading && (
+                <div className="text-sm text-gray-500 mt-1">Loading pricing...</div>
+              )}
+              {error && (
+                <div className="text-sm text-red-500 mt-1">{error}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pick-up Time <span className="text-red-500">*</span>
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MobileTimePicker
+                  label="Select time"
+                  value={selectedTime}
+                  onChange={(newTime: Dayjs | null) => {
+                    setSelectedTime(newTime);
+                    const timeString = newTime ? newTime.format('HH:mm') : '';
+                    setRentalInfo(prev => ({ ...prev, time: timeString }));
+                  }}
+                  ampm={true}
+                  minutesStep={30}
+                  slotProps={{
+                    textField: {
+                      required: true,
+                      fullWidth: true,
+                      size: "small",
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+
+           <div className="md:col-span-2">
+            <BookingCalendar
+              selectedCar={selectedCarData?.id}
+              startDate={rentalInfo.startDate}
+              endDate={rentalInfo.endDate}
+              onStartDateChange={(date) => 
+                setRentalInfo(prev => ({ ...prev, startDate: date }))
+              }
+              onEndDateChange={(date) => 
+                setRentalInfo(prev => ({ ...prev, endDate: date }))
+              }
+              onRangeError={setDateRangeError}
+              minDate={dayjs()}
+            />
+        
+            {dateRangeError && (
+              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-700">{dateRangeError}</p>
+              </div>
+            )}
+          </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fuel Type
+              </label>
+              <input
+                type="text"
+                disabled
+                value="Gasoline(Unleaded)"
+                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Self-drive? <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="selfDrive"
+                value={rentalInfo.selfDrive}
+                onChange={handleRentalInputChange}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Duration <span className="text-red-500">*</span>
+              </label>
+              
+              {hours > 0 ? (
+                <select
+                  name="duration"
+                  value={rentalInfo.duration}
+                  onChange={handleRentalInputChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="">Select duration</option>
+                  
+                  {show12HourOption && (
+                    <option value="12 hours">
+                      ₱{twelveHourPrice}/12 hours
+                    </option>
+                  )}
+                  
+                  {show24HourOption && (
+                    <option value="24 hours">
+                      ₱{twentyFourHourPrice}/24 hours
+                    </option>
+                  )}
+                  
+                  {hours > 24 && (
+                    <option value={`${days} days`}>
+                      ₱{multiDayPrice} for {days} {days === 1 ? 'day' : 'days'} ({hours} hours total)
+                    </option>
+                  )}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value="Select dates and time first"
+                  disabled
+                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+                />
+              )}
+              
+              <div className="text-sm text-gray-500 mt-1">
+                {hours > 0 ? (
+                  <>
+                    {hours} hours total • 
+                    {show12HourOption ? " 12-hour return possible" : 
+                    show24HourOption ? " 24-hour return possible" : 
+                    " Multi-day rental"}
+                  </>
+                ) : (
+                  "Select dates and time to calculate duration"
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-gray-800">
+              {rentalInfo.duration ? `Initial Price: ₱${totalPrice}` : "Initial Price: ₱0"}
+            </span>
+            {rentalInfo.startDate && rentalInfo.time && rentalInfo.duration && (
+              <div className="text-xs text-gray-600 mt-1 space-y-1">
+                <div>
+                  <span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}
+                </div>
+                <div>
+                  <span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {returnTime}
+                </div>
+                <div>
+                  <span className="font-medium">Duration:</span> {rentalInfo.duration}
+                </div>
+                <div>
+                  <span className="font-medium">Vehicle:</span> <span>{selectedCarData?.brand}</span>{" "}
+                  <span>{selectedCarData?.model}</span>{" "}
+                  <span>({selectedCarData?.year})</span> • {rentalInfo.area}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-3">
             <button
               type="button"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-blue-500 text-white py-2 px-4"
+              onClick={onBack}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
             >
-              Select car
+              Back
+            </button>
+            <button
+              type="submit"
+              disabled={!rentalInfo.duration || dateRangeError !== null}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            >
+              Next
             </button>
           </div>
-          <div>
-            <label htmlFor="transmission" className="block text-sm font-medium text-gray-700">
-              Transmission:
-            </label>
-            <input
-              type="text"
-              name="transmission"
-              id="transmission"
-              value={formData.transmission}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 sm:text-sm"
-              disabled
-            />
-          </div>
-          <div>
-            <label htmlFor="fuelType" className="block text-sm font-medium text-gray-700">
-              Fuel Type:
-            </label>
-            <input
-              type="text"
-              name="fuelType"
-              id="fuelType"
-              value={formData.fuelType}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 sm:text-sm"
-              disabled
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-          <div className="md:col-span-1">
-            <label htmlFor="area" className="block text-sm font-medium text-gray-700">
-              Area: *
-            </label>
-            <input
-              type="text"
-              name="area"
-              id="area"
-              value={formData.area}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div className="md:col-span-1">
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-              Date: *
-            </label>
-            <input
-              type="date"
-              name="date"
-              id="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div className="md:col-span-1">
-            <label htmlFor="time" className="block text-sm font-medium text-gray-700">
-              Time: *
-            </label>
-            <input
-              type="time"
-              name="time"
-              id="time"
-              value={formData.time}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div className="md:col-span-1">
-            <label htmlFor="selfDrive" className="block text-sm font-medium text-gray-700">
-              Self-drive? *
-            </label>
-            <select
-              name="selfDrive"
-              id="selfDrive"
-              value={formData.selfDrive}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            >
-              <option value="">Select</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-          <div className="md:col-span-1">
-            <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
-              Duration: *
-            </label>
-            <input
-              type="text"
-              name="duration"
-              id="duration"
-              value={formData.duration}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-        </div>
-        <div className="flex justify-between mt-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={onNext}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-          >
-            Next
-          </button>
         </div>
       </form>
     </div>
@@ -162,3 +290,4 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
 };
 
 export default RentalDetailsForm;
+

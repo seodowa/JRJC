@@ -135,6 +135,7 @@ const handleFinalSubmit = async () => {
       bookingFee,
       carWashFee,
       initialPayment,
+      bookingStatusId: 1, // Set status to Pending
     };
 
     // --- 2. Create Booking & Wait for Result ---

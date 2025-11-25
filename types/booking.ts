@@ -40,6 +40,7 @@ export interface BookingData {
   bookingFee: number;
   carWashFee: number;
   initialPayment: number;
+  bookingStatusId: number;
 }
 
 export interface BookingStatus {

@@ -10,7 +10,7 @@ import Cars from '@/components/admin/dashboard/Cars';
 import { RealtimeRefresher } from '@/components/admin/dashboard/RealtimeRefresher';
 
 export default async function DashboardPage() {
-  const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-md";
+  const cardBaseStyle = "bg-white p-6 rounded-4xl shadow-md";
 
   // Fetch all data in parallel
   const [cars, user, ongoingBookings] = await Promise.all([

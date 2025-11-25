@@ -76,7 +76,7 @@ export const createBooking = async (bookingData: BookingData) => {
           Duration: convertDurationToHours(bookingData.rentalInfo.duration),
           Chauffer: hasChauffer,
           Payment_Details_URL: bookingData.paymentInfo.referenceNumber,
-          Booking_Status_ID: 1,
+          Booking_Status_ID: bookingData.bookingStatusId,
           Location: bookingData.rentalInfo.area,
         }
       ])
