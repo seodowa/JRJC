@@ -18,6 +18,7 @@ type BookingsHeaderProps = {
   bookingStatuses: string[];
   showCheckboxes: boolean;
   onApprove: () => void;
+  onDecline: () => void;
 };
 
 const BookingsHeader = ({
@@ -30,6 +31,7 @@ const BookingsHeader = ({
   bookingStatuses,
   showCheckboxes,
   onApprove,
+  onDecline,
 }: BookingsHeaderProps) => {
   const router = useRouter();
 
@@ -71,7 +73,7 @@ const BookingsHeader = ({
         </div>
         {view !== 'history' && (
           <div className="flex items-center space-x-2">
-              <AsyncButton className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+              <AsyncButton onClick={onDecline} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
                                     hover:bg-red-400 hover:text-white">
                   Decline
               </AsyncButton>
