@@ -1,10 +1,12 @@
+import WalkInBookingClient from '@/components/admin/bookings/walk-in/WalkInBookingClient';
+import { Suspense } from 'react';
+import LoadingSpinner from '@/components/admin/LoadingSpinner';
 
 const WalkInBookingPage = () => {
   return (
-    <div>
-      <h1>Walk-in Booking Page</h1>
-      <p>This is where the walk-in booking form will be.</p>
-    </div>
+    <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><LoadingSpinner /></div>}>
+      <WalkInBookingClient />
+    </Suspense>
   );
 };
 
