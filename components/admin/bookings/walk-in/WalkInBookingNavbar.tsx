@@ -30,10 +30,10 @@ const WalkInBookingNavbar = ({
         <nav>
           <ul>
             {navItems.map((item) => (
-              <li key={item.id} className="mb-2">
+              <li key={item.id} className="mb-4">
                 <AsyncButton
                   onClick={() => scrollToRef(item.ref)}
-                  className={`w-full text-left p-2 rounded-lg hover:bg-gray-200`}
+                  className={`w-full text-left p-4 rounded-lg hover:bg-gray-200`}
                 >
                   {item.label}
                 </AsyncButton>

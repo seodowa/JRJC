@@ -57,7 +57,7 @@ const WalkInBookingLayout = () => {
 
   return (
     <div className="flex h-full relative">
-      <div className="flex h-70 bg-white rounded-4xl">
+      <div className="flex h-84 bg-white rounded-4xl">
         <WalkInBookingNavbar
           scrollToRef={scrollToRef}
           personalRef={personalRef}
@@ -65,7 +65,7 @@ const WalkInBookingLayout = () => {
           paymentRef={paymentRef}
         />
       </div>
-      <div className="flex-1 px-8 overflow-y-auto">
+      <div className="flex-1 p-2 overflow-y-auto">
         <div ref={personalRef}>
           <PersonalInformationForm onNext={handleNextToRental} />
         </div>
