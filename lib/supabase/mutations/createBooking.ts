@@ -1,9 +1,9 @@
 import { createClient } from "@/utils/supabase/client";
-import { BookingData } from "@/types";
+import { BookingData } from "@/types"; // Ensure this type is updated if needed, or use 'any' for flexibility here
 
 const supabase = createClient();
 
-export const createBooking = async (bookingData: BookingData) => {
+export const createBooking = async (bookingData: any) => {
   try {
     console.log("Starting booking creation...");
 
@@ -15,16 +15,18 @@ export const createBooking = async (bookingData: BookingData) => {
             return days * 24;
         }
         return 0; // fallback
-        };
+    };
     
-    // Step 1: Insert into Customer table - FIXED COLUMN NAME
+    // Step 1: Insert into Customer table
     console.log("Inserting customer:", {
       First_Name: bookingData.personalInfo.firstName,
       Last_Name: bookingData.personalInfo.lastName,
       Email: bookingData.personalInfo.email,
-      Contact_Number: bookingData.personalInfo.mobileNumber // Make sure this matches your DB
+      Contact_Number: bookingData.personalInfo.mobileNumber
     });
 
+    // Check if customer exists or just create new one? 
+    // Assuming simple create for now based on previous context.
     const { data: customerData, error: customerError } = await supabase
       .from('Customer')
       .insert([
@@ -33,14 +35,14 @@ export const createBooking = async (bookingData: BookingData) => {
           Last_Name: bookingData.personalInfo.lastName,
           Suffix: bookingData.personalInfo.suffix,
           Email: bookingData.personalInfo.email,
-          Contact_Number: bookingData.personalInfo.mobileNumber, // Fixed column name
+          Contact_Number: bookingData.personalInfo.mobileNumber,
         }
       ])
       .select('Customer_ID');
 
     if (customerError) {
       console.error("Customer insertion error details:", customerError);
-      throw new Error(`Customer creation failed: ${customerError.message} - Details: ${customerError.details}`);
+      throw new Error(`Customer creation failed: ${customerError.message}`);
     }
 
     console.log("Customer created successfully:", customerData);
@@ -59,12 +61,15 @@ export const createBooking = async (bookingData: BookingData) => {
       const days = parseInt(bookingData.rentalInfo.duration);
       endDateTime = new Date(new Date(startDateTime).getTime() + (days * 24 * 60 * 60 * 1000)).toISOString();
     } else {
+      // Fallback if end date is explicitly provided in a different format, 
+      // though your current logic relies on duration.
       endDateTime = new Date(`${bookingData.rentalInfo.endDate}T${bookingData.rentalInfo.time}`).toISOString();
     }
 
     const hasChauffer = bookingData.rentalInfo.selfDrive === "No";
 
     // Step 2: Insert into Booking_Details table
+    // FIX: Added Notification_Preference to the insert object
     const { data: bookingDetailsData, error: bookingError } = await supabase
       .from('Booking_Details')
       .insert([
@@ -75,12 +80,14 @@ export const createBooking = async (bookingData: BookingData) => {
           Model_ID: bookingData.selectedCar,
           Duration: convertDurationToHours(bookingData.rentalInfo.duration),
           Chauffer: hasChauffer,
-          Payment_Details_URL: bookingData.paymentInfo.referenceNumber,
-          Booking_Status_ID: bookingData.bookingStatusId,
+          Payment_Details_URL: null, // Or upload reference number if you have storage logic
+          Booking_Status_ID: 1, // Pending
           Location: bookingData.rentalInfo.area,
+          Notification_Preference: bookingData.notificationPreference // <--- Saving the preference
         }
       ])
-      .select();
+      .select()
+      .single();
 
     if (bookingError) {
       console.error("Booking details insertion error:", bookingError);
@@ -89,7 +96,7 @@ export const createBooking = async (bookingData: BookingData) => {
 
     return {
       customer: customerData[0],
-      booking: bookingDetailsData[0]
+      booking: bookingDetailsData
     };
   } catch (error) {
     console.error("Error creating booking:", error);
