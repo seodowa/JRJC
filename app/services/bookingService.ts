@@ -31,6 +31,7 @@ export const approveBookingsService = async (
       }
 
       // 2. Fetch Customer Contact Info for SMS
+      // We fetch this fresh from the DB because the table view model might not have phone numbers
       const { data: customerData, error: fetchError } = await supabase
         .from('Booking_Details')
         .select(`
@@ -55,6 +56,7 @@ export const approveBookingsService = async (
 
       if (phone) {
         let formattedNumber = phone;
+        // Ensure PH format for SMS API
         if (formattedNumber.startsWith('0')) {
           formattedNumber = '+63' + formattedNumber.substring(1);
         }
@@ -163,7 +165,7 @@ export const cancelBookingService = async (
     // 1. Update Status in Database (3 = Cancelled)
     const { error: updateError } = await supabase
       .from('Booking_Details')
-      .update({ Booking_Status_ID: 3 })
+      .update({ Booking_Status_ID: 5 })
       .eq('Booking_ID', bookingId);
 
     if (updateError) {
@@ -213,5 +215,46 @@ export const cancelBookingService = async (
   } catch (error) {
     console.error(`Unexpected error cancelling ${bookingId}:`, error);
     return { success: false, bookingId, error };
+  }
+};
+
+/**
+ * Sends a confirmation SMS for a newly created booking.
+ */
+export const sendBookingConfirmationService = async (
+  bookingId: string,
+  totalAmount: number,
+  status: string,
+  firstName: string,
+  mobileNumber: string,
+  referenceNumber: string
+): Promise<{ success: boolean; error?: any }> => {
+  try {
+    let formattedNumber = mobileNumber;
+    if (formattedNumber.startsWith('0')) {
+      formattedNumber = '+63' + formattedNumber.substring(1);
+    }
+
+    const message = `Hi ${firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${referenceNumber}. We will notify you once confirmed!`;
+
+    const res = await fetch('/api/sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: formattedNumber,
+        text: message
+      }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      return { success: true };
+    } else {
+      console.warn("SMS Failed:", data.error);
+      return { success: false, error: data.error };
+    }
+  } catch (error) {
+    console.error("Error sending confirmation SMS:", error);
+    return { success: false, error };
   }
 };

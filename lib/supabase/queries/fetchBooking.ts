@@ -4,21 +4,22 @@ import { BookingStatus } from "@/types";
 
 const supabase = createClient();
 
-// lib/supabase/queries/booking.ts
+// 1. Fixed fetchBookedDates using correct IDs
 export const fetchBookedDates = async (carModelId: number) => {
   const { data, error } = await supabase
     .from('Booking_Details')
     .select('Booking_Start_Date_Time, Booking_End_Date_Time')
     .eq('Model_ID', carModelId)
-    .in('Booking_Status_ID', [1, 2, 3]) // Adjust these IDs based on your Booking_Status table
-    // Assuming: 1 = Confirmed, 2 = Paid, 3 = In Progress, etc.
-    // Exclude: 4 = Cancelled, 5 = Completed, etc.
+    // FIX: Only fetch dates that are currently "occupying" the car.
+    // 1 = Pending, 2 = Confirmed, 3 = Ongoing.
+    // This automatically EXCLUDES Canceled (5) and Declined (6).
+    .in('Booking_Status_ID', [1, 2, 3]); 
 
   if (error) {
     console.error('Error fetching booked dates:', error);
     return [];
   }
-
+  console.log('Fetched booked dates:', data);
   return data || [];
 };
 
@@ -53,24 +54,24 @@ export const fetchBookings = async (filters: Record<string, any> = {}) => {
 export const fetchBookingStatus = async (uuid: string) => {
   try {
     const { data, error } = await supabase
-    .from("Booking_Details")
-    .select(`
-      Customer (
-        First_Name,
-        Last_Name
-      ),
-      Car_Models (
-        Manufacturer (
-          Manufacturer_Name
+      .from("Booking_Details")
+      .select(`
+        Customer (
+          First_Name,
+          Last_Name
         ),
-        Model_Name
-      ),
-      Booking_Status (
-        Name
-      )
-    `)
-    .eq("Booking_ID", uuid)
-    .single();
+        Car_Models (
+          Manufacturer (
+            Manufacturer_Name
+          ),
+          Model_Name
+        ),
+        Booking_Status (
+          Name
+        )
+      `)
+      .eq("Booking_ID", uuid)
+      .single();
 
     if (error) {
       throw new Error(error.message);

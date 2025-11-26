@@ -14,6 +14,7 @@ import { Car } from "@/types";
 import { fetchCars } from "@/lib/supabase/queries/fetchCars";
 import { createBooking } from "@/lib/supabase/mutations/createBooking";
 import BookingCalendar from "@/components/BookingCalendar";
+import { sendBookingConfirmationService } from "@/app/services/bookingService"; 
 
 interface PersonalInfo {
   firstName: string;
@@ -72,112 +73,92 @@ const BookingPage: React.FC = () => {
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
 
-   // --- SMS SENDING LOGIC ---
-  // Update the arguments to accept bookingId and status
-  const sendConfirmationSms = async (totalAmount: number, bookingId: string, status: string) => {
-  try {
-    // We inject the Booking ID and Status into the text here
-    const message = `Hi ${personalInfo.firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${paymentInfo.referenceNumber}. We will notify you once confirmed!`;
 
-    let formattedNumber = personalInfo.mobileNumber;
-    if (formattedNumber.startsWith('0')) {
-      formattedNumber = '+63' + formattedNumber.substring(1);
+  const handleFinalSubmit = async () => {
+    if (!selectedCar) {
+      setSubmitError("Please select a car");
+      return;
     }
 
-    console.log("Sending SMS to:", formattedNumber);
+    setSubmitting(true);
+    setSubmitError(null);
 
-    const res = await fetch('/api/sms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: formattedNumber, 
-        text: message
-      }),
-    });
+    try {
+      // --- 1. Calculate Totals ---
+      const { totalPrice } = calculateRentalDetails();
+      const bookingFee = 500;
+      const carWashFee = 300;
+      const initialPayment = totalPrice || 0;
+      const totalPayment = bookingFee + carWashFee + initialPayment;
 
-    const data = await res.json();
-    
-    if (data.success) {
-      console.log("SMS Sent Successfully!");
-    } else {
-      console.warn("SMS Failed:", data.error);
+      const bookingData = {
+        personalInfo,
+        rentalInfo,
+        paymentInfo,
+        selectedCar,
+        totalPayment,
+        bookingFee,
+        carWashFee,
+        initialPayment,
+        bookingStatusId: 1, // Set status to Pending
+      };
+
+      // --- 2. Create Booking & Wait for Result ---
+      const result = await createBooking(bookingData);
+      
+      console.log("Booking created:", result); 
+
+      // --- 3. Extract Data ---
+      const newBookingId = result.booking.Booking_ID;
+      const statusText = "Pending";
+
+      setBookingSuccess(true);
+
+      // --- 4. Send SMS using Service (Updated) ---
+      // We pass all necessary details to the service
+      await sendBookingConfirmationService(
+        newBookingId,
+        totalPayment,
+        statusText,
+        personalInfo.firstName,
+        personalInfo.mobileNumber,
+        paymentInfo.referenceNumber
+      );
+
+      // --- 5. Reset Form ---
+      setTimeout(() => {
+        setShowConfirm(false);
+        setPersonalInfo({
+          firstName: "",
+          lastName: "",
+          suffix: "",
+          email: "",
+          mobileNumber: "",
+        });
+        setRentalInfo({
+          area: "",
+          startDate: "",
+          endDate: "",
+          selfDrive: "",
+          duration: "",
+          time: "",
+        });
+        setPaymentInfo({
+          referenceNumber: "",
+        });
+        setSelectedCar(null);
+        setSelectedCarData(null);
+        setCurrentStep(1);
+        setBookingSuccess(false);
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Booking submission error:", error);
+      setSubmitError(error instanceof Error ? error.message : "Failed to create booking");
+    } finally {
+      setSubmitting(false);
     }
-  } catch (err) {
-    console.error("Error calling SMS API:", err);
-  }
-};
-
- // Inside BookingPage.tsx
-
-const handleFinalSubmit = async () => {
-  if (!selectedCar) {
-    setSubmitError("Please select a car");
-    return;
-  }
-
-  setSubmitting(true);
-  setSubmitError(null);
-
-  try {
-    // --- 1. Calculate Totals ---
-    const { totalPrice } = calculateRentalDetails();
-    const bookingFee = 500;
-    const carWashFee = 300;
-    const initialPayment = totalPrice || 0;
-    const totalPayment = bookingFee + carWashFee + initialPayment;
-
-    const bookingData = {
-      personalInfo,
-      rentalInfo,
-      paymentInfo,
-      selectedCar,
-      totalPayment,
-      bookingFee,
-      carWashFee,
-      initialPayment,
-      bookingStatusId: 1, // Set status to Pending
-    };
-
-    // --- 2. Create Booking & Wait for Result ---
-    const result = await createBooking(bookingData);
-    
-    // Log it just to be safe, though we know it works now!
-    console.log("Booking created:", result); 
-
-    // --- 3. Extract Data ---
-    // We access .booking.Booking_ID based on your console output
-    const newBookingId = result.booking.Booking_ID;
-    
-    // We hardcode "Pending" for the SMS because the DB gives us ID 1, 
-    // and "Pending" reads better for the user.
-    const statusText = "Pending";
-
-    setBookingSuccess(true);
-
-    // --- 4. Send SMS with the real ID ---
-    await sendConfirmationSms(totalPayment, newBookingId, statusText);
-
-    // --- 5. Reset Form ---
-    setTimeout(() => {
-      setShowConfirm(false);
-      // ... (rest of your reset states) ...
-      setPersonalInfo({
-        firstName: "",
-        lastName: "",
-        suffix: "",
-        email: "",
-        mobileNumber: "",
-      });
-      // ... etc
-    }, 3000);
-    
-  } catch (error) {
-    console.error("Booking submission error:", error);
-    setSubmitError(error instanceof Error ? error.message : "Failed to create booking");
-  } finally {
-    setSubmitting(false);
-  }
-};
+  };
 
   // Personal Info Handlers
   const handleInputChange = (
@@ -198,7 +179,6 @@ const handleFinalSubmit = async () => {
       }));
     }
   };
-
   
   // Rental Info Handlers
   const handleRentalInputChange = (
@@ -357,7 +337,6 @@ const handleFinalSubmit = async () => {
   }, []);
 
   
-
   // Auto-set duration when dates AND time change
   useEffect(() => {
     if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
@@ -377,7 +356,6 @@ const handleFinalSubmit = async () => {
   }, [rentalInfo.startDate, rentalInfo.endDate, rentalInfo.time]);
 
   
-
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:

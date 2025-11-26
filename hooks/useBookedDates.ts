@@ -1,4 +1,3 @@
-// hooks/useBookedDates.ts
 import { useState, useEffect } from 'react';
 import { fetchBookedDates } from '@/lib/supabase/queries/fetchBooking';
 
