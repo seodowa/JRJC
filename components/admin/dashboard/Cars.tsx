@@ -3,6 +3,7 @@ import { DashboardCarData } from "@/types";
 import CheckmarkIcon from "@/components/icons/CheckmarkIcon";
 import XmarkIcon from "@/components/icons/XmarkIcon";
 import PlusIcon from "@/components/icons/PlusIcon";
+import AsyncButton from "@/components/AsyncButton";
 
 interface CarsProps {
   cars: DashboardCarData[];
@@ -46,11 +47,11 @@ const Cars: React.FC<CarsProps> = ({ cars }) => {
           );
         })}
       </div>
-      <div className="bg-white h-60">
-        <div className="flex my-5">
-            <button className="flex flex-grow justify-center py-6 text-black font-bold rounded-3xl hover:bg-black/25 transition-colors ">
+      <div className="bg-white h-auto p-4">
+        <div className="flex">
+            <AsyncButton className="flex flex-grow justify-center py-6 text-black font-bold rounded-3xl hover:bg-black/25 transition-colors ">
               <PlusIcon className="w-16 h-16" />
-            </button>
+            </AsyncButton>
         </div>
       </div>
     </div>
