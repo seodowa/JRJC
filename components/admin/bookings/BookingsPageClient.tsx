@@ -15,7 +15,7 @@ import {
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
 import BookingDetailsModal from './BookingDetailsModal'; // Import the new modal component
-import { fetchSpecificBooking, SpecificBookingDetails } from '@/lib/supabase/queries/client/fetchSpecificBooking'; // Import the new fetcher and type
+import { SpecificBookingDetails } from '@/types/adminBooking';
 import { LoadingSpinner } from '@/components/LoadingSpinner'; // Import a generic spinner for modal loading
 
 type BookingsPageClientProps = {
@@ -147,7 +147,11 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     setIsModalLoading(true);
     setModalBookingDetails(null); // Clear previous details
     try {
-      const details = await fetchSpecificBooking(bookingId);
+      const response = await fetch(`/api/admin/bookings/${bookingId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch booking details');
+      }
+      const details: SpecificBookingDetails = await response.json();
       setModalBookingDetails(details);
     } catch (error) {
       console.error("Failed to fetch booking details for modal:", error);
