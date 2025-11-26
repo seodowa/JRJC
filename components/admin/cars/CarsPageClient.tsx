@@ -94,22 +94,29 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
         locations={dropdownData.locations}
       />
       
-      <main className="relative flex flex-col md:flex-row gap-6 h-full">
+      {/* Reduced gap from gap-6 to gap-4 for tighter layout */}
+      <main className="relative flex flex-col md:flex-row gap-4 h-full">
+        
         {/* List View Sidebar - Only visible in List View */}
         <AnimatePresence>
           {view === 'list' && (
             <motion.div
-              className={`relative w-full md:w-[320px] flex-shrink-0 ${cardBaseStyle}`}
+              // Reduced width from w-[320px] to w-[260px] to give more space to the list
+              className={`relative w-full md:w-[260px] flex-shrink-0 ${cardBaseStyle} flex flex-col`}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <h2 className="text-xl font-bold mb-6 text-gray-800">Manage Cars</h2>
-              <CarsSidebar cars={cars} onAddNewCar={handleOpenAddModal} />
+              <h2 className="text-xl font-bold mb-6 text-gray-800 flex-shrink-0">Manage Cars</h2>
+              
+              {/* Scrollable Sidebar Content */}
+              <div className="flex-1 overflow-y-auto pb-20 custom-scrollbar">
+                <CarsSidebar cars={cars} onAddNewCar={handleOpenAddModal} />
+              </div>
               
               {/* Toggle in Sidebar for List View */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
                 <ViewToggle view={view} setView={handleViewChange} />
               </div>
             </motion.div>
@@ -120,35 +127,36 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
         <div className="flex-1 h-full min-h-0">
           <div className={`relative h-full flex flex-col ${cardBaseStyle} overflow-hidden`}>
             
-            {/* Header Section (Grid View) */}
-            {view === 'grid' && (
-                <motion.div 
-                    className="flex items-center justify-between mb-6 flex-shrink-0"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                >
-                    <h2 className="text-2xl font-bold text-gray-800">Manage Cars</h2>
-                    
-                    <div className="flex items-center gap-3 w-full max-w-md justify-end">
-                        {/* Optional Filter Icon Button if needed to match exact design */}
-                        <button className="p-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 text-gray-600 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
-                            </svg>
-                        </button>
-                        <div className="w-64">
-                            <SearchBar
-                                placeholder="Find Car"
-                                onChange={(e) => handleSearch(e.target.value)}
-                                className="w-full"
-                            />
-                        </div>
+            {/* Header Section (Both Views) - Now visible in List View too if desired, or kept specific to Grid */}
+            <motion.div 
+                className="flex items-center justify-between mb-6 flex-shrink-0"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+            >
+                {/* Only show title here if in Grid view, otherwise it's in the sidebar */}
+                <h2 className="text-2xl font-bold text-gray-800">
+                    {view === 'grid' ? 'Manage Cars' : ''}
+                </h2>
+                
+                <div className="flex items-center gap-3 w-full max-w-md justify-end">
+                    {/* Optional Filter Icon Button */}
+                    <button className="p-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 text-gray-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                        </svg>
+                    </button>
+                    <div className="w-64">
+                        <SearchBar
+                            placeholder="Find Car"
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="w-full"
+                        />
                     </div>
-                </motion.div>
-            )}
+                </div>
+            </motion.div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar pb-24">
               <AnimatePresence mode="wait">
                   <motion.div
                       key={`${view}-${search}`}
@@ -156,7 +164,6 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="h-full"
                   >
                       {view === 'list' ? (
                         <CarListView 
@@ -183,7 +190,8 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                 >
-                    <div className="bg-white/80 backdrop-blur-sm p-1 rounded-full shadow-lg border border-gray-100">
+                    {/* FIX: Removed backdrop-blur-sm and bg-white/80, replaced with solid bg-white */}
+                    <div className="bg-white p-1 rounded-full shadow-lg border border-gray-100">
                         <ViewToggle view={view} setView={handleViewChange} />
                     </div>
                 </motion.div>

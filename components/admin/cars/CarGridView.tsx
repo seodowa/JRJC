@@ -160,7 +160,7 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
                           <div className="flex flex-col gap-1">
                               <AsyncButton
                                 onClick={() => onEditCar(car)}
-                                className="px-3 py-1 bg-white border border-gray-300 rounded-md text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+                                className="text-[10px] text-blue-600 font-bold hover:text-blue-700 hover:underline text-left pl-1 bg-transparent border-none shadow-none p-0 h-auto w-auto"
                               >
                                   Edit
                               </AsyncButton>
@@ -172,22 +172,25 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
                               </button>
                           </div>
 
-                          {/* Status Dropdown */}
-                          <div className="relative">
-                                <select
-                                    id={`status-${car.id}`}
-                                    value={car.status?.id || ''}
-                                    onChange={(e) => handleStatusChange(car.id, parseInt(e.target.value))}
-                                    className="appearance-none text-[10px] font-medium py-1 pl-2 pr-6 bg-white/80 border border-gray-200 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
-                                    style={{ backgroundImage: 'none' }} // Removing default arrow for cleaner look if preferred, or keep standard
-                                >
-                                    {carStatuses.map(status => (
-                                        <option key={status.id} value={status.id}>{status.status}</option>
-                                    ))}
-                                </select>
-                                {/* Custom arrow indicator */}
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-500">
-                                    <svg className="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                          {/* Status Dropdown with Label - Changed items-end to items-start */}
+                          <div className="flex flex-col items-start gap-0.5">
+                                <label htmlFor={`status-${car.id}`} className="text-[10px] font-semibold text-gray-500">Status:</label>
+                                <div className="relative">
+                                    <select
+                                        id={`status-${car.id}`}
+                                        value={car.status?.id || ''}
+                                        onChange={(e) => handleStatusChange(car.id, parseInt(e.target.value))}
+                                        className="appearance-none text-[10px] font-medium py-1 pl-2 pr-6 bg-white/80 border border-gray-200 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                                        style={{ backgroundImage: 'none' }} 
+                                    >
+                                        {carStatuses.map(status => (
+                                            <option key={status.id} value={status.id}>{status.status}</option>
+                                        ))}
+                                    </select>
+                                    {/* Custom arrow indicator */}
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-500">
+                                        <svg className="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                    </div>
                                 </div>
                             </div>
                       </div>
