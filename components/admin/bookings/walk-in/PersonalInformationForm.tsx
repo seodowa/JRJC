@@ -1,6 +1,6 @@
 "use client";
 
-import { useWalkInBooking } from "@/app/(admin)/adminSU/context/WalkInBookingContext";
+import { useWalkInBooking } from "@/app/(admin)/context/WalkInBookingContext";
 import AsyncButton from "@/components/AsyncButton";
 
 interface PersonalInformationFormProps {

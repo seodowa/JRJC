@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from 'react';
-import { WalkInBookingProvider, useWalkInBooking } from '@/app/(admin)/adminSU/context/WalkInBookingContext';
+import { WalkInBookingProvider, useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import WalkInBookingNavbar from './WalkInBookingNavbar';
 import PersonalInformationForm from './PersonalInformationForm';
 import RentalDetailsForm from './RentalDetailsForm';

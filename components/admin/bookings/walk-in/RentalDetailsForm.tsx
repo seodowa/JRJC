@@ -7,7 +7,7 @@ import BookingCalendar from '@/components/BookingCalendar';
 import { LocalizationProvider, MobileTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
-import { useWalkInBooking } from '@/app/(admin)/adminSU/context/WalkInBookingContext';
+import { useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import AsyncButton from "@/components/AsyncButton";
 
 interface RentalDetailsFormProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useWalkInBooking } from "@/app/(admin)/adminSU/context/WalkInBookingContext";
+import { useWalkInBooking } from "@/app/(admin)/context/WalkInBookingContext";
 import AsyncButton from "@/components/AsyncButton";
 
 interface PaymentDetailsProps {
