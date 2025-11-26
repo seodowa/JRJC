@@ -48,7 +48,7 @@ const BookingsHeader = ({
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{view === 'history' ? 'Bookings History' : 'Manage Bookings'}</h1>
         {view === 'history' ? (
-          <AsyncButton onClick={() => router.back()} className="px-4 py-2 bg-gray-200 rounded-md
+          <AsyncButton onClick={() => router.back()} className="px-4 py-2 shadow-sm bg-gray-200 rounded-md
                                                                      hover:bg-[#A1E3F9]">
             Back
           </AsyncButton>
@@ -69,11 +69,14 @@ const BookingsHeader = ({
           />
           {view !== 'history' && (
             <>
-                <AsyncButton onClick={onSelectAll} className="border-1 border-gray-300 p-2 bg-[#A1E3F9] rounded-lg text-white
-                                                            hover:bg-blue-400">
-                    {isAllSelected ? 'Deselect' : 'Select All'}
-                </AsyncButton>
-                <AsyncButton onClick={() => router.push('/adminSU/manageBookings/walk-inBooking')} className="border border-gray-300 p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400">
+                {activeTab !== 'All' && (
+                  <AsyncButton onClick={onSelectAll} className="shadow-sm p-2 bg-[#A1E3F9] rounded-lg text-white
+                                                              hover:bg-blue-400">
+                      {isAllSelected ? 'Deselect' : 'Select All'}
+                  </AsyncButton>
+                )}
+                <AsyncButton onClick={() => router.push('/adminSU/manageBookings/walk-inBooking')}
+                             className="shadow-sm p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400">
                     Walk-in Book
                 </AsyncButton>
             </>
@@ -83,11 +86,11 @@ const BookingsHeader = ({
           <div className="flex items-center space-x-2">
             {activeTab === 'Pending' && (
               <>
-                <AsyncButton onClick={onDecline} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+                <AsyncButton onClick={onDecline} className="px-4 py-2 shadow-sm text-red-500 rounded-lg
                                       hover:bg-red-400 hover:text-white">
                     Decline
                 </AsyncButton>
-                <AsyncButton onClick={onApprove} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                <AsyncButton onClick={onApprove} className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg
                                   hover:bg-blue-300">
                     Approve
                 </AsyncButton>
@@ -95,11 +98,11 @@ const BookingsHeader = ({
             )}
             {activeTab === 'Confirmed' && (
               <>
-                <AsyncButton onClick={onCancel} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+                <AsyncButton onClick={onCancel} className="px-4 py-2 shadow-sm text-red-500 rounded-lg
                                     hover:bg-red-400 hover:text-white">
                     Cancel
                 </AsyncButton>
-                <AsyncButton onClick={onStart} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                <AsyncButton onClick={onStart} className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg
                                   hover:bg-blue-400">
                     Start
                 </AsyncButton>
@@ -107,11 +110,11 @@ const BookingsHeader = ({
             )}
             {activeTab === 'Ongoing' && (
               <>
-                <AsyncButton onClick={onExtend} className="px-4 py-2 border border-gray-400 text-gray-700 rounded-lg
+                <AsyncButton onClick={onExtend} className="px-4 py-2 shadow-sm text-gray-700 rounded-lg
                                       hover:bg-green-400">
                     Extend
                 </AsyncButton>
-                <AsyncButton onClick={onFinish} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                <AsyncButton onClick={onFinish} className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg
                                   hover:bg-blue-400">
                     Finish
                 </AsyncButton>

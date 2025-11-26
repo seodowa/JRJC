@@ -9,7 +9,7 @@ type BookingTabsProps = {
   onTabChange: (tab: string) => void;
 };
 
-const BookingTabs = ({ tabs, activeTab, onTabChange }: BookingTabsProps) => {
+const BookingTabs = ({ tabs = [], activeTab, onTabChange }: BookingTabsProps) => {
   return (
     <div className="flex -mb-0.25">
       {tabs.map((tab) => (
