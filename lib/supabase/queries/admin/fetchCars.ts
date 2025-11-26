@@ -1,13 +1,11 @@
-// lib/supabase/queries/fetchDisplayManageCars.ts
-import { createClient } from "@/utils/supabase/client";
+import { supabaseAdmin } from "@/utils/supabase/admin";
 import { Car, CarPricing, CarStatus } from "@/types";
 
-export const fetchDisplayManageCars = async (): Promise<Car[]> => {
-  const supabase = createClient();
-  
+// DUPLICATE of fetchCars but using supabaseAdmin for Admin Context
+export const fetchCars = async (query?: string): Promise<Car[]> => {
   try {
-    const { data: carsData, error: carsError } = await supabase
-      .from("Car_Models")
+    const { data: carsData, error: carsError } = await supabaseAdmin
+      .rpc('search_cars', { search_term: query || '' })
       .select(`
         *,
         Transmission_Types (
@@ -19,7 +17,7 @@ export const fetchDisplayManageCars = async (): Promise<Car[]> => {
         Fuel_Types (
           Fuel
         ),
-        Car_Status!status_id (
+        Car_Status (
             id,
             status
         ),
@@ -29,14 +27,12 @@ export const fetchDisplayManageCars = async (): Promise<Car[]> => {
             location_name
           )
         )
-      `)
-      .eq('is_deleted', false);
+      `);
     
     if (carsError) {
       throw new Error(carsError.message);
     }
 
-    // Transform the data to match the Car type
     const transformedCars: Car[] = carsData?.map(car => {
       const carPricing: CarPricing[] = car.Car_Pricing?.map((price: any) => ({
         Car_ID: price.Car_ID,
@@ -64,7 +60,20 @@ export const fetchDisplayManageCars = async (): Promise<Car[]> => {
     return transformedCars;
     
   } catch (error) {
-    console.error("Error fetching display cars:", error);
+    console.error("Error fetching cars:", error);
     throw error;
   }
+};
+
+export const fetchCarStatuses = async (): Promise<CarStatus[]> => {
+    try {
+        const { data, error } = await supabaseAdmin
+            .from("Car_Status")
+            .select("id, status");
+        if (error) throw new Error(error.message);
+        return data.map(d => ({ id: d.id, status: d.status })) as CarStatus[];
+    } catch (error) {
+        console.error("Error fetching car statuses:", error);
+        return [];
+    }
 };

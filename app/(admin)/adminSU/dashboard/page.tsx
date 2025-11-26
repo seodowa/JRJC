@@ -1,7 +1,8 @@
 // This is a Server Component
-import { fetchDashboardCars } from '@/lib/supabase/queries/fetchDashboardCars';
-import { fetchUser } from '@/lib/supabase/queries/fetchUser';
-import { fetchOngoingBookings } from '@/lib/supabase/queries/fetchOngoingBookings';
+import { fetchDashboardCars } from '@/lib/supabase/queries/admin/fetchDashboardCars';
+import { fetchUser } from '@/lib/supabase/queries/admin/fetchUser';
+import { fetchOngoingBookings } from '@/lib/supabase/queries/admin/fetchOngoingBookings';
+import { fetchAllReviews } from '@/lib/supabase/queries/admin/fetchReviews';
 import WelcomeMessage from '@/components/admin/dashboard/WelcomeMessage';
 import Bookings from '@/components/admin/dashboard/Bookings';
 import CustomCalendar from '@/components/admin/dashboard/CustomCalendar';
@@ -13,11 +14,20 @@ export default async function DashboardPage() {
   const cardBaseStyle = "bg-white p-6 rounded-4xl shadow-md";
 
   // Fetch all data in parallel
-  const [cars, user, ongoingBookings] = await Promise.all([
+  const [cars, user, ongoingBookings, allReviews] = await Promise.all([
     fetchDashboardCars(),
     fetchUser(),
-    fetchOngoingBookings()
+    fetchOngoingBookings(),
+    fetchAllReviews()
   ]);
+
+  // Filter reviews for the last 30 days and sort by recent
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const recentReviews = allReviews
+    .filter(review => new Date(review.createdAt) > thirtyDaysAgo)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="p-2 md:p-4 min-h-screen">
@@ -48,7 +58,7 @@ export default async function DashboardPage() {
 
           {/* Bottom row: Recent Feedback */}
           <div className={`${cardBaseStyle} flex-grow overflow-y-auto`}>
-            <RecentFeedback />
+            <RecentFeedback reviews={recentReviews} />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { SpecificBookingDetails } from '@/lib/supabase/queries/fetchSpecificBooking';
+import { SpecificBookingDetails } from '@/lib/supabase/queries/client/fetchSpecificBooking';
 import Modal from '@/components/Modal'; // Generic Modal wrapper
 import Image from 'next/image';
 import AsyncButton from "@/components/AsyncButton"; // For car image

@@ -4,8 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Dayjs } from 'dayjs';
 import { Car, BookingData, CarPricing } from "@/types";
 import { useCarPricing } from '@/hooks/useCarPricing';
-import { createBooking } from '@/lib/supabase/mutations/createBooking';
-import { fetchCars } from '@/lib/supabase/queries/fetchCars';
+import { fetchCars } from '@/lib/supabase/queries/admin/fetchCars';
 
 // Define the shape of the context's value
 interface WalkInBookingContextType {
@@ -153,8 +152,21 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
         bookingStatusId,
       };
 
-      const result = await createBooking(bookingData);
+      // --- UPDATED: Use the new API route ---
+      const response = await fetch('/api/admin/bookings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to create booking");
+      }
+
+      const result = await response.json();
       const newBookingId = result.booking.Booking_ID;
+      // ---------------------------------------
       
       setBookingSuccess(true);
       await sendConfirmationSms(totalPayment, newBookingId, statusText);

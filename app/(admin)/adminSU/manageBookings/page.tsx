@@ -1,4 +1,4 @@
-import { fetchAdminBookings, fetchBookingStatuses } from '@/lib/supabase/queries/fetchAdminBookings';
+import { fetchAdminBookings, fetchBookingStatuses } from '@/lib/supabase/queries/admin/fetchBookings';
 import BookingsPageClient from '@/components/admin/bookings/BookingsPageClient';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';

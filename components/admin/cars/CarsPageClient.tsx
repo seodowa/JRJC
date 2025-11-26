@@ -11,7 +11,7 @@ import CarListView from "@/components/admin/cars/CarListView";
 import SearchBar from "@/components/SearchBar";
 import { useState, useEffect } from "react";
 import AddEditCarModal from "@/components/admin/cars/AddEditCarModal";
-import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes, fetchLocations } from '@/lib/supabase/queries/fetchDropdownData';
+import { fetchManufacturers, fetchTransmissionTypes, fetchFuelTypes, fetchLocations } from '@/lib/supabase/queries/client/fetchDropdownData';
 
 interface CarsPageClientProps {
   cars: Car[];

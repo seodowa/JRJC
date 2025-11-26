@@ -15,7 +15,7 @@ import {
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
 import BookingDetailsModal from './BookingDetailsModal'; // Import the new modal component
-import { fetchSpecificBooking, SpecificBookingDetails } from '@/lib/supabase/queries/fetchSpecificBooking'; // Import the new fetcher and type
+import { fetchSpecificBooking, SpecificBookingDetails } from '@/lib/supabase/queries/client/fetchSpecificBooking'; // Import the new fetcher and type
 import { LoadingSpinner } from '@/components/LoadingSpinner'; // Import a generic spinner for modal loading
 
 type BookingsPageClientProps = {

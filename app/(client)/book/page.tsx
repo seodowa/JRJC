@@ -9,7 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { MobileTimePicker } from "@mui/x-date-pickers";
 import { Car } from "@/types";
-import { fetchCars } from "@/lib/supabase/queries/fetchCars";
+import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
 import { createBooking } from "@/lib/supabase/mutations/createBooking";
 import BookingCalendar from "@/components/BookingCalendar";
 import { sendBookingConfirmationService } from "@/app/services/bookingService"; 

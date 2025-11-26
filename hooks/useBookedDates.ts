@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchBookedDates } from '@/lib/supabase/queries/fetchBooking';
+import { fetchBookedDates } from '@/lib/supabase/queries/client/fetchBooking';
 
 interface BookedDateRange {
   Booking_Start_Date_Time: string;

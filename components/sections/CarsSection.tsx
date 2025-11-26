@@ -1,7 +1,7 @@
 import "@/app/globals.css";
 import CarCard from "../CarCard";
 import Carousel from "../Carousel";
-import { fetchCars } from "@/lib/supabase/queries/fetchCars";
+import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
 
 export default async function CarsSection() {
   const CAROUSEL_HEIGHT = 38 * 16; // rem * 16 = px

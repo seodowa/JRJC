@@ -1,5 +1,5 @@
-import { fetchCars, fetchCarStatuses } from "@/lib/supabase/queries/fetchCars";
-import { fetchDisplayManageCars } from "@/lib/supabase/queries/fetchDisplayManageCars";
+import { fetchCars, fetchCarStatuses } from "@/lib/supabase/queries/admin/fetchCars";
+import { fetchDisplayManageCars } from "@/lib/supabase/queries/admin/fetchManageCars";
 import CarsPageClient from "@/components/admin/cars/CarsPageClient";
 import { Suspense } from "react";
 import LoadingSpinner from "@/components/admin/LoadingSpinner";

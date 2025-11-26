@@ -1,8 +1,8 @@
-import { fetchAllReviews } from '@/lib/supabase/queries/fetchReviews';
+import { fetchAllReviews } from '@/lib/supabase/queries/admin/fetchReviews';
 import ReviewsPageClient from '@/components/admin/reviews/ReviewsPageClient';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
-import { fetchCars } from '@/lib/supabase/queries/fetchCars';
+import { fetchCars } from '@/lib/supabase/queries/admin/fetchCars';
 import { RealtimeReviewsRefresher } from '@/components/admin/reviews/RealtimeReviewsRefresher';
 
 export const dynamic = 'force-dynamic';

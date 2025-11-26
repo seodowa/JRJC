@@ -1,6 +1,5 @@
 'use client';
 
-import { fetchAllReviews } from '@/lib/supabase/queries/fetchReviews';
 import { Review } from '@/types';
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -14,18 +13,14 @@ const formatDate = (date: Date) => {
   });
 };
 
-const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-};
-
 const TILES_PER_PAGE_LG = 3;
 const TILES_PER_PAGE_MD = 2;
 
-const RecentFeedback = () => {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface RecentFeedbackProps {
+  reviews: Review[];
+}
+
+const RecentFeedback = ({ reviews }: RecentFeedbackProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [tilesPerPage, setTilesPerPage] = useState(TILES_PER_PAGE_LG);
   const [animationClass, setAnimationClass] = useState('opacity-100');
@@ -48,31 +43,6 @@ const RecentFeedback = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    const getReviews = async () => {
-      setLoading(true);
-      try {
-        let fetchedReviews = await fetchAllReviews();
-        
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        fetchedReviews = fetchedReviews.filter(review => new Date(review.createdAt) > thirtyDaysAgo);
-
-        fetchedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-        setReviews(fetchedReviews);
-      } catch (e) {
-        setError('Failed to fetch recent feedback.');
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getReviews();
-  }, []);
-
   const totalPages = Math.ceil(reviews.length / tilesPerPage);
   const startIndex = currentPage * tilesPerPage;
   const currentReviews = reviews.slice(startIndex, startIndex + tilesPerPage);
@@ -93,16 +63,13 @@ const RecentFeedback = () => {
     <div>
       <h2 className="text-2xl font-bold mb-4">Recent Feedback (Last 30 Days)</h2>
       
-      {loading && <div className="flex items-center justify-center h-40"><p>Loading feedback...</p></div>}
-      {error && <div className="flex items-center justify-center h-40"><p className="text-red-500">{error}</p></div>}
-      
-      {!loading && !error && reviews.length === 0 && (
+      {reviews.length === 0 && (
         <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg">
             <p>No feedback in the last 30 days.</p>
         </div>
       )}
 
-      {!loading && !error && reviews.length > 0 && (
+      {reviews.length > 0 && (
         <div className="relative">
           <div 
             className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-opacity duration-300 ${animationClass}`}

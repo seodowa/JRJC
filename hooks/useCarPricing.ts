@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchSpecificCarPricing } from '@/lib/supabase/queries/fetchCars';
+import { fetchSpecificCarPricing } from '@/lib/supabase/queries/client/fetchCars';
 import { CarPricing } from '@/types';
 
 export const useCarPricing = (carModelId?: number | null) => {
