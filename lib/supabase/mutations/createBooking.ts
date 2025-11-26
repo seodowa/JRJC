@@ -68,35 +68,31 @@ export const createBooking = async (bookingData: any) => {
 
     const hasChauffer = bookingData.rentalInfo.selfDrive === "No";
 
-    // Step 2: Insert into Booking_Details table
-    // FIX: Added Notification_Preference to the insert object
+    // Step 2: Insert into Booking_Details table using Secure RPC
+    // This bypasses RLS SELECT restrictions by running as Security Definer on the DB
     const { data: bookingDetailsData, error: bookingError } = await supabase
-      .from('Booking_Details')
-      .insert([
-        {
-          Customer_ID: customerId,
-          Booking_Start_Date_Time: startDateTime,
-          Booking_End_Date_Time: endDateTime,
-          Model_ID: bookingData.selectedCar,
-          Duration: convertDurationToHours(bookingData.rentalInfo.duration),
-          Chauffer: hasChauffer,
-          Payment_Details_URL: null, // Or upload reference number if you have storage logic
-          Booking_Status_ID: 1, // Pending
-          Location: bookingData.rentalInfo.area,
-          Notification_Preference: bookingData.notificationPreference // <--- Saving the preference
-        }
-      ])
-      .select()
-      .single();
+      .rpc('create_new_booking', {
+        p_customer_id: customerId,
+        p_start_date: startDateTime,
+        p_end_date: endDateTime,
+        p_model_id: bookingData.selectedCar,
+        p_duration: convertDurationToHours(bookingData.rentalInfo.duration),
+        p_chauffer: hasChauffer,
+        p_location: bookingData.rentalInfo.area,
+        p_notification_preference: bookingData.notificationPreference
+      });
 
     if (bookingError) {
       console.error("Booking details insertion error:", bookingError);
       throw new Error(`Booking creation failed: ${bookingError.message}`);
     }
+    
+    // RPC returns the object directly or wrapped, ensuring we have the object
+    const finalBookingData = bookingDetailsData;
 
     return {
       customer: customerData[0],
-      booking: bookingDetailsData
+      booking: finalBookingData
     };
   } catch (error) {
     console.error("Error creating booking:", error);
