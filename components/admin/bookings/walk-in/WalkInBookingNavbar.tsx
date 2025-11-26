@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
+import AsyncButton from "@/components/AsyncButton";
 
 interface WalkInBookingNavbarProps {
   scrollToRef: (ref: React.RefObject<HTMLDivElement>) => void;
@@ -30,23 +31,23 @@ const WalkInBookingNavbar = ({
           <ul>
             {navItems.map((item) => (
               <li key={item.id} className="mb-2">
-                <button
+                <AsyncButton
                   onClick={() => scrollToRef(item.ref)}
-                  className={`w-full text-left p-2 rounded hover:bg-gray-200`}
+                  className={`w-full text-left p-2 rounded-lg hover:bg-gray-200`}
                 >
                   {item.label}
-                </button>
+                </AsyncButton>
               </li>
             ))}
           </ul>
         </nav>
       </div>
-      <button
+      <AsyncButton
         onClick={() => router.back()}
-        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg"
       >
         Back
-      </button>
+      </AsyncButton>
     </div>
   );
 };

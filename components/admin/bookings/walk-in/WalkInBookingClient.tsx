@@ -65,7 +65,7 @@ const WalkInBookingLayout = () => {
           paymentRef={paymentRef}
         />
       </div>
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 px-8 overflow-y-auto">
         <div ref={personalRef}>
           <PersonalInformationForm onNext={handleNextToRental} />
         </div>

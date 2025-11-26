@@ -1,6 +1,7 @@
 "use client";
 
 import { useWalkInBooking } from "@/app/(admin)/adminSU/context/WalkInBookingContext";
+import AsyncButton from "@/components/AsyncButton";
 
 interface PersonalInformationFormProps {
   onNext: () => void;
@@ -24,7 +25,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="firstName"
               value={personalInfo.firstName}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
               placeholder="Enter your first name"
             />
           </div>
@@ -38,7 +39,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="lastName"
               value={personalInfo.lastName}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
               placeholder="Enter your last name"
             />
           </div>
@@ -52,7 +53,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="suffix"
               value={personalInfo.suffix}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 p-2 block w-20 border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              placeholder="(e.g., Jr.)"
             />
           </div>
         </div>
@@ -67,7 +69,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="email"
               value={personalInfo.email}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
               placeholder="Enter your email address"
             />
           </div>
@@ -81,19 +83,19 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="mobileNumber"
               value={personalInfo.mobileNumber}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
               placeholder="Enter your mobile number"
             />
           </div>
         </div>
         <div className="flex justify-end mt-6">
-          <button
+          <AsyncButton
             type="button"
             onClick={onNext}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg"
           >
             Next
-          </button>
+          </AsyncButton>
         </div>
       </form>
     </div>

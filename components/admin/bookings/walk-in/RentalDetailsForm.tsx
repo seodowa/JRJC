@@ -8,6 +8,7 @@ import { LocalizationProvider, MobileTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import { useWalkInBooking } from '@/app/(admin)/adminSU/context/WalkInBookingContext';
+import AsyncButton from "@/components/AsyncButton";
 
 interface RentalDetailsFormProps {
   onBack: () => void;
@@ -85,7 +86,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                 name="area"
                 value={rentalInfo.area}
                 onChange={handleRentalInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-md p-2.5 text-sm"
                 required
                 disabled={loading}
               >
@@ -176,7 +177,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                 name="selfDrive"
                 value={rentalInfo.selfDrive}
                 onChange={handleRentalInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                 required
               >
                 <option value="">Select</option>
@@ -195,7 +196,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                   name="duration"
                   value={rentalInfo.duration}
                   onChange={handleRentalInputChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                   required
                 >
                   <option value="">Select duration</option>
@@ -268,20 +269,20 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
             )}
           </div>
           <div className="flex gap-3">
-            <button
+            <AsyncButton
               type="button"
               onClick={onBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Back
-            </button>
-            <button
+            </AsyncButton>
+            <AsyncButton
               type="submit"
               disabled={!rentalInfo.duration || dateRangeError !== null}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg"
             >
               Next
-            </button>
+            </AsyncButton>
           </div>
         </div>
       </form>

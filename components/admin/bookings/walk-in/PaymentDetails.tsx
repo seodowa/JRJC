@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useWalkInBooking } from "@/app/(admin)/adminSU/context/WalkInBookingContext";
+import AsyncButton from "@/components/AsyncButton";
 
 interface PaymentDetailsProps {
   onBack: () => void;
@@ -42,32 +43,33 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
   return (
     <div className="bg-white p-8 rounded-4xl shadow-md mt-8">
       <h2 className="text-xl font-bold mb-6">Payment Details</h2>
-
       {!paymentMethod ? (
         <div>
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Select a Payment Method:</h3>
-          <div className="flex space-x-4">
-            <button
-              onClick={() => handlePaymentMethodSelect("cash")}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            >
-              Cash
-            </button>
-            <button
-              onClick={() => handlePaymentMethodSelect("cashless")}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-            >
-              Cashless
-            </button>
+          <div className="flex flex-col items-center">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Select a Payment Method:</h3>
+            <div className="flex space-x-4">
+              <AsyncButton
+                onClick={() => handlePaymentMethodSelect("cash")}
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded"
+              >
+                Cash
+              </AsyncButton>
+              <AsyncButton
+                onClick={() => handlePaymentMethodSelect("cashless")}
+                className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+              >
+                Cashless
+              </AsyncButton>
+            </div>
           </div>
-          <div className="flex justify-start mt-8 pt-6 border-t border-gray-100">
-            <button
+          <div className="flex justify-end mt-8 pt-6 border-t border-gray-100">
+            <AsyncButton
               type="button"
               onClick={onBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200"
             >
               Back
-            </button>
+            </AsyncButton>
           </div>
         </div>
       ) : paymentMethod === "cash" ? (
@@ -90,20 +92,20 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
               </div>
             </div>
           </div>
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-            <button
+          <div className="flex justify-end mt-8 pt-6 border-t border-gray-100">
+            <AsyncButton
               type="button"
               onClick={handleGoBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200"
             >
               Go Back
-            </button>
-            <button
+            </AsyncButton>
+            <AsyncButton
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
             >
               Book
-            </button>
+            </AsyncButton>
           </div>
         </form>
       ) : (
@@ -142,7 +144,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                     onChange={handlePaymentInputChange}
                     placeholder="Enter GCash reference number"
                     required
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                   />
                 </div>
               </div>
@@ -157,21 +159,21 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             </div>
           </div>
 
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-            <button
+          <div className="flex justify-end mt-6 pt-6 gap-3 border-t border-gray-100">
+            <AsyncButton
               type="button"
               onClick={handleGoBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Go Back
-            </button>
+            </AsyncButton>
 
-            <button
+            <AsyncButton
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg"
             >
               Book
-            </button>
+            </AsyncButton>
           </div>
         </form>
       )}
