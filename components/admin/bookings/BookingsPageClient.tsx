@@ -4,7 +4,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { TAdminBooking } from '@/types/adminBooking';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
-import { approveBookingsService, declineBookingsService } from '@/app/services/bookingService'; 
+// Import all 4 service functions
+import { 
+  approveBookingsService, 
+  declineBookingsService, 
+  cancelBookingsService, 
+  startBookingsService 
+} from '@/app/services/bookingService'; 
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
 
@@ -24,7 +30,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const pathname = usePathname();
   const { replace, refresh } = useRouter();
 
-  // Handle Initial Statuses based on view (history vs active)
+  // Initialize Statuses
   useEffect(() => {
     let statuses = initialStatuses;
     if (view !== 'history') {
@@ -35,7 +41,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     setBookingStatuses(['All', ...statuses.filter(s => s !== 'All')]);
   }, [initialStatuses, view]);
 
-  // Handle Search Input with Debounce
+  // Search Handler
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
@@ -50,7 +56,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     setActiveTab(tab);
   };
 
-  // Filter Bookings based on Active Tab
+  // Filter Logic
   const filteredBookings = useMemo(() => {
     if (activeTab === 'All') {
       return bookings;
@@ -58,7 +64,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     return bookings.filter((booking) => booking.status === activeTab);
   }, [bookings, activeTab]);
 
-  // Handle Selection Logic
+  // Selection Logic
   const isAllSelected = useMemo(() => {
     const allFilteredBookingIds = filteredBookings.map((booking) => booking.bookingId);
     if (allFilteredBookingIds.length === 0) return false;
@@ -74,73 +80,53 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     }
   };
 
-  // --- APPROVE HANDLER ---
-  const handleApprove = async () => {
+  // --- GENERIC ACTION PROCESSOR ---
+  // This helper function handles the loading state, confirmation, service call, and alerting for all actions.
+  const processAction = async (
+    actionName: string, 
+    serviceFn: (ids: string[]) => Promise<any[]>
+  ) => {
     if (selectedBookings.length === 0) {
-      alert("Please select at least one booking to approve.");
+      alert(`Please select at least one booking to ${actionName}.`);
       return;
     }
 
-    if (!confirm(`Are you sure you want to approve ${selectedBookings.length} booking(s)?`)) return;
+    // Confirmation Dialog
+    const confirmMessage = `Are you sure you want to ${actionName.toUpperCase()} ${selectedBookings.length} booking(s)? This will update the status and notify the customer via SMS.`;
+    if (!confirm(confirmMessage)) return;
 
     setIsProcessing(true);
 
     try {
-      const results = await approveBookingsService(selectedBookings);
+      // Call the specific service function passed in
+      const results = await serviceFn(selectedBookings);
       
+      // Calculate results
       const successCount = results.filter(r => r.success).length;
       const failCount = results.filter(r => !r.success).length;
 
       if (failCount === 0) {
-        alert("Selected bookings have been APPROVED.");
+        alert(`Selected bookings have been successfully ${actionName}ed.`);
       } else {
-        alert(`${successCount} approved, but ${failCount} failed.`);
+        alert(`Action completed with issues: ${successCount} successful, ${failCount} failed.`);
       }
       
       setSelectedBookings([]); 
-      refresh(); // Refresh data to reflect new status
+      refresh(); // Refresh server data
 
     } catch (error) {
-      console.error("Critical error during approval:", error);
+      console.error(`Critical error during ${actionName}:`, error);
       alert("An unexpected error occurred.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // --- DECLINE HANDLER ---
-  const handleDecline = async () => {
-    if (selectedBookings.length === 0) {
-      alert("Please select at least one booking to decline.");
-      return;
-    }
-
-    if (!confirm(`Are you sure you want to DECLINE ${selectedBookings.length} booking(s)? This will send a notification to the customer.`)) return;
-
-    setIsProcessing(true);
-
-    try {
-      const results = await declineBookingsService(selectedBookings);
-      
-      const successCount = results.filter(r => r.success).length;
-      const failCount = results.filter(r => !r.success).length;
-
-      if (failCount === 0) {
-        alert("Selected bookings have been DECLINED.");
-      } else {
-        alert(`${successCount} declined, but ${failCount} failed.`);
-      }
-      
-      setSelectedBookings([]); 
-      refresh(); // Refresh data to reflect new status
-
-    } catch (error) {
-      console.error("Critical error during decline:", error);
-      alert("An unexpected error occurred.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  // --- ACTION HANDLERS ---
+  const handleApprove = () => processAction("approve", approveBookingsService);
+  const handleDecline = () => processAction("decline", declineBookingsService);
+  const handleCancel = () => processAction("cancel", cancelBookingsService);
+  const handleStart = () => processAction("start", startBookingsService);
 
   return (
     <div className="flex flex-col h-full p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md relative">
@@ -155,6 +141,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         showCheckboxes={view !== 'history'}
         onApprove={handleApprove}
         onDecline={handleDecline}
+        onCancel={handleCancel} // Pass Cancel handler
+        onStart={handleStart}   // Pass Start handler
       />
       
       {/* Loading Overlay */}
@@ -163,7 +151,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
            <div className="bg-white p-6 rounded-xl shadow-2xl border border-gray-100 flex flex-col items-center">
               <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500 mb-4"></div>
               <p className="text-gray-700 font-semibold text-lg">Processing...</p>
-              <p className="text-gray-400 text-sm mt-1">Please wait while we update the bookings.</p>
+              <p className="text-gray-400 text-sm mt-1">Sending notifications...</p>
            </div>
         </div>
       )}

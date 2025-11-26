@@ -19,6 +19,8 @@ type BookingsHeaderProps = {
   showCheckboxes: boolean;
   onApprove: () => void;
   onDecline: () => void;
+  onStart: () => void;
+  onCancel: () => void;
 };
 
 const BookingsHeader = ({
@@ -32,6 +34,8 @@ const BookingsHeader = ({
   showCheckboxes,
   onApprove,
   onDecline,
+  onStart,
+  onCancel,
 }: BookingsHeaderProps) => {
   const router = useRouter();
 
@@ -81,11 +85,11 @@ const BookingsHeader = ({
                                 hover:bg-blue-300">
                   Approve
               </AsyncButton>
-              <AsyncButton className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+              <AsyncButton onClick={onCancel} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
                                   hover:bg-red-400 hover:text-white">
                   Cancel
               </AsyncButton>
-              <AsyncButton className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+              <AsyncButton onClick={onStart} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
                                 hover:bg-blue-400">
                   Start
               </AsyncButton>
