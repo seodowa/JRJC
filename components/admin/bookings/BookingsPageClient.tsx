@@ -50,6 +50,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       statuses = ['All', 'Completed'];
     }
     setBookingStatuses(['All', ...statuses.filter(s => s !== 'All')]);
+    setActiveTab('All');
   }, [initialStatuses, view]);
 
   // Search Handler
