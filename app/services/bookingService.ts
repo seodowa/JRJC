@@ -135,6 +135,50 @@ export const startBookingsService = async (
 };
 
 /**
+ * Finishes a list of bookings: Updates DB status to 4 (Completed) and sends SMS.
+ */
+export const finishBookingsService = async (
+  bookingIds: string[]
+): Promise<BookingProcessResult[]> => {
+  const supabase = createClient();
+  const results: BookingProcessResult[] = [];
+
+  for (const bookingId of bookingIds) {
+    try {
+      // 1. Update Status to 4 (Completed)
+      const { error: updateError } = await supabase
+        .from('Booking_Details')
+        .update({ Booking_Status_ID: 4 })
+        .eq('Booking_ID', bookingId);
+
+      if (updateError) {
+        results.push({ success: false, bookingId, error: updateError });
+        continue;
+      }
+
+      // 2. Fetch Customer Info
+      const { data: customerData, error: fetchError } = await supabase
+        .from('Booking_Details')
+        .select(`Customer (Contact_Number, First_Name)`)
+        .eq('Booking_ID', bookingId)
+        .single();
+
+      if (!fetchError) {
+        const customer = (customerData as any)?.Customer;
+        if (customer?.Contact_Number) {
+          // 3. Send "Completed/Finished" SMS
+          await sendSMS(customer.Contact_Number, `Hi ${customer.First_Name || 'Customer'}, your booking (ID: ${bookingId}) has been COMPLETED. Thank you for choosing us!`);
+        }
+      }
+      results.push({ success: true, bookingId, message: "Finished and SMS sent" });
+    } catch (error) {
+      results.push({ success: false, bookingId, error });
+    }
+  }
+  return results;
+};
+
+/**
  * Cancels a list of bookings (Admin Batch): Updates DB status to 5 (Canceled) and sends SMS.
  */
 export const cancelBookingsService = async (

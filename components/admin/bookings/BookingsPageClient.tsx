@@ -9,7 +9,8 @@ import {
   approveBookingsService, 
   declineBookingsService, 
   cancelBookingsService, 
-  startBookingsService 
+  startBookingsService,
+  finishBookingsService
 } from '@/app/services/bookingService'; 
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
@@ -127,6 +128,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleDecline = () => processAction("decline", declineBookingsService);
   const handleCancel = () => processAction("cancel", cancelBookingsService);
   const handleStart = () => processAction("start", startBookingsService);
+  const handleFinish = () => processAction("finish", finishBookingsService);
+  const handleExtend = () => { alert("Extend functionality coming soon!"); };
 
   return (
     <div className="flex flex-col h-full p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md relative">
@@ -143,6 +146,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onDecline={handleDecline}
         onCancel={handleCancel} // Pass Cancel handler
         onStart={handleStart}   // Pass Start handler
+        onFinish={handleFinish}
+        onExtend={handleExtend}
       />
       
       {/* Loading Overlay */}

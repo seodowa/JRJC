@@ -21,6 +21,8 @@ type BookingsHeaderProps = {
   onDecline: () => void;
   onStart: () => void;
   onCancel: () => void;
+  onFinish: () => void;
+  onExtend: () => void;
 };
 
 const BookingsHeader = ({
@@ -36,6 +38,8 @@ const BookingsHeader = ({
   onDecline,
   onStart,
   onCancel,
+  onFinish,
+  onExtend,
 }: BookingsHeaderProps) => {
   const router = useRouter();
 
@@ -77,22 +81,42 @@ const BookingsHeader = ({
         </div>
         {view !== 'history' && (
           <div className="flex items-center space-x-2">
-              <AsyncButton onClick={onDecline} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+            {activeTab === 'Pending' && (
+              <>
+                <AsyncButton onClick={onDecline} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
+                                      hover:bg-red-400 hover:text-white">
+                    Decline
+                </AsyncButton>
+                <AsyncButton onClick={onApprove} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                                  hover:bg-blue-300">
+                    Approve
+                </AsyncButton>
+              </>
+            )}
+            {activeTab === 'Confirmed' && (
+              <>
+                <AsyncButton onClick={onCancel} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
                                     hover:bg-red-400 hover:text-white">
-                  Decline
-              </AsyncButton>
-              <AsyncButton onClick={onApprove} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
-                                hover:bg-blue-300">
-                  Approve
-              </AsyncButton>
-              <AsyncButton onClick={onCancel} className="px-4 py-2 border border-gray-400 text-red-500 rounded-lg
-                                  hover:bg-red-400 hover:text-white">
-                  Cancel
-              </AsyncButton>
-              <AsyncButton onClick={onStart} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
-                                hover:bg-blue-400">
-                  Start
-              </AsyncButton>
+                    Cancel
+                </AsyncButton>
+                <AsyncButton onClick={onStart} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                                  hover:bg-blue-400">
+                    Start
+                </AsyncButton>
+              </>
+            )}
+            {activeTab === 'Ongoing' && (
+              <>
+                <AsyncButton onClick={onExtend} className="px-4 py-2 border border-gray-400 text-gray-700 rounded-lg
+                                      hover:bg-green-400">
+                    Extend
+                </AsyncButton>
+                <AsyncButton onClick={onFinish} className="px-4 py-2 border border-gray-400 bg-[#A1E3F9] text-white rounded-lg
+                                  hover:bg-blue-400">
+                    Finish
+                </AsyncButton>
+              </>
+            )}
           </div>
         )}
       </div>

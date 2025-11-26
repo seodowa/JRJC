@@ -3,6 +3,7 @@ import ReviewsPageClient from '@/components/admin/reviews/ReviewsPageClient';
 import { Suspense } from 'react';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
 import { fetchCars } from '@/lib/supabase/queries/fetchCars';
+import { RealtimeReviewsRefresher } from '@/components/admin/reviews/RealtimeReviewsRefresher';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ const AdminReviewsPage = async () => {
 
   return (
     <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><LoadingSpinner /></div>}>
+      <RealtimeReviewsRefresher />
       <ReviewsPageClient reviews={reviews} cars={cars} />
     </Suspense>
   );

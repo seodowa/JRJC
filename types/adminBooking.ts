@@ -5,6 +5,7 @@ export type TAdminBooking = {
   duration: number;
   location: string;
   customerName: string;
+  customerSuffix: string; // Added customer suffix
   carModel: string;
   carManufacturer: string;
   carYear: number;
