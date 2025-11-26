@@ -52,7 +52,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
     if (term) {
       params.set('q', term);
     } else {
-      params.set('q', '');
+      params.delete('q');
     }
     router.replace(`${pathname}?${params.toString()}`);
   }, 800);
@@ -79,7 +79,8 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
     router.refresh();
   };
 
-  const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-md";
+  // Matches the visual style of the white container in the 2nd picture
+  const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-sm border border-gray-100";
 
   return (
     <>
@@ -92,20 +93,23 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
         fuelTypes={dropdownData.fuelTypes}
         locations={dropdownData.locations}
       />
-      <main className="relative flex flex-col md:flex-row gap-4 h-full">
-        {/* List View Sidebar */}
+      
+      <main className="relative flex flex-col md:flex-row gap-6 h-full">
+        {/* List View Sidebar - Only visible in List View */}
         <AnimatePresence>
           {view === 'list' && (
             <motion.div
-              className={`relative w-full md:w-[300px] flex-shrink-0 ${cardBaseStyle}`}
-              initial={{ x: "-100%", opacity: 0 }}
+              className={`relative w-full md:w-[320px] flex-shrink-0 ${cardBaseStyle}`}
+              initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20, mass: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <h2 className="text-xl font-bold mb-4">Manage Cars</h2>
+              <h2 className="text-xl font-bold mb-6 text-gray-800">Manage Cars</h2>
               <CarsSidebar cars={cars} onAddNewCar={handleOpenAddModal} />
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+              
+              {/* Toggle in Sidebar for List View */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
                 <ViewToggle view={view} setView={handleViewChange} />
               </div>
             </motion.div>
@@ -113,53 +117,75 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex-1">
-          <div className={`relative h-full flex flex-col ${cardBaseStyle}`}>
-            {/* Sticky Top Bar for Grid View */}
+        <div className="flex-1 h-full min-h-0">
+          <div className={`relative h-full flex flex-col ${cardBaseStyle} overflow-hidden`}>
+            
+            {/* Header Section (Grid View) */}
             {view === 'grid' && (
-                <motion.div
-                    className="sticky top-0 bg-white py-2 px-6 z-10 flex items-center justify-between"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                <motion.div 
+                    className="flex items-center justify-between mb-6 flex-shrink-0"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
                 >
-                    <h2 className="text-2xl font-bold">Manage Cars</h2>
-                    <SearchBar
-                        placeholder="Search by model or brand..."
-                        onChange={(e) => handleSearch(e.target.value)}
-                        className="w-1/3"
-                    />
+                    <h2 className="text-2xl font-bold text-gray-800">Manage Cars</h2>
+                    
+                    <div className="flex items-center gap-3 w-full max-w-md justify-end">
+                        {/* Optional Filter Icon Button if needed to match exact design */}
+                        <button className="p-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 text-gray-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                            </svg>
+                        </button>
+                        <div className="w-64">
+                            <SearchBar
+                                placeholder="Find Car"
+                                onChange={(e) => handleSearch(e.target.value)}
+                                className="w-full"
+                            />
+                        </div>
+                    </div>
                 </motion.div>
             )}
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
               <AnimatePresence mode="wait">
                   <motion.div
                       key={`${view}-${search}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ ease: "easeInOut", duration: 0.3 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="h-full"
                   >
                       {view === 'list' ? (
-                        <CarListView cars={cars} onEditCar={handleOpenEditModal} carStatuses={carStatuses} />
+                        <CarListView 
+                            cars={cars} 
+                            onEditCar={handleOpenEditModal} 
+                            carStatuses={carStatuses} 
+                        />
                       ) : (
-                        <CarGridView cars={cars} onAddNewCar={handleOpenAddModal} onEditCar={handleOpenEditModal} carStatuses={carStatuses} />
+                        <CarGridView 
+                            cars={cars} 
+                            onAddNewCar={handleOpenAddModal} 
+                            onEditCar={handleOpenEditModal} 
+                            carStatuses={carStatuses} 
+                        />
                       )}
                   </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Sticky Bottom Bar for Grid View */}
+            {/* Floating Toggle for Grid View */}
             {view === 'grid' && (
                 <motion.div
-                    className="sticky bottom-0 bg-white px-4 z-10 flex justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
                 >
-                    <ViewToggle view={view} setView={handleViewChange} />
+                    <div className="bg-white/80 backdrop-blur-sm p-1 rounded-full shadow-lg border border-gray-100">
+                        <ViewToggle view={view} setView={handleViewChange} />
+                    </div>
                 </motion.div>
             )}
           </div>

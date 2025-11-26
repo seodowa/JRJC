@@ -98,70 +98,100 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
       >
         {/* Add a new car tile */}
         <div>
-          <div className="relative border-2 border-dashed border-gray-300 rounded-lg text-center flex flex-col items-center justify-center group" style={{ minHeight: '250px', height: '100%' }}>
+          <div className="relative border-2 border-dashed border-gray-300 rounded-2xl text-center flex flex-col items-center justify-center group bg-white hover:bg-gray-50 transition-colors h-[220px]">
               <AsyncButton
                 onClick={onAddNewCar}
-                className="w-full h-full flex flex-col items-center justify-center rounded-md text-black hover:bg-gray-500/25"
+                className="w-full h-full flex flex-col items-center justify-center rounded-xl text-gray-600 hover:text-gray-800"
               >
-                  <PlusIcon className="w-16 h-16 mb-2" />
-                  <span className="font-bold">Add a new car</span>
+                  <PlusIcon className="w-12 h-12 mb-2 opacity-60" />
+                  <span className="font-medium text-base">Add a new car</span>
               </AsyncButton>
           </div>
         </div>
 
         {cars.map((car) => (
             <motion.div key={car.id} variants={itemVariants}>
-              <div className="relative border rounded-lg p-4 text-center overflow-hidden group flex items-center justify-center" style={{ minHeight: '250px', height: '100%' }}>
-                  {car.image ? (
-                      <div
-                          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
-                          style={{ backgroundImage: `url(${car.image})` }}
-                      ></div>
-                  ) : (
-                      <CarPlaceholderIcon className="w-32 h-32 text-gray-300" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-white/80 z-5"></div> {/*White Gradient*/}
-                  <div className="absolute top-1 left-0 right-0 z-5 bg-opacity-50 p-2 rounded-t-lg flex justify-between items-end">
-                      <div className="text-left">
-                          <h1 className="absolute top-1 font-bold text-black text-lg">{`${car.brand} ${car.model} ${car.year} (${car.transmission})`}</h1>
+              <div className="relative border border-gray-200 rounded-2xl p-4 shadow-sm bg-white overflow-hidden h-[220px] group hover:shadow-md transition-shadow">
+                  
+                  {/* Faded Background Image */}
+                  <div className="absolute inset-0 z-0">
+                    {car.image ? (
+                        <div
+                            className="w-full h-full bg-cover bg-center opacity-40 group-hover:opacity-50 transition-opacity duration-500"
+                            style={{ backgroundImage: `url(${car.image})` }}
+                        ></div>
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-50 opacity-50">
+                            <CarPlaceholderIcon className="w-24 h-24 text-gray-300" />
+                        </div>
+                    )}
+                    {/* White gradient overlay to ensure text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/40 to-white/90"></div>
+                  </div>
+
+                  {/* Content Layout */}
+                  <div className="relative z-10 flex flex-col h-full justify-between">
+                      
+                      {/* Top Row: Title and Prices */}
+                      <div className="flex justify-between items-start gap-2">
+                          {/* Car Title */}
+                          <h3 className="font-bold text-gray-900 text-lg leading-tight max-w-[55%]">
+                              {car.brand} {car.model} <span className="text-gray-700">{car.year}</span>
+                              <span className="block text-sm font-normal text-gray-600 mt-0.5">({car.transmission})</span>
+                          </h3>
+
+                          {/* Pricing Info - Right Aligned */}
+                          <div className="text-[10px] text-right text-gray-800 font-medium leading-tight">
+                              {car.price?.map((priceInfo) => (
+                                  <div key={priceInfo.Location} className="mb-1.5 last:mb-0">
+                                      <div className="font-bold text-gray-600 opacity-90">{priceInfo.Location}:</div>
+                                      {priceInfo.Location !== "Outside Region 10" && (
+                                          <div>₱{priceInfo.Price_12_Hours}/12hrs</div>
+                                      )}
+                                      <div>₱{priceInfo.Price_24_Hours}/24hrs</div>
+                                  </div>
+                              ))}
+                          </div>
                       </div>
-                      <div className="abosolute bottom-1 text-sm text-right">
-                          {car.price?.map((priceInfo) => (
-                              <div key={priceInfo.Location} className="mb-1">
-                                  <p className="font-semibold">{priceInfo.Location}:</p>
-                                  {priceInfo.Location !== "Outside Region 10" && (
-                                      <p>₱{priceInfo.Price_12_Hours}/12hrs</p>
-                                  )}
-                                  <p>₱{priceInfo.Price_24_Hours}/24hrs</p>
-                              </div>
-                          ))}
+
+                      {/* Bottom Row: Actions and Status */}
+                      <div className="flex justify-between items-end mt-auto">
+                          {/* Edit/Delete Buttons */}
+                          <div className="flex flex-col gap-1">
+                              <AsyncButton
+                                onClick={() => onEditCar(car)}
+                                className="px-3 py-1 bg-white border border-gray-300 rounded-md text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+                              >
+                                  Edit
+                              </AsyncButton>
+                              <button 
+                                onClick={() => handleDeleteClick(car)}
+                                className="text-[10px] text-red-500 font-bold hover:text-red-600 hover:underline text-left pl-1"
+                              >
+                                  Delete
+                              </button>
+                          </div>
+
+                          {/* Status Dropdown */}
+                          <div className="relative">
+                                <select
+                                    id={`status-${car.id}`}
+                                    value={car.status?.id || ''}
+                                    onChange={(e) => handleStatusChange(car.id, parseInt(e.target.value))}
+                                    className="appearance-none text-[10px] font-medium py-1 pl-2 pr-6 bg-white/80 border border-gray-200 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                                    style={{ backgroundImage: 'none' }} // Removing default arrow for cleaner look if preferred, or keep standard
+                                >
+                                    {carStatuses.map(status => (
+                                        <option key={status.id} value={status.id}>{status.status}</option>
+                                    ))}
+                                </select>
+                                {/* Custom arrow indicator */}
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-gray-500">
+                                    <svg className="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
                       </div>
                   </div>
-                  <div className="absolute right-2 bottom-2 z-5 flex items-center gap-2">
-                        <label htmlFor={`status-${car.id}`} className="font-semibold text-sm">Status:</label>
-                        <select
-                            id={`status-${car.id}`}
-                            value={car.status?.id || ''}
-                            onChange={(e) => handleStatusChange(car.id, parseInt(e.target.value))}
-                            className="text-sm rounded-md w-full max-w-[100px] text-black bg-white"
-                        >
-                            {carStatuses.map(status => (
-                                <option key={status.id} value={status.id}>{status.status}</option>
-                            ))}
-                        </select>
-                    </div>
-                  <AsyncButton
-                    onClick={() => onEditCar(car)}
-                    className="absolute left-2 bottom-8 z-5 px-2 rounded-md bg-white/70 border-1 border-black/60 hover:bg-white text-black text-sm"
-                  >
-                      Edit
-                  </AsyncButton>
-                  <AsyncButton 
-                    onClick={() => handleDeleteClick(car)}
-                    className="absolute left-2 bottom-2 z-5 px-2 rounded-md bg-red-400 border-1 border-black/60 hover:bg-red-600 text-black text-sm"
-                  >
-                      Delete
-                  </AsyncButton>
               </div>
             </motion.div>
         ))}
