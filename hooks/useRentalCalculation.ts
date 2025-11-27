@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import { BookingData } from '@/types';
 import { Dayjs } from 'dayjs';
 
@@ -9,7 +9,7 @@ interface UseRentalCalculationProps {
 
 export const useRentalCalculation = ({ rentalInfo, calculatePrice }: UseRentalCalculationProps) => {
 
-  const calculateRentalDetails = useMemo(() => {
+  const calculateRentalDetails = useCallback(() => {
     if (!rentalInfo.startDate || !rentalInfo.endDate || !rentalInfo.time) {
       return { hours: 0, days: 0, totalPrice: 0, twelveHourPrice: 0, twentyFourHourPrice: 0, multiDayPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
     }
@@ -52,7 +52,7 @@ export const useRentalCalculation = ({ rentalInfo, calculatePrice }: UseRentalCa
   }, [rentalInfo, calculatePrice]);
 
 
-  const calculateReturnTime = useMemo(() => {
+  const calculateReturnTime = useCallback(() => {
     if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) {
       return { returnDate: "", returnTime: "" };
     }
