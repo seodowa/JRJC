@@ -24,7 +24,7 @@ export interface Car {
   fuelType: 'Gasoline' | 'Hybrid' | 'Diesel'
   available: boolean
   color?: string
-  status: CarStatus 
+  status?: CarStatus
 }
 
 export interface CarFilters {

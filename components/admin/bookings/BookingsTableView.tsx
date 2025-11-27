@@ -5,7 +5,7 @@ import { TAdminBooking } from '@/types/adminBooking';
 interface BookingsTableViewProps {
   bookings: TAdminBooking[];
   selectedBookings: string[];
-  setSelectedBookings: (selected: string[]) => void;
+  setSelectedBookings: (selected: any) => void;
   showCheckboxes: boolean;
   onRowClick: (bookingId: string) => void; // New prop for row click
 }
@@ -13,9 +13,9 @@ interface BookingsTableViewProps {
 const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, showCheckboxes, onRowClick }: BookingsTableViewProps) => {
   const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, bookingId: string) => {
     if (event.target.checked) {
-      setSelectedBookings((prev) => [...prev, bookingId]);
+      setSelectedBookings((prev: any) => [...prev, bookingId]);
     } else {
-      setSelectedBookings((prev) => prev.filter((id) => id !== bookingId));
+      setSelectedBookings((prev: any) => prev.filter((id: any) => id !== bookingId));
     }
   };
 

@@ -18,8 +18,8 @@ const Bookings = ({ bookings }: BookingsProps) => {
   };
 
   const getFullName = (booking: Booking) => {
-    if (!booking.Customer) return 'Unknown Customer';
-    return [booking.Customer.First_Name, booking.Customer.Last_Name].filter(Boolean).join(' ');
+    if (!booking.Customer_ID) return 'Unknown Customer';
+    return booking.Customer_Full_Name;
   };
 
   return (

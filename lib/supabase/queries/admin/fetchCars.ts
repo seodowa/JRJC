@@ -53,7 +53,7 @@ export const fetchCars = async (query?: string): Promise<Car[]> => {
         seats: car.Number_Of_Seats,
         available: car.Available || true,
         color: car.color_code,
-        status: car.Car_Status ? { id: car.Car_Status.id, status: car.Car_Status.status } : null
+        status: car.Car_Status ? { id: car.Car_Status.id, status: car.Car_Status.status } : undefined
       };
     }) || [];
 

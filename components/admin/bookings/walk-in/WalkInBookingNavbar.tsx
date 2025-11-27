@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import AsyncButton from "@/components/AsyncButton";
 
 interface WalkInBookingNavbarProps {
-  scrollToRef: (ref: React.RefObject<HTMLDivElement>) => void;
-  personalRef: React.RefObject<HTMLDivElement>;
-  rentalRef: React.RefObject<HTMLDivElement>;
-  paymentRef: React.RefObject<HTMLDivElement>;
+  scrollToRef: (ref: React.RefObject<HTMLDivElement | null>) => void;
+  personalRef: React.RefObject<HTMLDivElement | null>;
+  rentalRef: React.RefObject<HTMLDivElement | null>;
+  paymentRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const WalkInBookingNavbar = ({

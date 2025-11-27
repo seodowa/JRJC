@@ -11,6 +11,7 @@ import { useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import AsyncButton from "@/components/AsyncButton";
 import { formatDate, formatTime } from '@/utils/dateUtils';
 import { useRentalCalculation } from '@/hooks/useRentalCalculation';
+import { Dispatch, SetStateAction } from 'react';
 
 interface RentalDetailsFormProps {
   onBack: () => void;
@@ -64,7 +65,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
             <div className="md:col-span-2">
               <SelectCar 
                 selectedCar={selectedCar} 
-                setSelectedCar={setSelectedCar}
+                setSelectedCar={setSelectedCar as Dispatch<SetStateAction<number | null>>}
                 onCarSelect={setSelectedCarData}
                 cars={cars}
               />              
