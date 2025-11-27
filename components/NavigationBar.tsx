@@ -17,8 +17,8 @@ export default function NavigationBar() {
     return (
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
                            bg-[rgba(255,255,255,0.15)] md:backdrop-blur-lg z-50 overflow-hidden">
-            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50 font-main-font">
-                <a className="mr-auto" href="/">JRJC</a>
+            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50 text-lg font-main-font">
+                <a className="mr-auto" href="/"><img src="/images/jrjc_logo.png" alt="" className="max-h-10"/></a>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">
                     <HamburgerIcon />
@@ -47,11 +47,11 @@ export default function NavigationBar() {
                     </label>
                     {Object.entries(navigationLinks).map(
                         ([name, href]) => (
-                            <a key={name} href={href} className="text-lg px-5 2xl:px-12 py-5 h-auto w-full flex hover:text-hover-color
+                            <a key={name} href={href} className="px-5 2xl:px-12 py-5 h-auto w-full flex hover:text-hover-color
                                                               md:w-auto md:h-full md:py-0 md:items-center">{name}</a>
                         )
                     )}
-                    <a href="book" className="text-lg font-bold text-[#3674B5] px-5 py-5 h-auto w-full flex hover:text-hover-color
+                    <a href="book" className="font-bold text-[#3674B5] px-5 py-5 h-auto w-full flex hover:text-hover-color
                                            md:w-auto md:h-full md:py-0 md:items-center">Book Now</a>
                 </div>
             </nav>
