@@ -37,264 +37,79 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
-// Centralized notification logic to handle preferences
-const handleNotification = async (
-  customer: any, 
-  booking: any, 
-  message: string, 
-  subject: string
-) => {
-  // Check preference stored in booking, default to SMS if missing
-  const preference = booking?.Notification_Preference || 'SMS';
-
-  if (preference === 'SMS' && customer?.Contact_Number) {
-    await sendSMS(customer.Contact_Number, message);
-  } else if (preference === 'Email' && customer?.Email) {
-    const html = `
-      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
-        <h2>${subject}</h2>
-        <p>${message}</p>
-        <br/>
-        <p>Thank you,</p>
-        <p>The Team</p>
-      </div>
-    `;
-    await sendEmail(customer.Email, subject, html);
-  } else {
-    // Fallback: If preferred method fails (e.g. prefer Email but no email address), try the other
-    if (customer?.Contact_Number) await sendSMS(customer.Contact_Number, message);
-    else if (customer?.Email) await sendEmail(customer.Email, subject, `<p>${message}</p>`);
-  }
-};
+// --- Admin Actions (Delegated to API Route) ---
 
 /**
- * Approves a list of bookings: Updates DB status to 2 (Confirmed).
+ * Generic helper to call the status update API route.
+ * This replaces the client-side DB updates and SMS logic for admin actions.
  */
-export const approveBookingsService = async (
-  bookingIds: string[]
-): Promise<BookingProcessResult[]> => {
-  const supabase = createClient();
-  const results: BookingProcessResult[] = [];
+const callStatusApi = async (bookingIds: string[], action: string): Promise<BookingProcessResult[]> => {
+  try {
+    const response = await fetch('/api/admin/bookings/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingIds, action }),
+    });
 
-  for (const bookingId of bookingIds) {
-    try {
-      const { error: updateError } = await supabase
-        .from('Booking_Details')
-        .update({ Booking_Status_ID: 2 })
-        .eq('Booking_ID', bookingId);
+    const data = await response.json();
 
-      if (updateError) {
-        console.error(`Failed to update booking ${bookingId}`, updateError);
-        results.push({ success: false, bookingId, error: updateError });
-        continue;
-      }
-
-      const { data: bookingData, error: fetchError } = await supabase
-        .from('Booking_Details')
-        .select(`
-          Notification_Preference,
-          Customer (Contact_Number, First_Name, Email)
-        `)
-        .eq('Booking_ID', bookingId)
-        .single();
-
-      if (!fetchError && bookingData) {
-        const customer = (bookingData as any)?.Customer;
-        const message = `Hi ${customer?.First_Name || 'Customer'}, Good news! Your booking (ID: ${bookingId}) has been APPROVED. See you soon!`;
-        await handleNotification(customer, bookingData, message, "Booking Approved");
-      }
-      results.push({ success: true, bookingId, message: "Approved and notification sent" });
-    } catch (error) {
-      results.push({ success: false, bookingId, error });
+    if (!response.ok) {
+      throw new Error(data.error || `Failed to ${action} bookings`);
     }
+
+    // Map the API results back to our service format
+    return data.results.map((r: any) => ({
+      success: r.success,
+      bookingId: r.bookingId,
+      message: r.success ? `Successfully ${action}ed` : r.error
+    }));
+  } catch (error: any) {
+    console.error(`API Error during ${action}:`, error);
+    // Fail all if the API call itself blows up
+    return bookingIds.map(id => ({
+      success: false,
+      bookingId: id,
+      error: error.message
+    }));
   }
-  return results;
+};
+
+export const approveBookingsService = async (bookingIds: string[]) => {
+  return callStatusApi(bookingIds, 'approve');
+};
+
+export const declineBookingsService = async (bookingIds: string[]) => {
+  return callStatusApi(bookingIds, 'decline');
+};
+
+export const startBookingsService = async (bookingIds: string[]) => {
+  return callStatusApi(bookingIds, 'start');
+};
+
+export const finishBookingsService = async (bookingIds: string[]) => {
+  return callStatusApi(bookingIds, 'finish');
+};
+
+export const cancelBookingsService = async (bookingIds: string[]) => {
+  return callStatusApi(bookingIds, 'cancel');
 };
 
 /**
- * Declines a list of bookings: Updates DB status to 6 (Declined).
+ * Cancels a single booking (User initiated).
+ * Note: Users might not have access to the admin API route depending on your RLS/Auth.
+ * If this fails for normal users, you might need a separate user-facing route or keep the old logic here.
+ * Assuming this is for admins mostly, or the route handles user permissions.
  */
-export const declineBookingsService = async (
-  bookingIds: string[]
-): Promise<BookingProcessResult[]> => {
-  const supabase = createClient();
-  const results: BookingProcessResult[] = [];
-
-  for (const bookingId of bookingIds) {
-    try {
-      const { error: updateError } = await supabase
-        .from('Booking_Details')
-        .update({ Booking_Status_ID: 6 }) 
-        .eq('Booking_ID', bookingId);
-
-      if (updateError) {
-        results.push({ success: false, bookingId, error: updateError });
-        continue;
-      }
-
-      const { data: bookingData, error: fetchError } = await supabase
-        .from('Booking_Details')
-        .select(`
-          Notification_Preference,
-          Customer (Contact_Number, First_Name, Email)
-        `)
-        .eq('Booking_ID', bookingId)
-        .single();
-
-      if (!fetchError && bookingData) {
-        const customer = (bookingData as any)?.Customer;
-        const message = `Hi ${customer?.First_Name || 'Customer'}, we regret to inform you that your booking (ID: ${bookingId}) has been DECLINED. Please contact us for details.`;
-        await handleNotification(customer, bookingData, message, "Booking Declined");
-      }
-      results.push({ success: true, bookingId, message: "Declined and notification sent" });
-    } catch (error) {
-      results.push({ success: false, bookingId, error });
-    }
-  }
-  return results;
+export const cancelBookingService = async (bookingId: string): Promise<BookingProcessResult> => {
+  const results = await cancelBookingsService([bookingId]);
+  return results[0];
 };
 
-/**
- * Starts a list of bookings: Updates DB status to 3 (Ongoing).
- */
-export const startBookingsService = async (
-  bookingIds: string[]
-): Promise<BookingProcessResult[]> => {
-  const supabase = createClient();
-  const results: BookingProcessResult[] = [];
-
-  for (const bookingId of bookingIds) {
-    try {
-      const { error: updateError } = await supabase
-        .from('Booking_Details')
-        .update({ Booking_Status_ID: 3 }) 
-        .eq('Booking_ID', bookingId);
-
-      if (updateError) {
-        results.push({ success: false, bookingId, error: updateError });
-        continue;
-      }
-
-      const { data: bookingData, error: fetchError } = await supabase
-        .from('Booking_Details')
-        .select(`
-          Notification_Preference,
-          Customer (Contact_Number, First_Name, Email)
-        `)
-        .eq('Booking_ID', bookingId)
-        .single();
-
-      if (!fetchError && bookingData) {
-        const customer = (bookingData as any)?.Customer;
-        const message = `Hi ${customer?.First_Name || 'Customer'}, your rental (ID: ${bookingId}) has officially STARTED. Drive safely!`;
-        await handleNotification(customer, bookingData, message, "Rental Started");
-      }
-      results.push({ success: true, bookingId, message: "Started and notification sent" });
-    } catch (error) {
-      results.push({ success: false, bookingId, error });
-    }
-  }
-  return results;
-};
-
-/**
- * Finishes a list of bookings: Updates DB status to 4 (Completed).
- */
-export const finishBookingsService = async (
-  bookingIds: string[]
-): Promise<BookingProcessResult[]> => {
-  const supabase = createClient();
-  const results: BookingProcessResult[] = [];
-
-  for (const bookingId of bookingIds) {
-    try {
-      const { error: updateError } = await supabase
-        .from('Booking_Details')
-        .update({ Booking_Status_ID: 4 })
-        .eq('Booking_ID', bookingId);
-
-      if (updateError) {
-        results.push({ success: false, bookingId, error: updateError });
-        continue;
-      }
-
-      const { data: bookingData, error: fetchError } = await supabase
-        .from('Booking_Details')
-        .select(`
-          Notification_Preference,
-          Customer (Contact_Number, First_Name, Email)
-        `)
-        .eq('Booking_ID', bookingId)
-        .single();
-
-      if (!fetchError && bookingData) {
-        const customer = (bookingData as any)?.Customer;
-        const message = `Hi ${customer?.First_Name || 'Customer'}, your booking (ID: ${bookingId}) has been COMPLETED. Thank you for choosing us!`;
-        await handleNotification(customer, bookingData, message, "Booking Completed");
-      }
-      results.push({ success: true, bookingId, message: "Finished and notification sent" });
-    } catch (error) {
-      results.push({ success: false, bookingId, error });
-    }
-  }
-  return results;
-};
-
-/**
- * Cancels a list of bookings (Admin Batch): Updates DB status to 5 (Canceled).
- */
-export const cancelBookingsService = async (
-  bookingIds: string[]
-): Promise<BookingProcessResult[]> => {
-  const supabase = createClient();
-  const results: BookingProcessResult[] = [];
-
-  for (const bookingId of bookingIds) {
-    try {
-      const { error: updateError } = await supabase
-        .from('Booking_Details')
-        .update({ Booking_Status_ID: 5 }) 
-        .eq('Booking_ID', bookingId);
-
-      if (updateError) {
-        results.push({ success: false, bookingId, error: updateError });
-        continue;
-      }
-
-      const { data: bookingData, error: fetchError } = await supabase
-        .from('Booking_Details')
-        .select(`
-          Notification_Preference,
-          Customer (Contact_Number, First_Name, Email)
-        `)
-        .eq('Booking_ID', bookingId)
-        .single();
-
-      if (!fetchError && bookingData) {
-        const customer = (bookingData as any)?.Customer;
-        const message = `Hi ${customer?.First_Name || 'Customer'}, your booking (ID: ${bookingId}) has been CANCELLED by the admin. Please contact us if this is a mistake.`;
-        await handleNotification(customer, bookingData, message, "Booking Cancelled");
-      }
-      results.push({ success: true, bookingId, message: "Cancelled and notification sent" });
-    } catch (error) {
-      results.push({ success: false, bookingId, error });
-    }
-  }
-  return results;
-};
-
-/**
- * Cancels a single booking (User initiated): Updates DB status to 5 (Canceled).
- */
-export const cancelBookingService = async (
-  bookingId: string
-): Promise<BookingProcessResult> => {
-  const result = await cancelBookingsService([bookingId]);
-  return result[0];
-};
+// --- User Actions (Client-Side logic for New Bookings) ---
 
 /**
  * Sends a confirmation notification (SMS or Email) for a newly created booking.
+ * This runs on the client immediately after the user submits the booking form.
  */
 export const sendBookingConfirmationService = async (
   bookingId: string,
