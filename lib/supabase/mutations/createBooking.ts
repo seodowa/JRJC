@@ -1,11 +1,13 @@
 import { createClient } from "@/utils/supabase/client";
-import { BookingData } from "@/types"; // Ensure this type is updated if needed, or use 'any' for flexibility here
+// Ensure this type is updated if needed, or use 'any' for flexibility here
+// import { BookingData } from "@/types"; 
 
 const supabase = createClient();
 
 export const createBooking = async (bookingData: any) => {
   try {
     console.log("Starting booking creation...");
+    console.log("Booking Data Received:", bookingData);
 
     const convertDurationToHours = (duration: string): number => {
         if (duration === "12 hours") return 12;
@@ -49,22 +51,46 @@ export const createBooking = async (bookingData: any) => {
 
     const customerId = customerData[0].Customer_ID;
 
-    // Calculate timestamps
-    const startDateTime = new Date(`${bookingData.rentalInfo.startDate}T${bookingData.rentalInfo.time}`).toISOString();
+    // --- DATE CALCULATION FIX START ---
     
+    // 1. Construct startDateTime manually using string interpolation.
+    // This preserves the exact date/time selected by the user without UTC conversion shifts.
+    const startDateTime = `${bookingData.rentalInfo.startDate}T${bookingData.rentalInfo.time}:00`;
+    console.log("Calculated startDateTime (Local):", startDateTime);
+
+    // 2. Calculate endDateTime
     let endDateTime: string;
-    if (bookingData.rentalInfo.duration === "12 hours") {
-      endDateTime = new Date(new Date(startDateTime).getTime() + (12 * 60 * 60 * 1000)).toISOString();
-    } else if (bookingData.rentalInfo.duration === "24 hours") {
-      endDateTime = new Date(new Date(startDateTime).getTime() + (24 * 60 * 60 * 1000)).toISOString();
-    } else if (bookingData.rentalInfo.duration.includes("days")) {
-      const days = parseInt(bookingData.rentalInfo.duration);
-      endDateTime = new Date(new Date(startDateTime).getTime() + (days * 24 * 60 * 60 * 1000)).toISOString();
+    
+    // Helper to format a Date object back to "YYYY-MM-DDTHH:mm:ss" in LOCAL time
+    const formatLocalDateTime = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    };
+
+    if (bookingData.rentalInfo.duration === "12 hours" || 
+        bookingData.rentalInfo.duration === "24 hours" || 
+        bookingData.rentalInfo.duration.includes("days")) {
+        
+        const startDateObj = new Date(startDateTime);
+        const durationHours = convertDurationToHours(bookingData.rentalInfo.duration);
+        
+        // Add duration to the date object
+        startDateObj.setHours(startDateObj.getHours() + durationHours);
+        
+        // Format back to string
+        endDateTime = formatLocalDateTime(startDateObj);
+        
     } else {
-      // Fallback if end date is explicitly provided in a different format, 
-      // though your current logic relies on duration.
-      endDateTime = new Date(`${bookingData.rentalInfo.endDate}T${bookingData.rentalInfo.time}`).toISOString();
+      // Fallback: If specific end date provided, format it manually too
+      endDateTime = `${bookingData.rentalInfo.endDate}T${bookingData.rentalInfo.time}:00`;
     }
+    
+    // --- DATE CALCULATION FIX END ---
 
     const hasChauffer = bookingData.rentalInfo.selfDrive === "No";
 
