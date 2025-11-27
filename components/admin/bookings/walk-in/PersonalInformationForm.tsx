@@ -8,7 +8,17 @@ interface PersonalInformationFormProps {
 }
 
 const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
-  const { personalInfo, handleInputChange } = useWalkInBooking();
+  const { personalInfo, setPersonalInfo } = useWalkInBooking();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === "mobileNumber") {
+      const numbersOnly = value.replace(/\D/g, "");
+      setPersonalInfo((prev) => ({ ...prev, [name]: numbersOnly }));
+    } else {
+      setPersonalInfo((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
   return (
     <div className="bg-white p-8 rounded-4xl shadow-md">

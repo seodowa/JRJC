@@ -9,6 +9,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import { useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import AsyncButton from "@/components/AsyncButton";
+import { formatDate, formatTime } from '@/utils/dateUtils';
+import { useRentalCalculation } from '@/hooks/useRentalCalculation';
 
 interface RentalDetailsFormProps {
   onBack: () => void;
@@ -18,7 +20,7 @@ interface RentalDetailsFormProps {
 const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
   const {
     rentalInfo,
-    handleRentalInputChange,
+    setRentalInfo,
     selectedCar,
     setSelectedCar,
     selectedCarData,
@@ -29,15 +31,12 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
     error,
     selectedTime,
     setSelectedTime,
-    setRentalInfo,
     dateRangeError,
     setDateRangeError,
-    formatDate,
-    formatTime,
-    calculateRentalDetails,
-    calculateReturnTime
+    calculatePrice,
   } = useWalkInBooking();
 
+  const { calculateRentalDetails: getCalculatedRentalDetails, calculateReturnTime: getCalculatedReturnTime } = useRentalCalculation({ rentalInfo, calculatePrice });
   const {
     hours,
     days,
@@ -47,9 +46,14 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
     multiDayPrice,
     show12HourOption,
     show24HourOption
-  } = calculateRentalDetails();
+  } = getCalculatedRentalDetails();
 
-  const { returnTime } = calculateReturnTime();
+  const { returnTime } = getCalculatedReturnTime();
+
+  const handleRentalInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setRentalInfo((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="bg-white p-8 rounded-4xl shadow-md mt-8">

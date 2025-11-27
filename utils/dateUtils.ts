@@ -28,3 +28,20 @@ export function getTimeAgo(date: Date) {
     
     return `${years} years ago`;
   }
+
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+};
+
+export const formatTime = (timeString: string) => {
+  if (!timeString) return "";
+  const [hours, minutes] = timeString.split(':');
+  const hour = parseInt(hours);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+  return `${displayHour}:${minutes} ${period}`;
+};

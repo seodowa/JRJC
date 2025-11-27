@@ -11,13 +11,17 @@ interface PaymentDetailsProps {
 const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
   const {
     paymentInfo,
-    handlePaymentInputChange,
     calculateRentalDetails,
     setShowConfirm,
     setPaymentInfo,
     paymentMethod,
-    setPaymentMethod
+    setPaymentMethod,
   } = useWalkInBooking();
+
+  const handlePaymentInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setPaymentInfo((prev) => ({ ...prev, [name]: value }));
+  };
 
   const { totalPrice } = calculateRentalDetails();
   const bookingFee = 500;
