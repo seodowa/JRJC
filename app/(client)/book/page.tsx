@@ -12,7 +12,9 @@ import { Car } from "@/types";
 import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
 import { createBooking } from "@/lib/supabase/mutations/createBooking";
 import BookingCalendar from "@/components/BookingCalendar";
-import { sendBookingConfirmationService } from "@/app/services/bookingService"; 
+import { sendBookingConfirmationService } from "@/app/services/bookingService";
+// 1. Import Supabase Client (Adjust path to where your client is initialized)
+import { createClient } from "@/utils/supabase/client"; 
 
 interface PersonalInfo {
   firstName: string;
@@ -36,6 +38,7 @@ interface PaymentInfo {
 }
 
 const BookingPage: React.FC = () => {
+  // ... existing state ...
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -68,10 +71,45 @@ const BookingPage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [dateRangeError, setDateRangeError] = useState<string | null>(null);
-  
-  // New State for Notification Preference
   const [notificationType, setNotificationType] = useState<'SMS' | 'Email'>('SMS');
 
+  // --- NEW: Realtime State ---
+  const [refreshKey, setRefreshKey] = useState(0);
+  const supabase = createClient(); // Initialize client
+
+  // --- NEW: Realtime Subscription Effect ---
+  useEffect(() => {
+    // Subscribe to the 'bookings' table
+    const channel = supabase
+      .channel('realtime-bookings')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings' },
+        (payload) => {
+          console.log('Realtime update detected:', payload);
+          // Increment key to trigger re-renders of dependent components
+          setRefreshKey((prev) => prev + 1);
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
+
+  // --- MODIFIED: Fetch Cars dependent on refreshKey ---
+  useEffect(() => {
+    const loadCars = async () => {
+      const carData = await fetchCars();
+      setCars(carData);
+    };
+    loadCars();
+  }, [refreshKey]); // <--- Added dependency here
+
+  // ... (Keep existing handlers: handleConfirmBooking, handleFinalSubmit, etc.) ...
+  
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
 
@@ -85,7 +123,6 @@ const BookingPage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      // --- 1. Calculate Totals ---
       const { totalPrice } = calculateRentalDetails();
       const bookingFee = 500;
       const carWashFee = 300;
@@ -101,22 +138,19 @@ const BookingPage: React.FC = () => {
         bookingFee,
         carWashFee,
         initialPayment,
-        bookingStatusId: 1, // Set status to Pending
-        notificationPreference: notificationType, // <--- Pass preference to be saved in DB
+        bookingStatusId: 1, 
+        notificationPreference: notificationType, 
       };
 
-      // --- 2. Create Booking & Wait for Result ---
       const result = await createBooking(bookingData);
       
       console.log("Booking created:", result); 
 
-      // --- 3. Extract Data ---
       const newBookingId = result.booking.Booking_ID;
       const statusText = "Pending";
 
       setBookingSuccess(true);
 
-      // --- 4. Send Notification using Service ---
       await sendBookingConfirmationService(
         newBookingId,
         totalPayment,
@@ -128,32 +162,19 @@ const BookingPage: React.FC = () => {
         notificationType 
       );
 
-      // --- 5. Reset Form ---
       setTimeout(() => {
         setShowConfirm(false);
-        setPersonalInfo({
-          firstName: "",
-          lastName: "",
-          suffix: "",
-          email: "",
-          mobileNumber: "",
-        });
-        setRentalInfo({
-          area: "",
-          startDate: "",
-          endDate: "",
-          selfDrive: "",
-          duration: "",
-          time: "",
-        });
-        setPaymentInfo({
-          referenceNumber: "",
-        });
+        // Reset form...
+        setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
+        setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
+        setPaymentInfo({ referenceNumber: "" });
         setSelectedCar(null);
         setSelectedCarData(null);
         setCurrentStep(1);
         setBookingSuccess(false);
         setNotificationType('SMS'); 
+        // Force a refresh after self-submission as well
+        setRefreshKey(prev => prev + 1);
       }, 3000);
       
     } catch (error) {
@@ -164,8 +185,6 @@ const BookingPage: React.FC = () => {
     }
   };
 
-  // ... (rest of the component remains unchanged)
-  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "mobileNumber") {
@@ -201,6 +220,7 @@ const BookingPage: React.FC = () => {
     }
   };
 
+  // ... (Keep existing helpers: formatDate, formatTime, calculateRentalDetails, calculateReturnTime) ...
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
@@ -218,7 +238,6 @@ const BookingPage: React.FC = () => {
       return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
     }
 
-    // CHECK: Is the selected area strictly "Outside Region 10"?
     const isOutsideRegion10 = rentalInfo.area === "Outside Region 10";
 
     const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
@@ -229,8 +248,6 @@ const BookingPage: React.FC = () => {
     if (hours <= 0) return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
 
     const days = Math.ceil(hours / 24);
-
-    // LOGIC: Only show 12hr option if it fits the time AND it is NOT outside region 10
     const show12HourOption = hours <= 24 && !isOutsideRegion10;
     const show24HourOption = hours <= 24;
 
@@ -247,22 +264,13 @@ const BookingPage: React.FC = () => {
     } else if (rentalInfo.duration?.includes("days")) {
       totalPrice = multiDayPrice;
     } else {
-      // Auto-calculate price for display
       if (hours <= 12 && show12HourOption) totalPrice = twelveHourPrice;
       else if (hours <= 24) totalPrice = twentyFourHourPrice;
       else totalPrice = multiDayPrice;
     }
 
     return { 
-      hours, 
-      days, 
-      totalPrice, 
-      twelveHourPrice, 
-      twentyFourHourPrice, 
-      multiDayPrice, 
-      show12HourOption, 
-      show24HourOption,
-      isOutsideRegion10 // Return this to use in useEffect
+      hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10 
     };
   };
 
@@ -284,26 +292,12 @@ const BookingPage: React.FC = () => {
   const { returnTime } = calculateReturnTime();
 
   useEffect(() => {
-    const loadCars = async () => {
-      const carData = await fetchCars();
-      setCars(carData);
-    };
-    loadCars();
-  }, []);
-
- useEffect(() => {
     if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
-      // Get the flag from our calculation function
       const { hours, isOutsideRegion10 } = calculateRentalDetails();
-
-      // Only run auto-selection if duration isn't set or hours changed significantly
       if (!rentalInfo.duration || hours > 48) {
-        
-        // If short trip (<=12h) AND allowed area -> 12 hours
         if (hours <= 12 && !isOutsideRegion10) {
            setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
         }
-        // If short trip BUT outside region 10 -> defaults to 24 hours
         else if (hours <= 24) {
            setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
         } 
@@ -313,7 +307,6 @@ const BookingPage: React.FC = () => {
         }
       }
     }
-    // IMPORTANT: Add rentalInfo.area to dependencies so it updates when dropdown changes
   }, [rentalInfo.startDate, rentalInfo.endDate, rentalInfo.time, rentalInfo.area]);
 
   const renderStepContent = () => {
@@ -322,6 +315,7 @@ const BookingPage: React.FC = () => {
         return (
           <div className="p-6">
             <form onSubmit={handleSubmit}>
+              {/* ... (Same as before) ... */}
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
                   <InputField label="First Name" name="firstName" type="text" value={personalInfo.firstName} onChange={handleInputChange} placeholder="Enter your first name" required className="col-span-3 md:col-span-1" />
@@ -344,10 +338,14 @@ const BookingPage: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <SelectCar selectedCar={selectedCar} setSelectedCar={setSelectedCar} onCarSelect={setSelectedCarData} cars={cars} />
+                    {/* Add key here if SelectCar fetches data internally, otherwise optional */}
+                    <SelectCar 
+                        selectedCar={selectedCar} 
+                        setSelectedCar={setSelectedCar} 
+                        onCarSelect={setSelectedCarData} 
+                        cars={cars} // cars is now auto-updated via Realtime
+                    />
                   </div>
-                  {/* ... (Transmission, Area, Pick-up Time, BookingCalendar, Fuel Type, Self-drive inputs) ... */}
-                  {/* Keeping existing inputs for brevity, assuming standard implementation */}
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Transmission</label><input type="text" disabled value={selectedCarData?.transmission || "—"} className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" /></div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Area <span className="text-red-500">*</span></label>
@@ -366,9 +364,23 @@ const BookingPage: React.FC = () => {
                     </LocalizationProvider>
                   </div>
                   <div className="md:col-span-2">
-                    <BookingCalendar selectedCar={selectedCarData?.id} startDate={rentalInfo.startDate} endDate={rentalInfo.endDate} onStartDateChange={(date) => setRentalInfo(prev => ({ ...prev, startDate: date }))} onEndDateChange={(date) => setRentalInfo(prev => ({ ...prev, endDate: date }))} onRangeError={setDateRangeError} minDate={dayjs()} />
+                    {/* --- IMPORTANT: Added key={refreshKey} --- 
+                        This forces the Calendar to re-render and re-fetch blocked dates 
+                        when a new booking comes in. 
+                    */}
+                    <BookingCalendar 
+                        key={refreshKey} 
+                        selectedCar={selectedCarData?.id} 
+                        startDate={rentalInfo.startDate} 
+                        endDate={rentalInfo.endDate} 
+                        onStartDateChange={(date) => setRentalInfo(prev => ({ ...prev, startDate: date }))} 
+                        onEndDateChange={(date) => setRentalInfo(prev => ({ ...prev, endDate: date }))} 
+                        onRangeError={setDateRangeError} 
+                        minDate={dayjs()} 
+                    />
                     {dateRangeError && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md"><p className="text-sm text-red-700">{dateRangeError}</p></div>}
                   </div>
+                  {/* ... (Rest of Step 2 inputs same as before) ... */}
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Fuel Type</label><input type="text" disabled value="Gasoline(Unleaded)" className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" /></div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Self-drive? <span className="text-red-500">*</span></label>
@@ -421,6 +433,7 @@ const BookingPage: React.FC = () => {
         return (
           <div className="relative p-6">
             <form onSubmit={handleSubmit}>
+              {/* ... (Same Payment Form UI) ... */}
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   <div>
@@ -473,25 +486,11 @@ const BookingPage: React.FC = () => {
                             <p className="text-sm font-medium text-gray-700 mb-2">Where should we send notifications?</p>
                             <div className="flex gap-4">
                               <label className="flex items-center space-x-2 cursor-pointer">
-                                <input
-                                  type="radio"
-                                  name="notificationType"
-                                  value="SMS"
-                                  checked={notificationType === 'SMS'}
-                                  onChange={() => setNotificationType('SMS')}
-                                  className="form-radio h-4 w-4 text-blue-600"
-                                />
+                                <input type="radio" name="notificationType" value="SMS" checked={notificationType === 'SMS'} onChange={() => setNotificationType('SMS')} className="form-radio h-4 w-4 text-blue-600" />
                                 <span className="text-sm text-gray-700">SMS</span>
                               </label>
                               <label className="flex items-center space-x-2 cursor-pointer">
-                                <input
-                                  type="radio"
-                                  name="notificationType"
-                                  value="Email"
-                                  checked={notificationType === 'Email'}
-                                  onChange={() => setNotificationType('Email')}
-                                  className="form-radio h-4 w-4 text-blue-600"
-                                />
+                                <input type="radio" name="notificationType" value="Email" checked={notificationType === 'Email'} onChange={() => setNotificationType('Email')} className="form-radio h-4 w-4 text-blue-600" />
                                 <span className="text-sm text-gray-700">Email</span>
                               </label>
                             </div>
@@ -526,7 +525,7 @@ const BookingPage: React.FC = () => {
       <img src="/images/BG.webp" className="opacity-20 min-w-full absolute bottom-0 -z-2" />
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* ... (Header and Progress Bar logic same as before) ... */}
+          {/* ... (Header and Progress Bar same as before) ... */}
           <div className="lg:hidden mb-6 text-center">
             <span className="text-lg font-semibold text-gray-900">{["Personal Information", "Rental Details", "Payment Details"][currentStep - 1]}</span>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-3"><div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${(currentStep / 3) * 100}%` }}></div></div>
