@@ -13,7 +13,6 @@ import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
 import { createBooking } from "@/lib/supabase/mutations/createBooking";
 import BookingCalendar from "@/components/BookingCalendar";
 import { sendBookingConfirmationService } from "@/app/services/bookingService";
-// 1. Import Supabase Client (Adjust path to where your client is initialized)
 import { createClient } from "@/utils/supabase/client"; 
 
 interface PersonalInfo {
@@ -38,7 +37,6 @@ interface PaymentInfo {
 }
 
 const BookingPage: React.FC = () => {
-  // ... existing state ...
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -71,15 +69,15 @@ const BookingPage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [dateRangeError, setDateRangeError] = useState<string | null>(null);
-  const [notificationType, setNotificationType] = useState<'SMS' | 'Email'>('SMS');
+  
+  // --- UPDATED: Changed from single string to Array for multi-select ---
+  const [notificationPreferences, setNotificationPreferences] = useState<string[]>(['SMS']);
 
-  // --- NEW: Realtime State ---
+  // Realtime State
   const [refreshKey, setRefreshKey] = useState(0);
-  const supabase = createClient(); // Initialize client
+  const supabase = createClient();
 
-  // --- NEW: Realtime Subscription Effect ---
   useEffect(() => {
-    // Subscribe to the 'bookings' table
     const channel = supabase
       .channel('realtime-bookings')
       .on(
@@ -87,31 +85,37 @@ const BookingPage: React.FC = () => {
         { event: '*', schema: 'public', table: 'bookings' },
         (payload) => {
           console.log('Realtime update detected:', payload);
-          // Increment key to trigger re-renders of dependent components
           setRefreshKey((prev) => prev + 1);
         }
       )
       .subscribe();
 
-    // Cleanup subscription on unmount
     return () => {
       supabase.removeChannel(channel);
     };
   }, [supabase]);
 
-  // --- MODIFIED: Fetch Cars dependent on refreshKey ---
   useEffect(() => {
     const loadCars = async () => {
       const carData = await fetchCars();
       setCars(carData);
     };
     loadCars();
-  }, [refreshKey]); // <--- Added dependency here
+  }, [refreshKey]);
 
-  // ... (Keep existing handlers: handleConfirmBooking, handleFinalSubmit, etc.) ...
-  
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
+
+  // --- NEW: Helper to toggle checkboxes ---
+  const handleNotificationToggle = (type: string) => {
+    setNotificationPreferences((prev) => {
+      if (prev.includes(type)) {
+        return prev.filter((t) => t !== type);
+      } else {
+        return [...prev, type];
+      }
+    });
+  };
 
   const handleFinalSubmit = async () => {
     if (!selectedCar) {
@@ -129,6 +133,9 @@ const BookingPage: React.FC = () => {
       const initialPayment = totalPrice || 0;
       const totalPayment = bookingFee + carWashFee + initialPayment;
 
+      // --- UPDATED: Join the array into a string (e.g., "SMS, Email") ---
+      const finalPreferenceString = notificationPreferences.join(', ');
+
       const bookingData = {
         personalInfo,
         rentalInfo,
@@ -139,7 +146,7 @@ const BookingPage: React.FC = () => {
         carWashFee,
         initialPayment,
         bookingStatusId: 1, 
-        notificationPreference: notificationType, 
+        notificationPreference: finalPreferenceString, // <--- Sending combined string
       };
 
       const result = await createBooking(bookingData);
@@ -159,12 +166,11 @@ const BookingPage: React.FC = () => {
         personalInfo.email, 
         personalInfo.mobileNumber,
         paymentInfo.referenceNumber,
-        notificationType 
+        finalPreferenceString // <--- Sending combined string to service
       );
 
       setTimeout(() => {
         setShowConfirm(false);
-        // Reset form...
         setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
         setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
         setPaymentInfo({ referenceNumber: "" });
@@ -172,8 +178,7 @@ const BookingPage: React.FC = () => {
         setSelectedCarData(null);
         setCurrentStep(1);
         setBookingSuccess(false);
-        setNotificationType('SMS'); 
-        // Force a refresh after self-submission as well
+        setNotificationPreferences(['SMS']); // Reset to default
         setRefreshKey(prev => prev + 1);
       }, 3000);
       
@@ -220,7 +225,6 @@ const BookingPage: React.FC = () => {
     }
   };
 
-  // ... (Keep existing helpers: formatDate, formatTime, calculateRentalDetails, calculateReturnTime) ...
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
@@ -315,7 +319,6 @@ const BookingPage: React.FC = () => {
         return (
           <div className="p-6">
             <form onSubmit={handleSubmit}>
-              {/* ... (Same as before) ... */}
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
                   <InputField label="First Name" name="firstName" type="text" value={personalInfo.firstName} onChange={handleInputChange} placeholder="Enter your first name" required className="col-span-3 md:col-span-1" />
@@ -338,12 +341,11 @@ const BookingPage: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    {/* Add key here if SelectCar fetches data internally, otherwise optional */}
                     <SelectCar 
                         selectedCar={selectedCar} 
                         setSelectedCar={setSelectedCar} 
                         onCarSelect={setSelectedCarData} 
-                        cars={cars} // cars is now auto-updated via Realtime
+                        cars={cars} 
                     />
                   </div>
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Transmission</label><input type="text" disabled value={selectedCarData?.transmission || "—"} className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" /></div>
@@ -364,10 +366,6 @@ const BookingPage: React.FC = () => {
                     </LocalizationProvider>
                   </div>
                   <div className="md:col-span-2">
-                    {/* --- IMPORTANT: Added key={refreshKey} --- 
-                        This forces the Calendar to re-render and re-fetch blocked dates 
-                        when a new booking comes in. 
-                    */}
                     <BookingCalendar 
                         key={refreshKey} 
                         selectedCar={selectedCarData?.id} 
@@ -380,7 +378,6 @@ const BookingPage: React.FC = () => {
                     />
                     {dateRangeError && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md"><p className="text-sm text-red-700">{dateRangeError}</p></div>}
                   </div>
-                  {/* ... (Rest of Step 2 inputs same as before) ... */}
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Fuel Type</label><input type="text" disabled value="Gasoline(Unleaded)" className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" /></div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Self-drive? <span className="text-red-500">*</span></label>
@@ -433,7 +430,6 @@ const BookingPage: React.FC = () => {
         return (
           <div className="relative p-6">
             <form onSubmit={handleSubmit}>
-              {/* ... (Same Payment Form UI) ... */}
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   <div>
@@ -483,17 +479,32 @@ const BookingPage: React.FC = () => {
                       {!submitting && (
                         <>
                           <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-700 mb-2">Where should we send notifications?</p>
+                            <p className="text-sm font-medium text-gray-700 mb-2">Where should we send notifications? <span className="text-red-500">*</span></p>
+                            
+                            {/* --- UPDATED: Multi-select Checkboxes --- */}
                             <div className="flex gap-4">
                               <label className="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="notificationType" value="SMS" checked={notificationType === 'SMS'} onChange={() => setNotificationType('SMS')} className="form-radio h-4 w-4 text-blue-600" />
+                                <input 
+                                  type="checkbox" 
+                                  checked={notificationPreferences.includes('SMS')} 
+                                  onChange={() => handleNotificationToggle('SMS')} 
+                                  className="form-checkbox h-4 w-4 text-blue-600 rounded" 
+                                />
                                 <span className="text-sm text-gray-700">SMS</span>
                               </label>
                               <label className="flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="notificationType" value="Email" checked={notificationType === 'Email'} onChange={() => setNotificationType('Email')} className="form-radio h-4 w-4 text-blue-600" />
+                                <input 
+                                  type="checkbox" 
+                                  checked={notificationPreferences.includes('Email')} 
+                                  onChange={() => handleNotificationToggle('Email')} 
+                                  className="form-checkbox h-4 w-4 text-blue-600 rounded" 
+                                />
                                 <span className="text-sm text-gray-700">Email</span>
                               </label>
                             </div>
+                            {notificationPreferences.length === 0 && (
+                              <p className="text-xs text-red-500 mt-1">Please select at least one notification method.</p>
+                            )}
                           </div>
 
                           <div className="text-sm text-gray-700 mb-4 p-3 bg-gray-50 rounded-md">
@@ -504,7 +515,11 @@ const BookingPage: React.FC = () => {
 
                       <div className="flex justify-between gap-3">
                         <button onClick={handleCancelConfirm} disabled={submitting} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50">Cancel</button>
-                        <button onClick={handleFinalSubmit} disabled={submitting} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md disabled:bg-blue-400 flex items-center justify-center">
+                        <button 
+                          onClick={handleFinalSubmit} 
+                          disabled={submitting || notificationPreferences.length === 0} 
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
+                        >
                           {submitting ? 'Processing...' : 'Confirm'}
                         </button>
                       </div>
@@ -525,7 +540,6 @@ const BookingPage: React.FC = () => {
       <img src="/images/BG.webp" className="opacity-20 min-w-full absolute bottom-0 -z-2" />
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* ... (Header and Progress Bar same as before) ... */}
           <div className="lg:hidden mb-6 text-center">
             <span className="text-lg font-semibold text-gray-900">{["Personal Information", "Rental Details", "Payment Details"][currentStep - 1]}</span>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-3"><div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${(currentStep / 3) * 100}%` }}></div></div>

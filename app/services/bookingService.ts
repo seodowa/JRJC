@@ -9,9 +9,6 @@ export type BookingProcessResult = {
 
 // --- Admin Actions (Delegated to Admin API Route) ---
 
-/**
- * Generic helper to call the admin status update API route.
- */
 const callStatusApi = async (bookingIds: string[], action: string): Promise<BookingProcessResult[]> => {
   try {
     const response = await fetch('/api/admin/bookings/status', {
@@ -41,32 +38,14 @@ const callStatusApi = async (bookingIds: string[], action: string): Promise<Book
   }
 };
 
-export const approveBookingsService = async (bookingIds: string[]) => {
-  return callStatusApi(bookingIds, 'approve');
-};
-
-export const declineBookingsService = async (bookingIds: string[]) => {
-  return callStatusApi(bookingIds, 'decline');
-};
-
-export const startBookingsService = async (bookingIds: string[]) => {
-  return callStatusApi(bookingIds, 'start');
-};
-
-export const finishBookingsService = async (bookingIds: string[]) => {
-  return callStatusApi(bookingIds, 'finish');
-};
-
-export const cancelBookingsService = async (bookingIds: string[]) => {
-  return callStatusApi(bookingIds, 'cancel');
-};
+export const approveBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'approve');
+export const declineBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'decline');
+export const startBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'start');
+export const finishBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'finish');
+export const cancelBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'cancel');
 
 // --- User Actions ---
 
-/**
- * Cancels a single booking (User initiated).
- * Calls the public cancellation API route.
- */
 export const cancelBookingService = async (bookingId: string): Promise<BookingProcessResult> => {
   try {
     const response = await fetch('/api/bookings/cancel', {
@@ -90,8 +69,8 @@ export const cancelBookingService = async (bookingId: string): Promise<BookingPr
 };
 
 /**
- * Sends a confirmation notification (SMS or Email) for a newly created booking.
- * This runs on the client immediately after the user submits the booking form.
+ * Sends a confirmation notification.
+ * Supports multiple methods simultaneously (e.g., "SMS, Email").
  */
 export const sendBookingConfirmationService = async (
   bookingId: string,
@@ -101,7 +80,7 @@ export const sendBookingConfirmationService = async (
   email: string,
   mobileNumber: string,
   referenceNumber: string,
-  notificationType: 'SMS' | 'Email'
+  notificationType: string // Changed from strict union to string to allow "SMS, Email"
 ): Promise<{ success: boolean; error?: any }> => {
   try {
     const message = `Hi ${firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${referenceNumber}. We will notify you once confirmed!`;
@@ -112,15 +91,21 @@ export const sendBookingConfirmationService = async (
         formattedNumber = '+63' + formattedNumber.substring(1);
     }
 
-    if (notificationType === 'SMS') {
-      // Send SMS
-      await fetch('/api/sms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: formattedNumber, text: message })
-      });
-    } else {
-      // Send Email
+    const promises = [];
+
+    // 1. Check if SMS is requested
+    if (notificationType.includes('SMS')) {
+      promises.push(
+        fetch('/api/sms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: formattedNumber, text: message })
+        })
+      );
+    } 
+    
+    // 2. Check if Email is requested (Independent check, allows both)
+    if (notificationType.includes('Email')) {
       const html = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Booking Confirmation</h2>
@@ -138,16 +123,22 @@ export const sendBookingConfirmationService = async (
         </div>
       `;
       
-      await fetch('/api/email', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: email, subject, html })
-      });
+      promises.push(
+        fetch('/api/email', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: email, subject, html })
+        })
+      );
     }
+
+    // Wait for all selected notifications to attempt sending
+    await Promise.all(promises);
 
     return { success: true };
   } catch (error) {
     console.error("Confirmation Send Error:", error);
+    // Return success: false, but in a real app you might want to know *which* failed
     return { success: false, error };
   }
 };
