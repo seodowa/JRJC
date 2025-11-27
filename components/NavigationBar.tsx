@@ -1,3 +1,5 @@
+"use client"
+
 import "@/app/globals.css";
 import React from "react";
 import HamburgerIcon from "./icons/HamburgerIcon";
@@ -7,9 +9,9 @@ export default function NavigationBar() {
     // Mapping of navigation item names to their corresponding anchor IDs
     const navigationLinks = {
         "Booking Tracker": "/tracker", // Assuming this doesn't scroll to a section
-        "Cars": "#cars",
-        "Reviews": "#reviews",
-        "About Us": "#about-us",
+        "Cars": "/#cars",
+        "Reviews": "/#reviews",
+        "About Us": "/#about-us",
     };
 
     return (
