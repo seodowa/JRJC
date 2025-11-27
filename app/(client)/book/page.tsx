@@ -215,20 +215,31 @@ const BookingPage: React.FC = () => {
 
   const calculateRentalDetails = () => {
     if (!rentalInfo.startDate || !rentalInfo.endDate || !rentalInfo.time) {
-      return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false };
+      return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
     }
+
+    // CHECK: Is the selected area strictly "Outside Region 10"?
+    const isOutsideRegion10 = rentalInfo.area === "Outside Region 10";
+
     const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
     const endDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
     const timeDiff = endDateTime.getTime() - startDateTime.getTime();
     const hours = Math.ceil(timeDiff / (1000 * 3600));
-    if (hours <= 0) return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false };
+
+    if (hours <= 0) return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
+
     const days = Math.ceil(hours / 24);
-    const show12HourOption = hours <= 24;
+
+    // LOGIC: Only show 12hr option if it fits the time AND it is NOT outside region 10
+    const show12HourOption = hours <= 24 && !isOutsideRegion10;
     const show24HourOption = hours <= 24;
+
     const twelveHourPrice = calculatePrice(rentalInfo.area, "12 hours");
     const twentyFourHourPrice = calculatePrice(rentalInfo.area, "24 hours");
     const multiDayPrice = days * twentyFourHourPrice;
+
     let totalPrice = 0;
+
     if (rentalInfo.duration === "12 hours") {
       totalPrice = twelveHourPrice;
     } else if (rentalInfo.duration === "24 hours") {
@@ -236,14 +247,26 @@ const BookingPage: React.FC = () => {
     } else if (rentalInfo.duration?.includes("days")) {
       totalPrice = multiDayPrice;
     } else {
-      if (hours <= 12) totalPrice = twelveHourPrice;
+      // Auto-calculate price for display
+      if (hours <= 12 && show12HourOption) totalPrice = twelveHourPrice;
       else if (hours <= 24) totalPrice = twentyFourHourPrice;
       else totalPrice = multiDayPrice;
     }
-    return { hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption };
+
+    return { 
+      hours, 
+      days, 
+      totalPrice, 
+      twelveHourPrice, 
+      twentyFourHourPrice, 
+      multiDayPrice, 
+      show12HourOption, 
+      show24HourOption,
+      isOutsideRegion10 // Return this to use in useEffect
+    };
   };
 
-  const { hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption } = calculateRentalDetails();
+  const { hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10 } = calculateRentalDetails();
 
   const calculateReturnTime = () => {
     if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) return { returnDate: "", returnTime: "" };
@@ -268,19 +291,30 @@ const BookingPage: React.FC = () => {
     loadCars();
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
-      const { hours } = calculateRentalDetails();
+      // Get the flag from our calculation function
+      const { hours, isOutsideRegion10 } = calculateRentalDetails();
+
+      // Only run auto-selection if duration isn't set or hours changed significantly
       if (!rentalInfo.duration || hours > 48) {
-        if (hours <= 12) setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
-        else if (hours <= 24) setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
+        
+        // If short trip (<=12h) AND allowed area -> 12 hours
+        if (hours <= 12 && !isOutsideRegion10) {
+           setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
+        }
+        // If short trip BUT outside region 10 -> defaults to 24 hours
+        else if (hours <= 24) {
+           setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
+        } 
         else {
-          const days = Math.ceil(hours / 24);
-          setRentalInfo(prev => ({ ...prev, duration: `${days} days` }));
+           const days = Math.ceil(hours / 24);
+           setRentalInfo(prev => ({ ...prev, duration: `${days} days` }));
         }
       }
     }
-  }, [rentalInfo.startDate, rentalInfo.endDate, rentalInfo.time]);
+    // IMPORTANT: Add rentalInfo.area to dependencies so it updates when dropdown changes
+  }, [rentalInfo.startDate, rentalInfo.endDate, rentalInfo.time, rentalInfo.area]);
 
   const renderStepContent = () => {
     switch (currentStep) {
