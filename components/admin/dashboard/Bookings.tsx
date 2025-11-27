@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
-import { useBookings } from '@/hooks/useBookings';
 import { Booking } from '@/types';
 
-const Bookings = () => {
-  const { bookings, loading, error } = useBookings({ Booking_Status_ID: 1 });
+interface BookingsProps {
+  bookings: Booking[];
+}
 
+const Bookings = ({ bookings }: BookingsProps) => {
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -25,11 +27,7 @@ const Bookings = () => {
       <h2 className="text-2xl font-bold mb-2 flex-shrink-0">Pending Bookings</h2>
       
       <div className="overflow-y-auto flex-grow">
-        {loading ? (
-          <p className="text-gray-500">Loading bookings...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : bookings.length === 0 ? (
+        {bookings.length === 0 ? (
           <p className="text-gray-500">No pending bookings at the moment.</p>
         ) : (
           <div className="space-y-4">
