@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Dayjs } from 'dayjs';
 import { Car, BookingData, CarPricing } from "@/types";
 import { useCarPricing } from '@/hooks/useCarPricing';
+import { useToast } from "@/components/toast/use-toast";
 
 // Define the shape of the context's value
 interface WalkInBookingContextType {
@@ -13,6 +14,8 @@ interface WalkInBookingContextType {
   setRentalInfo: React.Dispatch<React.SetStateAction<BookingData['rentalInfo']>>;
   paymentInfo: BookingData['paymentInfo'];
   setPaymentInfo: React.Dispatch<React.SetStateAction<BookingData['paymentInfo']>>;
+  paymentMethod: "cash" | "cashless" | null;
+  setPaymentMethod: React.Dispatch<React.SetStateAction<"cash" | "cashless" | null>>;
   selectedCar: number | null;
   setSelectedCar: (id: number | null) => void;
   selectedCarData: any;
@@ -71,6 +74,8 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     referenceNumber: "",
   });
 
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "cashless" | null>(null);
+
   const [selectedCar, setSelectedCar] = useState<number | null>(null);
   const [selectedCarData, setSelectedCarData] = useState<any>(null);
   const [cars, setCars] = useState<Car[]>([]);
@@ -83,6 +88,7 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
   const [showConfirm, setShowConfirm] = useState(false);
 
   const { pricingData, loading, error, calculatePrice } = useCarPricing(selectedCar);
+  const { toast } = useToast();
 
   const sendConfirmationSms = async (totalAmount: number, bookingId: string, status: string) => {
     try {
@@ -99,11 +105,28 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
       const data = await res.json();
       if (data.success) {
         console.log("SMS Sent Successfully!");
+        toast({
+          title: "SMS Notification Sent",
+          description: `Confirmation SMS sent to ${formattedNumber}.`,
+          duration: 3000,
+        });
       } else {
         console.warn("SMS Failed:", data.error);
+        toast({
+          variant: "destructive",
+          title: "SMS Notification Failed",
+          description: `Failed to send SMS: ${data.error || "Unknown error"}`,
+          duration: 3000,
+        });
       }
     } catch (err) {
       console.error("Error calling SMS API:", err);
+      toast({
+        variant: "destructive",
+        title: "SMS Notification Error",
+        description: "An error occurred while sending the SMS notification.",
+        duration: 3000,
+      });
     }
   };
 
@@ -168,20 +191,33 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
       // ---------------------------------------
       
       setBookingSuccess(true);
-      await sendConfirmationSms(totalPayment, newBookingId, statusText);
-      setTimeout(() => {
-        setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
-        setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
-        setPaymentInfo({ referenceNumber: "" });
-        setSelectedCar(null);
-        setSelectedCarData(null);
-        setSelectedTime(null);
-        setBookingSuccess(false);
-        setShowConfirm(false);
-      }, 3000);
+      toast({
+        title: "Booking Confirmed",
+        description: "The booking has been successfully submitted.",
+        duration: 3000,
+      });
+      sendConfirmationSms(totalPayment, newBookingId, statusText);
+      
+      setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
+      setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
+      setPaymentInfo({ referenceNumber: "" });
+      setPaymentMethod(null);
+      setSelectedCar(null);
+      setSelectedCarData(null);
+      setSelectedTime(null);
+      setBookingSuccess(false);
+      setShowConfirm(false);
+      setCurrentStep(1);
+      
     } catch (error) {
       console.error("Booking submission error:", error);
       setSubmitError(error instanceof Error ? error.message : "Failed to create booking");
+      toast({
+        variant: "destructive",
+        title: "Booking Failed",
+        description: error instanceof Error ? error.message : "Failed to create booking",
+        duration: 3000,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -296,6 +332,7 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     personalInfo, setPersonalInfo,
     rentalInfo, setRentalInfo,
     paymentInfo, setPaymentInfo,
+    paymentMethod, setPaymentMethod,
     selectedCar, setSelectedCar,
     selectedCarData, setSelectedCarData,
     cars,

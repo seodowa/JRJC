@@ -9,13 +9,14 @@ interface PaymentDetailsProps {
 }
 
 const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "cashless" | null>(null);
   const {
     paymentInfo,
     handlePaymentInputChange,
     calculateRentalDetails,
     setShowConfirm,
     setPaymentInfo,
+    paymentMethod,
+    setPaymentMethod
   } = useWalkInBooking();
 
   const { totalPrice } = calculateRentalDetails();
