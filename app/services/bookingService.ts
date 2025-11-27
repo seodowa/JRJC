@@ -7,41 +7,10 @@ export type BookingProcessResult = {
   error?: any;
 };
 
-// --- Helpers ---
-
-const sendSMS = async (number: string, text: string) => {
-  let formattedNumber = number;
-  if (formattedNumber.startsWith('0')) {
-    formattedNumber = '+63' + formattedNumber.substring(1);
-  }
-  try {
-    await fetch('/api/sms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: formattedNumber, text })
-    });
-  } catch (e) {
-    console.error("SMS Send Error", e);
-  }
-};
-
-const sendEmail = async (to: string, subject: string, html: string) => {
-  try {
-    await fetch('/api/email', { 
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to, subject, html })
-    });
-  } catch (e) {
-    console.error("Email Send Error", e);
-  }
-};
-
-// --- Admin Actions (Delegated to API Route) ---
+// --- Admin Actions (Delegated to Admin API Route) ---
 
 /**
- * Generic helper to call the status update API route.
- * This replaces the client-side DB updates and SMS logic for admin actions.
+ * Generic helper to call the admin status update API route.
  */
 const callStatusApi = async (bookingIds: string[], action: string): Promise<BookingProcessResult[]> => {
   try {
@@ -57,7 +26,6 @@ const callStatusApi = async (bookingIds: string[], action: string): Promise<Book
       throw new Error(data.error || `Failed to ${action} bookings`);
     }
 
-    // Map the API results back to our service format
     return data.results.map((r: any) => ({
       success: r.success,
       bookingId: r.bookingId,
@@ -65,7 +33,6 @@ const callStatusApi = async (bookingIds: string[], action: string): Promise<Book
     }));
   } catch (error: any) {
     console.error(`API Error during ${action}:`, error);
-    // Fail all if the API call itself blows up
     return bookingIds.map(id => ({
       success: false,
       bookingId: id,
@@ -94,18 +61,33 @@ export const cancelBookingsService = async (bookingIds: string[]) => {
   return callStatusApi(bookingIds, 'cancel');
 };
 
+// --- User Actions ---
+
 /**
  * Cancels a single booking (User initiated).
- * Note: Users might not have access to the admin API route depending on your RLS/Auth.
- * If this fails for normal users, you might need a separate user-facing route or keep the old logic here.
- * Assuming this is for admins mostly, or the route handles user permissions.
+ * Calls the public cancellation API route.
  */
 export const cancelBookingService = async (bookingId: string): Promise<BookingProcessResult> => {
-  const results = await cancelBookingsService([bookingId]);
-  return results[0];
-};
+  try {
+    const response = await fetch('/api/bookings/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId }),
+    });
 
-// --- User Actions (Client-Side logic for New Bookings) ---
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { success: false, bookingId, error: data.error };
+    }
+
+    return { success: true, bookingId, message: "Booking cancelled successfully" };
+
+  } catch (error: any) {
+    console.error("Client Cancellation Error:", error);
+    return { success: false, bookingId, error: error.message };
+  }
+};
 
 /**
  * Sends a confirmation notification (SMS or Email) for a newly created booking.
@@ -125,9 +107,20 @@ export const sendBookingConfirmationService = async (
     const message = `Hi ${firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${referenceNumber}. We will notify you once confirmed!`;
     const subject = "Booking Confirmation";
 
+    let formattedNumber = mobileNumber;
+    if (formattedNumber.startsWith('0')) {
+        formattedNumber = '+63' + formattedNumber.substring(1);
+    }
+
     if (notificationType === 'SMS') {
-      await sendSMS(mobileNumber, message);
+      // Send SMS
+      await fetch('/api/sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: formattedNumber, text: message })
+      });
     } else {
+      // Send Email
       const html = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Booking Confirmation</h2>
@@ -144,11 +137,17 @@ export const sendBookingConfirmationService = async (
           <p>Thank you!</p>
         </div>
       `;
-      await sendEmail(email, subject, html);
+      
+      await fetch('/api/email', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: email, subject, html })
+      });
     }
 
     return { success: true };
   } catch (error) {
+    console.error("Confirmation Send Error:", error);
     return { success: false, error };
   }
 };
