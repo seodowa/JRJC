@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { WalkInBookingProvider, useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import WalkInBookingNavbar from './WalkInBookingNavbar';
 import PersonalInformationForm from './PersonalInformationForm';
@@ -14,7 +14,6 @@ const WalkInBookingLayout = () => {
     showConfirm,
     setShowConfirm,
     submitting,
-    bookingSuccess,
     submitError,
     handleFinalSubmit,
     calculateRentalDetails

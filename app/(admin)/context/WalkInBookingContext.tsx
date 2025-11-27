@@ -45,7 +45,6 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
   const [cars, setCars] = useState<Car[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
   const [dateRangeError, setDateRangeError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(null);
@@ -129,7 +128,6 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
       setSelectedCar(null);
       setSelectedCarData(null);
       setSelectedTime(null);
-      setBookingSuccess(false); // No longer needed for modal, but good for reset
       setShowConfirm(false);
       setCurrentStep(1);
       
@@ -189,7 +187,6 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     cars,
     submitting, setSubmitting,
     submitError,
-    bookingSuccess, setBookingSuccess,
     dateRangeError, setDateRangeError,
     currentStep, setCurrentStep,
     selectedTime, setSelectedTime,
@@ -197,8 +194,7 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     loading,
     error,
     calculatePrice,
-    // Removed handleInputChange, handleRentalInputChange, handlePaymentInputChange
-    // Removed handleFinalSubmit as it's now internal to the context logic
+    handleFinalSubmit, // Re-exposed to allow client components to use it
     formatDate, // Export from utils
     formatTime, // Export from utils
     calculateRentalDetails, // Export from useRentalCalculation

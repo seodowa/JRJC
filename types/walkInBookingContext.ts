@@ -20,8 +20,6 @@ export interface WalkInBookingContextType {
   submitting: boolean;
   setSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
   submitError: string | null;
-  bookingSuccess: boolean;
-  setBookingSuccess: React.Dispatch<React.SetStateAction<boolean>>;
   dateRangeError: string | null;
   setDateRangeError: (error: string | null) => void;
   currentStep: number;
@@ -32,8 +30,7 @@ export interface WalkInBookingContextType {
   loading: boolean;
   error: string | null;
   calculatePrice: (area: string, duration: string) => number;
-  // Removed handleInputChange, handleRentalInputChange, handlePaymentInputChange
-  // Removed handleFinalSubmit as it's now internal to the context logic
+  handleFinalSubmit: () => Promise<void>;
   formatDate: (dateString: string) => string;
   formatTime: (timeString: string) => string;
   calculateRentalDetails: () => { hours: number; days: number; totalPrice: number; twelveHourPrice: number; twentyFourHourPrice: number; multiDayPrice: number; show12HourOption: boolean; show24HourOption: boolean; };
