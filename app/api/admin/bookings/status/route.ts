@@ -1,20 +1,16 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/utils/supabase/admin';
-import { getSession } from '@/lib'; // Assuming this handles session verification
+import { getSession } from '@/lib'; 
 import { sendSMS } from '@/lib/sms';
 
 // Helper to send email via the existing API route
 const sendEmail = async (to: string, subject: string, html: string) => {
   try {
-    // Construct the full URL. Ensure NEXT_PUBLIC_BASE_URL is set in your .env
-    // Fallback to localhost for development if not set
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     
     const response = await fetch(`${baseUrl}/api/email`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to, subject, html }),
     });
 
@@ -24,7 +20,6 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     }
   } catch (error) {
     console.error("Failed to send email:", error);
-    // We log but don't re-throw to avoid breaking the loop of other bookings
   }
 };
 
@@ -49,6 +44,7 @@ export async function POST(req: Request) {
       let smsTemplate = '';
       let emailSubject = '';
 
+      // Set Status ID and Templates
       switch (action) {
         case 'approve':
           statusId = 2;
@@ -90,7 +86,7 @@ export async function POST(req: Request) {
         continue;
       }
 
-      // Fetch Customer & Preference for Notification
+      // Fetch Customer & Preference
       const { data: bookingData, error: fetchError } = await supabaseAdmin
         .from('Booking_Details')
         .select(`
@@ -104,49 +100,59 @@ export async function POST(req: Request) {
       if (!fetchError && bookingData?.Customer) {
         const customer = bookingData.Customer as any;
         const firstName = customer.First_Name || 'Customer';
-        const preference = bookingData.Notification_Preference || 'SMS'; // Default to SMS
+        const preference = bookingData.Notification_Preference || 'SMS'; // Default string
 
-        // Prepare Message
+        // Prepare Message Content
         const messageText = smsTemplate
           .replace('{name}', firstName)
           .replace('{id}', bookingId);
 
         try {
-          if (preference === 'SMS' && customer.Contact_Number) {
-            // Send SMS
-            let formattedNumber = customer.Contact_Number;
-            if (formattedNumber.startsWith('0')) {
-              formattedNumber = '+63' + formattedNumber.substring(1);
-            }
-            await sendSMS(formattedNumber, messageText);
+            const promises = [];
+            let notificationSent = false;
 
-          } else if (preference === 'Email' && customer.Email) {
-            // Send Email via Route
-            const html = `
-              <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
-                <h2 style="color: #333;">${emailSubject}</h2>
-                <p>${messageText}</p>
-                <br/>
-                <p>Thank you,</p>
-                <p>The Team</p>
-              </div>
-            `;
-            await sendEmail(customer.Email, emailSubject, html);
+            // --- 1. Check SMS Preference ---
+            if (preference.includes('SMS') && customer.Contact_Number) {
+                let formattedNumber = customer.Contact_Number;
+                if (formattedNumber.startsWith('0')) {
+                    formattedNumber = '+63' + formattedNumber.substring(1);
+                }
+                promises.push(sendSMS(formattedNumber, messageText));
+                notificationSent = true;
+            } 
 
-          } else {
-            // Fallback Logic
-            if (customer.Contact_Number) {
-               let formattedNumber = customer.Contact_Number;
-               if (formattedNumber.startsWith('0')) formattedNumber = '+63' + formattedNumber.substring(1);
-               await sendSMS(formattedNumber, messageText);
-            } else if (customer.Email) {
-               const html = `<p>${messageText}</p>`;
-               await sendEmail(customer.Email, emailSubject, html);
+            // --- 2. Check Email Preference (Independent check) ---
+            if (preference.includes('Email') && customer.Email) {
+                const html = `
+                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
+                        <h2 style="color: #333;">${emailSubject}</h2>
+                        <p>${messageText}</p>
+                        <br/>
+                        <p>Thank you,</p>
+                        <p>The Team</p>
+                    </div>
+                `;
+                promises.push(sendEmail(customer.Email, emailSubject, html));
+                notificationSent = true;
             }
-          }
+
+            // --- 3. Fallback: If neither was selected or preference is empty ---
+            if (!notificationSent) {
+                 if (customer.Contact_Number) {
+                     let formattedNumber = customer.Contact_Number;
+                     if (formattedNumber.startsWith('0')) formattedNumber = '+63' + formattedNumber.substring(1);
+                     promises.push(sendSMS(formattedNumber, messageText));
+                 } else if (customer.Email) {
+                     const html = `<p>${messageText}</p>`;
+                     promises.push(sendEmail(customer.Email, emailSubject, html));
+                 }
+            }
+
+            // Wait for all notifications to send
+            await Promise.all(promises);
+
         } catch (notifyError) {
           console.error(`Failed to send notification for booking ${bookingId}:`, notifyError);
-          // We don't mark the whole operation as failed just because notification failed, but we log it.
         }
       }
 
