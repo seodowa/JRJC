@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface InputFieldProps {
@@ -12,6 +11,9 @@ interface InputFieldProps {
   optional?: boolean;
   selectOptions?: { value: string; label: string }[];
   className?: string;
+  // --- Re-added these so regex validation works ---
+  pattern?: string;
+  title?: string;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -24,15 +26,19 @@ const InputField: React.FC<InputFieldProps> = ({
   required = false,
   optional = false,
   selectOptions,
-  className = ''
+  className = '',
+  pattern,
+  title
 }) => {
   const renderInput = () => {
+    // 1. Handle Select Inputs
     if (type === 'select' || selectOptions) {
       return (
         <select
           name={name}
           value={value}
           onChange={onChange}
+          required={required} // Ensure select also respects required
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         >
           <option value="">Select {label.toLowerCase()}</option>
@@ -44,30 +50,23 @@ const InputField: React.FC<InputFieldProps> = ({
         </select>
       );
     }
-    else if (required) {
-      return (
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required 
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-        />
-      );
-    }
 
+    // 2. Handle Text/Email/Tel Inputs
+    // We consolidated the 'if (required)' check here. 
+    // Passing `required={required}` handles both cases automatically.
     return (
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-        />
-      );
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required} // Passes the boolean to the DOM
+        pattern={pattern}   // Passes the regex for validation
+        title={title}       // Passes the error message bubble
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+      />
+    );
   };
 
   return (

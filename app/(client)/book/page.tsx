@@ -70,10 +70,8 @@ const BookingPage: React.FC = () => {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [dateRangeError, setDateRangeError] = useState<string | null>(null);
   
-  // --- UPDATED: Changed from single string to Array for multi-select ---
   const [notificationPreferences, setNotificationPreferences] = useState<string[]>(['SMS']);
 
-  // Realtime State
   const [refreshKey, setRefreshKey] = useState(0);
   const supabase = createClient();
 
@@ -84,7 +82,6 @@ const BookingPage: React.FC = () => {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'bookings' },
         (payload) => {
-          console.log('Realtime update detected:', payload);
           setRefreshKey((prev) => prev + 1);
         }
       )
@@ -106,7 +103,6 @@ const BookingPage: React.FC = () => {
   const handleConfirmBooking = () => setShowConfirm(true);
   const handleCancelConfirm = () => setShowConfirm(false);
 
-  // --- NEW: Helper to toggle checkboxes ---
   const handleNotificationToggle = (type: string) => {
     setNotificationPreferences((prev) => {
       if (prev.includes(type)) {
@@ -133,7 +129,6 @@ const BookingPage: React.FC = () => {
       const initialPayment = totalPrice || 0;
       const totalPayment = bookingFee + carWashFee + initialPayment;
 
-      // --- UPDATED: Join the array into a string (e.g., "SMS, Email") ---
       const finalPreferenceString = notificationPreferences.join(', ');
 
       const bookingData = {
@@ -146,13 +141,11 @@ const BookingPage: React.FC = () => {
         carWashFee,
         initialPayment,
         bookingStatusId: 1, 
-        notificationPreference: finalPreferenceString, // <--- Sending combined string
+        notificationPreference: finalPreferenceString, 
       };
 
       const result = await createBooking(bookingData);
       
-      console.log("Booking created:", result); 
-
       const newBookingId = result.booking.Booking_ID;
       const statusText = "Pending";
 
@@ -166,7 +159,7 @@ const BookingPage: React.FC = () => {
         personalInfo.email, 
         personalInfo.mobileNumber,
         paymentInfo.referenceNumber,
-        finalPreferenceString // <--- Sending combined string to service
+        finalPreferenceString 
       );
 
       setTimeout(() => {
@@ -178,7 +171,7 @@ const BookingPage: React.FC = () => {
         setSelectedCarData(null);
         setCurrentStep(1);
         setBookingSuccess(false);
-        setNotificationPreferences(['SMS']); // Reset to default
+        setNotificationPreferences(['SMS']); 
         setRefreshKey(prev => prev + 1);
       }, 3000);
       
@@ -210,8 +203,19 @@ const BookingPage: React.FC = () => {
     setPaymentInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // --- UPDATED: Form Validation Logic ---
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // 1. Trigger browser native validation (shows bubbles)
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      form.reportValidity(); 
+      return; 
+    }
+
+    // 2. Only proceed if valid
     if (currentStep < 3) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -318,13 +322,29 @@ const BookingPage: React.FC = () => {
       case 1:
         return (
           <div className="p-6">
-            <form onSubmit={handleSubmit}>
+            {/* Added noValidate to handle validation manually via checkValidity() */}
+            <form onSubmit={handleSubmit} noValidate>
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
                   <InputField label="First Name" name="firstName" type="text" value={personalInfo.firstName} onChange={handleInputChange} placeholder="Enter your first name" required className="col-span-3 md:col-span-1" />
                   <InputField label="Last Name" name="lastName" type="text" value={personalInfo.lastName} onChange={handleInputChange} placeholder="Enter your last name" required className="col-span-2 md:col-span-1" />
-                  <InputField label="Suffix" name="suffix" type="text" value={personalInfo.suffix} onChange={handleInputChange} placeholder="(e.g., Jr.)" optional />
-                  <InputField label="Email" name="email" type="email" value={personalInfo.email} onChange={handleInputChange} placeholder="Enter your email" required className="col-span-3 md:col-span-1" />
+                  <InputField label="Suffix" name="suffix" type="text" value={personalInfo.suffix} onChange={handleInputChange} placeholder="(e.g., Jr.)" optional={true} />
+                  
+                  {/* --- UPDATED: Email Field --- */}
+                  <InputField 
+                    label="Email" 
+                    name="email" 
+                    type="email" 
+                    value={personalInfo.email} 
+                    onChange={handleInputChange} 
+                    placeholder="Enter your email" 
+                    optional={true} // This adds the (Optional) text to label
+                    // Fixed Regex: Escaped hyphens (\-) to prevent "Invalid character class" error
+                    pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                    title="Please enter a valid email address (e.g., user@domain.com)"
+                    className="col-span-3 md:col-span-1" 
+                  />
+                  
                   <InputField label="Mobile Number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-2 md:col-span-1" />
                 </div>
               </div>
@@ -337,7 +357,7 @@ const BookingPage: React.FC = () => {
       case 2:
         return (
           <div className="p-6">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
@@ -429,7 +449,7 @@ const BookingPage: React.FC = () => {
 
         return (
           <div className="relative p-6">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   <div>
@@ -481,7 +501,6 @@ const BookingPage: React.FC = () => {
                           <div className="mb-4">
                             <p className="text-sm font-medium text-gray-700 mb-2">Where should we send notifications? <span className="text-red-500">*</span></p>
                             
-                            {/* --- UPDATED: Multi-select Checkboxes --- */}
                             <div className="flex gap-4">
                               <label className="flex items-center space-x-2 cursor-pointer">
                                 <input 
@@ -492,18 +511,23 @@ const BookingPage: React.FC = () => {
                                 />
                                 <span className="text-sm text-gray-700">SMS</span>
                               </label>
-                              <label className="flex items-center space-x-2 cursor-pointer">
+                              <label className={`flex items-center space-x-2 ${!personalInfo.email ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
                                 <input 
                                   type="checkbox" 
                                   checked={notificationPreferences.includes('Email')} 
                                   onChange={() => handleNotificationToggle('Email')} 
-                                  className="form-checkbox h-4 w-4 text-blue-600 rounded" 
+                                  disabled={!personalInfo.email} 
+                                  className="form-checkbox h-4 w-4 text-blue-600 rounded disabled:bg-gray-300" 
                                 />
                                 <span className="text-sm text-gray-700">Email</span>
                               </label>
                             </div>
+                            
                             {notificationPreferences.length === 0 && (
                               <p className="text-xs text-red-500 mt-1">Please select at least one notification method.</p>
+                            )}
+                            {!personalInfo.email && (
+                              <p className="text-xs text-gray-500 mt-1">Provide an email in Step 1 to enable Email notifications.</p>
                             )}
                           </div>
 
