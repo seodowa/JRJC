@@ -10,13 +10,15 @@ import {
   declineBookingsService, 
   cancelBookingsService, 
   startBookingsService,
-  finishBookingsService
+  finishBookingsService,
+  extendBookingService // 1. Import this
 } from '@/app/services/bookingService'; 
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
-import BookingDetailsModal from './BookingDetailsModal'; // Import the new modal component
+import BookingDetailsModal from './BookingDetailsModal'; 
 import { SpecificBookingDetails } from '@/types/adminBooking';
-import { LoadingSpinner } from '@/components/LoadingSpinner'; // Import a generic spinner for modal loading
+import { LoadingSpinner } from '@/components/LoadingSpinner'; 
+import { useToast } from "@/components/toast/use-toast"; // Ensure you use your toast hook
 
 type BookingsPageClientProps = {
   bookings: TAdminBooking[];
@@ -30,7 +32,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const [bookingStatuses, setBookingStatuses] = useState<string[]>(['All']);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // State for the Booking Details Modal
+  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookingIdForModal, setSelectedBookingIdForModal] = useState<string | null>(null);
   const [modalBookingDetails, setModalBookingDetails] = useState<SpecificBookingDetails | null>(null);
@@ -39,6 +41,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace, refresh } = useRouter();
+  const { toast } = useToast(); // Initialize toast
 
   // Initialize Statuses
   useEffect(() => {
@@ -92,19 +95,18 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     }
   };
 
-  // --- GENERIC ACTION PROCESSOR (for multi-select actions) ---
+  // --- GENERIC ACTION PROCESSOR ---
   const processAction = async (
     actionName: string, 
     serviceFn: (ids: string[]) => Promise<any[]>,
-    idsToProcess: string[] = selectedBookings // Default to selectedBookings
+    idsToProcess: string[] = selectedBookings
   ) => {
     if (idsToProcess.length === 0) {
-      alert(`Please select at least one booking to ${actionName}.`);
+      toast({ title: "Error", description: `Please select at least one booking to ${actionName}.`, variant: "destructive" });
       return;
     }
 
-    // Confirmation Dialog
-    const confirmMessage = `Are you sure you want to ${actionName.toUpperCase()} ${idsToProcess.length} booking(s)? This will update the status and notify the customer via SMS.`;
+    const confirmMessage = `Are you sure you want to ${actionName.toUpperCase()} ${idsToProcess.length} booking(s)?`;
     if (!confirm(confirmMessage)) return;
 
     setIsProcessing(true);
@@ -116,37 +118,57 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       const failCount = results.filter(r => !r.success).length;
 
       if (failCount === 0) {
-        alert(`Selected bookings have been successfully ${actionName}ed.`);
+        toast({ title: "Success", description: `Selected bookings have been successfully ${actionName}ed.`, variant: "default" });
       } else {
-        alert(`Action completed with issues: ${successCount} successful, ${failCount} failed.`);
+        toast({ title: "Warning", description: `Action completed with issues: ${successCount} successful, ${failCount} failed.`, variant: "destructive" });
       }
       
       setSelectedBookings([]); 
-      refresh(); // Refresh server data
-      setIsModalOpen(false); // Close modal if action was from there
+      refresh(); 
+      setIsModalOpen(false); 
 
     } catch (error) {
       console.error(`Critical error during ${actionName}:`, error);
-      alert("An unexpected error occurred.");
+      toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // --- ACTION HANDLERS (for multi-select actions from header) ---
+  // --- 2. EXTEND HANDLER (Specific for single booking extension) ---
+  const handleExtendAction = async (bookingId: string, newEndDate: string) => {
+    setIsProcessing(true);
+    try {
+        const result = await extendBookingService(bookingId, newEndDate);
+        if (result.success) {
+            toast({ title: "Success", description: "Booking extended successfully.", variant: "default" });
+            refresh();
+            setIsModalOpen(false);
+        } else {
+            toast({ title: "Error", description: result.error || "Failed to extend booking", variant: "destructive" });
+        }
+    } catch (error) {
+        toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
+    } finally {
+        setIsProcessing(false);
+    }
+  };
+
+  // --- ACTION HANDLERS (Header) ---
   const handleApprove = () => processAction("approve", approveBookingsService);
   const handleDecline = () => processAction("decline", declineBookingsService);
   const handleCancel = () => processAction("cancel", cancelBookingsService);
   const handleStart = () => processAction("start", startBookingsService);
   const handleFinish = () => processAction("finish", finishBookingsService);
-  const handleExtend = () => { alert("Extend functionality coming soon!"); };
+  // Header Extend is currently just an alert as extending is usually per-booking logic
+  const handleExtendHeader = () => { alert("Please select a specific booking to extend."); };
 
-  // --- MODAL RELATED FUNCTIONS ---
+  // --- MODAL FUNCTIONS ---
   const handleOpenModal = useCallback(async (bookingId: string) => {
     setIsModalOpen(true);
     setSelectedBookingIdForModal(bookingId);
     setIsModalLoading(true);
-    setModalBookingDetails(null); // Clear previous details
+    setModalBookingDetails(null); 
     try {
       const response = await fetch(`/api/admin/bookings/${bookingId}`);
       if (!response.ok) {
@@ -156,12 +178,12 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       setModalBookingDetails(details);
     } catch (error) {
       console.error("Failed to fetch booking details for modal:", error);
-      alert("Failed to load booking details.");
-      setIsModalOpen(false); // Close modal on error
+      toast({ title: "Error", description: "Failed to load booking details.", variant: "destructive" });
+      setIsModalOpen(false);
     } finally {
       setIsModalLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -169,14 +191,16 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     setModalBookingDetails(null);
   };
 
-  // --- ACTION HANDLERS FOR SINGLE BOOKING FROM MODAL ---
-  // These use the selectedBookingIdForModal
+  // --- MODAL ACTION HANDLERS ---
   const handleModalApprove = () => selectedBookingIdForModal && processAction("approve", approveBookingsService, [selectedBookingIdForModal]);
   const handleModalDecline = () => selectedBookingIdForModal && processAction("decline", declineBookingsService, [selectedBookingIdForModal]);
   const handleModalCancel = () => selectedBookingIdForModal && processAction("cancel", cancelBookingsService, [selectedBookingIdForModal]);
   const handleModalStart = () => selectedBookingIdForModal && processAction("start", startBookingsService, [selectedBookingIdForModal]);
   const handleModalFinish = () => selectedBookingIdForModal && processAction("finish", finishBookingsService, [selectedBookingIdForModal]);
-  const handleModalExtend = () => { alert(`Extend functionality for booking ${selectedBookingIdForModal} coming soon!`); }; // Placeholder for extend
+  
+  // 3. Connect the extend handler
+  // Note: We don't wrap this in processAction because it takes different arguments (date)
+  const handleModalExtend = (bookingId: string, newEndDate: string) => handleExtendAction(bookingId, newEndDate);
 
   return (
     <div className="flex flex-col h-full p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md relative">
@@ -187,23 +211,22 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         isAllSelected={isAllSelected}
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        bookingStatuses={bookingStatuses} // Pass bookingStatuses here
+        bookingStatuses={bookingStatuses}
         showCheckboxes={view !== 'history' && activeTab !== 'All'}
         onApprove={handleApprove}
         onDecline={handleDecline}
         onCancel={handleCancel}
         onStart={handleStart}
         onFinish={handleFinish}
-        onExtend={handleExtend}
+        onExtend={handleExtendHeader} // Header button
       />
       
-      {/* Loading Overlay for Multi-Select Actions */}
-      {isProcessing && !isModalOpen && ( // Only show if modal is not open
+      {/* Loading Overlay */}
+      {isProcessing && !isModalOpen && (
         <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center rounded-3xl backdrop-blur-sm">
            <div className="bg-white p-6 rounded-xl shadow-2xl border border-gray-100 flex flex-col items-center">
               <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500 mb-4"></div>
               <p className="text-gray-700 font-semibold text-lg">Processing...</p>
-              <p className="text-gray-400 text-sm mt-1">Sending notifications...</p>
            </div>
         </div>
       )}
@@ -213,8 +236,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
           bookings={filteredBookings}
           selectedBookings={selectedBookings}
           setSelectedBookings={setSelectedBookings}
-          showCheckboxes={view !== 'history' && activeTab !== 'All'} // Update showCheckboxes here too
-          onRowClick={handleOpenModal} // Pass the new row click handler
+          showCheckboxes={view !== 'history' && activeTab !== 'All'}
+          onRowClick={handleOpenModal}
         />
       </div>
 
@@ -228,13 +251,13 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onCancel={handleModalCancel}
         onStart={handleModalStart}
         onFinish={handleModalFinish}
-        onExtend={handleModalExtend}
-        isProcessing={isProcessing || isModalLoading} // Modal is processing if either actions or data fetch is happening
+        onExtend={handleModalExtend} // Connected here
+        isProcessing={isProcessing || isModalLoading}
       />
 
-      {/* Loading Spinner for Modal Content */}
+      {/* Loading Spinner for Modal Content Fetching */}
       {isModalOpen && isModalLoading && (
-        <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center rounded-3xl backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <LoadingSpinner />
         </div>
       )}

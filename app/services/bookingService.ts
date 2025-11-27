@@ -142,3 +142,24 @@ export const sendBookingConfirmationService = async (
     return { success: false, error };
   }
 };
+
+export const extendBookingService = async (bookingId: string, newEndDate: string) => {
+  try {
+    const response = await fetch('/api/admin/bookings/extend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId, newEndDate }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to extend booking');
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Extend Service Error:", error);
+    return { success: false, error: error.message };
+  }
+};

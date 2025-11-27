@@ -23,6 +23,8 @@ const ManageBookingsPage = async ({
 
   const bookingStatuses = await fetchBookingStatuses();
 
+  
+
   return (
     <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><LoadingSpinner /></div>}>
       <RealtimeBookingsRefresher />

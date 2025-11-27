@@ -15,6 +15,7 @@ export type TAdminBooking = {
 
 export type SpecificBookingDetails = {
   Booking_ID: string;
+  Model_ID: number;
   Booking_Start_Date_Time: string;
   Booking_End_Date_Time: string;
   Duration: number;
