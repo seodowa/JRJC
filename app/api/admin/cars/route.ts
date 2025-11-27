@@ -60,6 +60,91 @@ const getLocationIds = async (locationNames: string[]): Promise<Map<string, numb
     return locationMap;
 };
 
+export async function GET(req: Request) {
+  // 1. Authenticate using the centralized getSession function
+  const session = await getSession();
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const type = searchParams.get('type');
+
+  try {
+    if (type === 'statuses') {
+        const { data, error } = await supabaseAdmin
+            .from("Car_Status")
+            .select("id, status");
+        if (error) throw new Error(error.message);
+        const statuses = data.map(d => ({ id: d.id, status: d.status }));
+        return NextResponse.json(statuses);
+    }
+
+    // Default: Fetch Cars
+    const query = searchParams.get('query') || '';
+    
+    const { data: carsData, error: carsError } = await supabaseAdmin
+      .rpc('search_cars', { search_term: query })
+      .select(`
+        *,
+        Transmission_Types (
+          Name
+        ),
+        Manufacturer (
+          Manufacturer_Name
+        ),
+        Fuel_Types (
+          Fuel
+        ),
+        Car_Status (
+            id,
+            status
+        ),
+        Car_Pricing (
+          *,
+          Location (
+            location_name
+          )
+        )
+      `);
+    
+    if (carsError) {
+      throw new Error(carsError.message);
+    }
+
+    // Transform the data
+    const transformedCars = carsData?.map((car: any) => {
+      const carPricing = car.Car_Pricing?.map((price: any) => ({
+        Car_ID: price.Car_ID,
+        Location: price.Location?.location_name,
+        Price_12_Hours: price.Price_12_Hours,
+        Price_24_Hours: price.Price_24_Hours
+      })) || [];
+
+      return {
+        id: car.Model_ID,
+        brand: car.Manufacturer?.Manufacturer_Name,
+        model: car.Model_Name,
+        year: car.Year_Model,
+        transmission: car.Transmission_Types?.Name || "Unknown",
+        fuelType: car.Fuel_Types?.Fuel || "Unknown",
+        image: car.image,
+        price: carPricing,
+        seats: car.Number_Of_Seats,
+        available: car.Available || true,
+        color: car.color_code,
+        status: car.Car_Status ? { id: car.Car_Status.id, status: car.Car_Status.status } : null
+      };
+    }) || [];
+
+    return NextResponse.json(transformedCars);
+
+  } catch (error: any) {
+    console.error('API Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 export async function PUT(req: Request) {
   // 1. Authenticate using the centralized getSession function
   const session = await getSession();

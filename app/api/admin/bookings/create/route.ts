@@ -13,8 +13,6 @@ export async function POST(req: Request) {
   try {
     const bookingData: BookingData = await req.json();
 
-    console.log("Admin creating booking...", bookingData);
-
     const convertDurationToHours = (duration: string): number => {
         if (duration === "12 hours") return 12;
         if (duration === "24 hours") return 24;

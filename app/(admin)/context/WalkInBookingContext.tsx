@@ -4,7 +4,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Dayjs } from 'dayjs';
 import { Car, BookingData, CarPricing } from "@/types";
 import { useCarPricing } from '@/hooks/useCarPricing';
-import { fetchCars } from '@/lib/supabase/queries/admin/fetchCars';
 
 // Define the shape of the context's value
 interface WalkInBookingContextType {
@@ -267,8 +266,14 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
 
   useEffect(() => {
     const loadCars = async () => {
-      const carData = await fetchCars();
-      setCars(carData);
+      try {
+        const response = await fetch('/api/admin/cars');
+        if (!response.ok) throw new Error('Failed to fetch cars');
+        const carData = await response.json();
+        setCars(carData);
+      } catch (error) {
+        console.error("Error loading cars:", error);
+      }
     };
     loadCars();
   }, []);

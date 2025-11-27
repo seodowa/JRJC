@@ -25,7 +25,7 @@ export const fetchAdminBookings = async (query: string = ''): Promise<TAdminBook
         Name
       )
     `)
-    .order('Booking_Start_Date_Time', { ascending: false });
+    .order('date_created', { ascending: false });
 
   if (query) {
       bookingQuery = bookingQuery.or(`Customer.First_Name.ilike.%${query}%,Customer.Last_Name.ilike.%${query}%,Booking_ID.eq.${query}`);
@@ -47,7 +47,7 @@ export const fetchAdminBookings = async (query: string = ''): Promise<TAdminBook
         endDate: booking.Booking_End_Date_Time,
         duration: booking.Duration,
         location: booking.Location,
-        customerName: `${booking.Customer?.First_Name || ''} ${booking.Customer?.Last_Name || ''}`.trim(),
+        customerName: `${booking.Customer?.First_Name || ''} ${booking.Customer?.Last_Name || ''} ${booking.Customer?.Suffix || ''}`.trim(),
         customerSuffix: booking.Customer?.Suffix || '',
         carModel: booking.Car_Models?.Model_Name || 'Unknown Model',
         carManufacturer: booking.Car_Models?.Manufacturer?.Manufacturer_Name || 'Unknown Make',
