@@ -6,7 +6,7 @@ export default function HeroSection() {
                     flex flex-col items-center -mt-12 overflow-hidden
                     md:flex-row-reverse">
        <div className="flex flex-col items-center w-full h-1/2
-                       md:min-h-screen md:w-3/5 pt-40 md:pt-60 md:pl-20 
+                       md:min-h-screen md:w-3/5 pt-30 md:pt-60 md:pl-20 
                        md:bg-gradient-to-l from-main-color from-85% to-transparent z-1">
           <div className="flex flex-col justify-center items-center">
             <h1 className="font-extrabold text-8xl text-[#578FCA]">JRJC</h1>
