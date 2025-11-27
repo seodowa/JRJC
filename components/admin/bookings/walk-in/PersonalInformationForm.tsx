@@ -92,7 +92,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
           <AsyncButton
             type="button"
             onClick={onNext}
-            className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg"
+            className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
           >
             Next
           </AsyncButton>

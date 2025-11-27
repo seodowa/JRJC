@@ -50,13 +50,13 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <div className="flex space-x-4">
               <AsyncButton
                 onClick={() => handlePaymentMethodSelect("cash")}
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded"
+                className="bg-green-500 hover:bg-green-600 shadow-sm text-white font-bold py-2 px-8 rounded-lg"
               >
                 Cash
               </AsyncButton>
               <AsyncButton
                 onClick={() => handlePaymentMethodSelect("cashless")}
-                className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+                className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
               >
                 Cashless
               </AsyncButton>
@@ -66,7 +66,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <AsyncButton
               type="button"
               onClick={onBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Back
             </AsyncButton>
@@ -92,17 +92,17 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
               </div>
             </div>
           </div>
-          <div className="flex justify-end mt-8 pt-6 border-t border-gray-100">
+          <div className="flex justify-end mt-6 pt-6 gap-3 border-t border-gray-100">
             <AsyncButton
               type="button"
               onClick={handleGoBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Go Back
             </AsyncButton>
             <AsyncButton
               type="submit"
-              className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+              className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
             >
               Book
             </AsyncButton>
@@ -163,14 +163,14 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <AsyncButton
               type="button"
               onClick={handleGoBack}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Go Back
             </AsyncButton>
 
             <AsyncButton
               type="submit"
-              className="bg-[#A1E3F9] hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-lg"
+              className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
             >
               Book
             </AsyncButton>

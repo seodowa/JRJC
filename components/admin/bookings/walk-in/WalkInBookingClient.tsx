@@ -6,6 +6,7 @@ import WalkInBookingNavbar from './WalkInBookingNavbar';
 import PersonalInformationForm from './PersonalInformationForm';
 import RentalDetailsForm from './RentalDetailsForm';
 import PaymentDetails from './PaymentDetails';
+import AsyncButton from "@/components/AsyncButton";
 
 const WalkInBookingLayout = () => {
   const {
@@ -125,17 +126,17 @@ const WalkInBookingLayout = () => {
                 </div>
 
                 <div className="flex justify-between">
-                  <button
+                  <AsyncButton
                     onClick={handleCancelConfirm}
                     disabled={submitting}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md w-[45%] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-md w-[45%] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </AsyncButton>
+                  <AsyncButton
                     onClick={handleFinalSubmit}
                     disabled={submitting}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md w-[45%] disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-medium py-2 px-4 rounded-md w-[45%] disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {submitting ? (
                       <>
@@ -148,7 +149,7 @@ const WalkInBookingLayout = () => {
                     ) : (
                       'Confirm'
                     )}
-                  </button>
+                  </AsyncButton>
                 </div>
               </>
             )}
