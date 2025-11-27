@@ -61,12 +61,12 @@ export async function GET() {
       if (!booking.Customer || !booking.Car_Models) continue;
 
       // Extract Data based on your Schema
-      const customerName = booking.Customer.First_Name;
+      const customerName = booking.Customer[0].First_Name;
       
       // Access nested data: Car_Models -> Manufacturer -> Name
       // We use optional chaining (?.) just in case a car has no manufacturer assigned
-      const carBrand = booking.Car_Models.Manufacturer?.Manufacturer_Name || "";
-      const carModel = booking.Car_Models.Model_Name;
+      const carBrand = booking.Car_Models[0].Manufacturer[0]?.Manufacturer_Name || "";
+      const carModel = booking.Car_Models[0].Model_Name;
       const fullCarName = `${carBrand} ${carModel}`.trim();
 
       // Format Date
@@ -77,7 +77,7 @@ export async function GET() {
       // Create Message
       const message = `Hi ${customerName}, reminder for your rental of ${fullCarName} tomorrow (${dateStr} at ${timeStr}). Ref: ${booking.Booking_ID}. See you soon!`;
 
-      let formattedNumber = booking.Customer.Contact_Number;
+      let formattedNumber = booking.Customer[0].Contact_Number;
       if (formattedNumber.startsWith('0')) {
         formattedNumber = '+63' + formattedNumber.substring(1);
       }
