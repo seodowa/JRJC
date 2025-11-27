@@ -10,6 +10,7 @@ export async function GET() {
 
   try {
     console.log("Starting reminder check...");
+    
 
     // 1. Calculate "Tomorrow"
     const now = new Date();
@@ -54,19 +55,35 @@ export async function GET() {
     }
 
     const results = [];
+    
 
     // 3. Loop and Send
+    // 3. Loop and Send
     for (const booking of bookings) {
-      // Safety checks in case data is missing
-      if (!booking.Customer || !booking.Car_Models) continue;
+      // --- SAFE EXTRACTION START ---
+      // Handle Supabase returning either an Array or an Object for relations
+      const customerData = Array.isArray(booking.Customer) ? booking.Customer[0] : booking.Customer;
+      const carModelData = Array.isArray(booking.Car_Models) ? booking.Car_Models[0] : booking.Car_Models;
 
-      // Extract Data based on your Schema
-      const customerName = booking.Customer[0].First_Name;
+      // Skip if data is missing
+      if (!customerData || !carModelData) {
+        console.warn(`Skipping Booking ${booking.Booking_ID}: Incomplete data.`);
+        continue;
+      }
+
+      // Safe access to properties
+      const customerName = customerData.First_Name;
+      const rawContactNumber = customerData.Contact_Number; // <--- This fixes your current error
       
-      // Access nested data: Car_Models -> Manufacturer -> Name
-      // We use optional chaining (?.) just in case a car has no manufacturer assigned
-      const carBrand = booking.Car_Models[0].Manufacturer[0]?.Manufacturer_Name || "";
-      const carModel = booking.Car_Models[0].Model_Name;
+      // Handle nested Manufacturer
+      const manufacturerData = Array.isArray(carModelData.Manufacturer) 
+        ? carModelData.Manufacturer[0] 
+        : carModelData.Manufacturer;
+      
+      const carBrand = manufacturerData?.Manufacturer_Name || "";
+      const carModel = carModelData.Model_Name;
+      // --- SAFE EXTRACTION END ---
+
       const fullCarName = `${carBrand} ${carModel}`.trim();
 
       // Format Date
@@ -77,8 +94,9 @@ export async function GET() {
       // Create Message
       const message = `Hi ${customerName}, reminder for your rental of ${fullCarName} tomorrow (${dateStr} at ${timeStr}). Ref: ${booking.Booking_ID}. See you soon!`;
 
-      let formattedNumber = booking.Customer[0].Contact_Number;
-      if (formattedNumber.startsWith('0')) {
+      // Format Number safely using the variable we created above
+      let formattedNumber = rawContactNumber; 
+      if (formattedNumber && formattedNumber.startsWith('0')) {
         formattedNumber = '+63' + formattedNumber.substring(1);
       }
 
@@ -106,7 +124,6 @@ export async function GET() {
         results.push({ id: booking.Booking_ID, status: 'Failed', error: smsData.error });
       }
     }
-
     return NextResponse.json({ 
       success: true, 
       processed: results.length, 
