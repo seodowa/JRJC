@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Car } from '@/types';
 import { createCar, updateCar } from '@/lib/supabase/mutations/cars';
 import AsyncButton from '@/components/AsyncButton';
-import CloseIcon from '@/components/icons/CloseIcon';
 import CarPlaceholderIcon from '@/components/icons/CarPlaceholderIcon';
 import ColorPickerModal from '@/components/admin/ColorPickerModal';
 import Image from 'next/image';
+import { Palette } from 'lucide-react'; 
 
 interface AddEditCarModalProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ const initialFormData = {
   transmission: 'Automatic',
   fuelType: 'Gasoline',
   seats: 4,
-  color: '#000000',
+  color: '#FFFFFF',
   price: [],
 };
 
@@ -84,7 +84,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
         price: [
           ...otherPrices,
           { ...existingLocationPrice, [type]: numericValue }
-        ].sort((a, b) => a.Location.localeCompare(b.Location)) // Keep order consistent
+        ].sort((a, b) => a.Location.localeCompare(b.Location))
       };
     });
   };
@@ -105,12 +105,6 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
     }
   };
 
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setImageFile(null);
-    setFormData(prev => ({ ...prev, image: null }));
-  };
-
   const handleSelectColor = (color: string) => {
     setFormData(prev => ({ ...prev, color }));
   };
@@ -128,7 +122,6 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
       onClose();
     } catch (error) {
       console.error('Failed to save car:', error);
-      // Optionally, show a toast notification for the error
     } finally {
       setIsSubmitting(false);
     }
@@ -136,130 +129,165 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Helper for labels
+  const Label = ({ children }: { children: React.ReactNode }) => (
+    <label className="block text-xs font-medium text-gray-500 mb-1">
+      {children} <span className="text-red-500">*</span>
+    </label>
+  );
+
+  // Helper for input styles - slightly smaller padding (py-1.5)
+  const inputClassName = "w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500";
+
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-        <form onSubmit={handleSubmit} className="relative bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">{isEditMode ? 'Edit Car' : 'Add a New Car'}</h2>
-            <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">
-              <CloseIcon />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Column 1: Image */}
-            <div className="flex flex-col items-center">
-              <label className="font-semibold text-gray-700 mb-2">Car Image</label>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+        {/* Changed max-w-5xl to max-w-4xl and p-8 to p-6 */}
+        <form onSubmit={handleSubmit} className="relative bg-white p-6 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+          
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{isEditMode ? 'Edit Car' : 'Add Car'}</h2>
+          
+          {/* Changed gap-8 to gap-6 */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            
+            {/* Left Side: Image Uploader - Adjusted width to w-64 (approx 256px) */}
+            <div className="w-full lg:w-64 flex-shrink-0">
               <div 
                 onClick={handleImageClick}
-                className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors"
+                className="w-full aspect-square bg-[#e0e0e0] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden relative hover:opacity-90 transition-opacity"
               >
                 {imagePreview ? (
-                  <Image src={imagePreview} alt="Car preview" width={250} height={192} className="object-cover w-full h-full rounded-lg" />
+                  <Image src={imagePreview} alt="Car preview" fill className="object-cover" />
                 ) : (
-                  <CarPlaceholderIcon className="w-24 h-24 text-gray-400" />
+                  <div className="flex flex-col items-center justify-center text-gray-400">
+                    <CarPlaceholderIcon className="w-20 h-20 mb-2" />
+                  </div>
                 )}
                 <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
               </div>
-              {imagePreview && (
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="mt-2 px-3 py-1 text-sm text-red-600 bg-red-100 rounded-md hover:bg-red-200"
-                >
-                  Remove Image
-                </button>
-              )}
             </div>
 
-            {/* Column 2: Details */}
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="brand" className="block text-sm font-medium text-gray-700">Brand</label>
-                <select name="brand" id="brand" value={formData.brand || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                  <option value="" disabled>Select a brand</option>
-                  {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="model" className="block text-sm font-medium text-gray-700">Model</label>
-                <input type="text" name="model" id="model" value={formData.model || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-              </div>
-              <div>
-                <label htmlFor="year" className="block text-sm font-medium text-gray-700">Year Model</label>
-                <input type="number" name="year" id="year" value={formData.year || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g. 2023" />
-              </div>
-              <div>
-                <label htmlFor="seats" className="block text-sm font-medium text-gray-700">Number of Car Seats</label>
-                <input type="number" name="seats" id="seats" value={formData.seats || ''} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g. 5" />
-              </div>
-              <div>
-                <label htmlFor="transmission" className="block text-sm font-medium text-gray-700">Transmission</label>
-                <select name="transmission" id="transmission" value={formData.transmission || 'Automatic'} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                  {transmissionTypes.map(type => <option key={type} value={type}>{type}</option>)}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="fuelType" className="block text-sm font-medium text-gray-700">Fuel Type</label>
-                <select name="fuelType" id="fuelType" value={formData.fuelType || 'Gasoline'} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                  {fuelTypes.map(type => <option key={type} value={type}>{type}</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="block text-sm font-medium text-gray-700">Color:</label>
-                <button 
-                  type="button" 
-                  onClick={() => setIsColorPickerOpen(true)} 
-                  className="w-10 h-10 rounded-full border border-gray-400 flex items-center justify-center overflow-hidden" 
-                  style={{ backgroundColor: formData.color && formData.color !== '#000000' ? formData.color : '#e0e0e0' }} // Default gray if no color or black
-                >
-                  {(!formData.color || formData.color === '#000000') && (
-                    <span className="text-xs text-gray-600">N/A</span> // Placeholder text
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Column 3: Pricing */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-700">Pricing</h3>
-              {locations.map(location => (
-                <div key={location}>
-                  <label className="block text-sm font-medium text-gray-700">{location}</label>
-                  <div className="flex gap-2 mt-1">
-                    {location !== "Outside Region 10" && (
-                      <input 
-                        type="number" 
-                        placeholder="12 Hours Price"
-                        value={formData.price?.find(p => p.Location === location)?.Price_12_Hours || ''}
-                        onChange={(e) => handlePriceChange(location, 'Price_12_Hours', e.target.value)}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                    )}
-                    <input 
-                      type="number" 
-                      placeholder="24 Hours Price"
-                      value={formData.price?.find(p => p.Location === location)?.Price_24_Hours || ''}
-                      onChange={(e) => handlePriceChange(location, 'Price_24_Hours', e.target.value)}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
-                  </div>
+            {/* Right Side: Form Fields */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+              
+              {/* Column 1: Details - Reduced space-y */}
+              <div className="space-y-3">
+                <div>
+                  <Label>Brand:</Label>
+                  <select name="brand" value={formData.brand || ''} onChange={handleInputChange} className={inputClassName}>
+                    <option value="" disabled>Select Brand</option>
+                    {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
+                  </select>
                 </div>
-              ))}
+                
+                <div>
+                  <Label>Model:</Label>
+                  <input type="text" name="model" value={formData.model || ''} onChange={handleInputChange} className={inputClassName} />
+                </div>
+
+                <div>
+                  <Label>Year Model:</Label>
+                  <input type="number" name="year" value={formData.year || ''} onChange={handleInputChange} className={inputClassName} />
+                </div>
+
+                <div>
+                  <Label>Number of Car Seats:</Label>
+                  <input type="number" name="seats" value={formData.seats || ''} onChange={handleInputChange} className={inputClassName} />
+                </div>
+
+                <div>
+                  <Label>Transmission:</Label>
+                  <select name="transmission" value={formData.transmission || ''} onChange={handleInputChange} className={inputClassName}>
+                    {transmissionTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <Label>Fuel Type:</Label>
+                  <select name="fuelType" value={formData.fuelType || ''} onChange={handleInputChange} className={inputClassName}>
+                    {fuelTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Column 2: Color & Pricing - Reduced space-y */}
+              <div className="space-y-4">
+                
+                {/* Color Picker */}
+                <div>
+                  <Label>Color:</Label>
+                  <button 
+                    type="button" 
+                    onClick={() => setIsColorPickerOpen(true)} 
+                    className={`${inputClassName} flex items-center gap-2 text-left bg-white`}
+                  >
+                    <div className="w-5 h-5 rounded-full bg-blue-300 flex items-center justify-center text-white">
+                        <Palette size={12} /> 
+                    </div>
+                    <span className="flex-grow text-gray-600 font-medium text-xs">
+                        {formData.color || '#FFFFFF'}
+                    </span>
+                    <div 
+                      className="w-4 h-4 rounded-full border border-gray-200" 
+                      style={{ backgroundColor: formData.color || '#FFFFFF' }}
+                    />
+                  </button>
+                </div>
+
+                {/* Pricing Section */}
+                <div className="space-y-2">
+                  <h3 className="font-bold text-sm text-gray-800">Pricing</h3>
+                  
+                  {locations.map(location => (
+                    <div key={location}>
+                      <Label>{location}:</Label>
+                      <div className="flex gap-2">
+                        {location !== "Outside Region 10" && (
+                          <input 
+                            type="number" 
+                            placeholder="₱/12h"
+                            value={formData.price?.find(p => p.Location === location)?.Price_12_Hours || ''}
+                            onChange={(e) => handlePriceChange(location, 'Price_12_Hours', e.target.value)}
+                            className={`${inputClassName} placeholder-gray-400`}
+                          />
+                        )}
+                        <input 
+                          type="number" 
+                          placeholder="₱/24h"
+                          value={formData.price?.find(p => p.Location === location)?.Price_24_Hours || ''}
+                          onChange={(e) => handlePriceChange(location, 'Price_24_Hours', e.target.value)}
+                          className={`${inputClassName} placeholder-gray-400`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 mt-8">
-            <AsyncButton type="button" onClick={onClose} className="px-6 py-2 rounded-md text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300">
+          {/* Footer Actions - Reduced margin and padding */}
+          <div className="flex justify-end gap-3 mt-6">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="px-6 py-2 rounded-md text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 transition-colors"
+            >
               Cancel
-            </AsyncButton>
-            <AsyncButton type="submit" isLoading={isSubmitting} loadingText="Saving..." className="px-6 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-              {isEditMode ? 'Save Changes' : 'Add Car'}
+            </button>
+            <AsyncButton 
+              type="submit" 
+              isLoading={isSubmitting} 
+              loadingText="Saving..." 
+              className="px-6 py-2 rounded-md text-sm font-medium text-white bg-gray-900 hover:bg-black transition-colors"
+            >
+              Confirm
             </AsyncButton>
           </div>
         </form>
       </div>
+      
       <ColorPickerModal
         isOpen={isColorPickerOpen}
         onClose={() => setIsColorPickerOpen(false)}
