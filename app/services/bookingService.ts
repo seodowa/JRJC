@@ -44,6 +44,7 @@ export const startBookingsService = async (bookingIds: string[]) => callStatusAp
 
 interface FinishBookingPayload {
   dateReturned: string;
+  additionalHours: number; // Added
   additionalFees: number; // For the Payment_Details record
   totalPayment: number; // For the Payment_Details record
   paymentStatus: string; // For the Payment_Details record
@@ -123,7 +124,7 @@ export const sendBookingConfirmationService = async (
             <p style="margin: 5px 0;"><strong>Booking ID:</strong> ${bookingId}</p>
             <p style="margin: 5px 0;"><strong>Status:</strong> ${status}</p>
             <p style="margin: 5px 0;"><strong>Total Amount:</strong> P${totalAmount}</p>
-            <p style="margin: 5px 0;"><strong>Reference Number:</strong> ${referenceNumber}</p>
+            <p style="margin: 5px 0;"><strong>Reference Number:</strong> ${bfReferenceNumber}</p>
           </div>
           <p>We will review your booking and notify you once it is confirmed.</p>
           <br/>

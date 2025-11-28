@@ -123,12 +123,6 @@ const BookingsHeader = ({
                 >
                   Extend
                 </AsyncButton>
-                <AsyncButton 
-                  onClick={onFinish} 
-                  className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg hover:bg-blue-400"
-                >
-                  Finish
-                </AsyncButton>
               </>
             )}
           </div>

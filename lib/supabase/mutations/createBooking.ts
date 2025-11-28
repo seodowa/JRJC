@@ -96,6 +96,7 @@ export const createBooking = async (bookingData: any) => {
 
     // Step 2: Insert into Booking_Details table using Secure RPC
     // This bypasses RLS SELECT restrictions by running as Security Definer on the DB
+    
     const { data: bookingDetailsData, error: bookingError } = await supabase
       .rpc('create_new_booking', {
         p_customer_id: customerId,

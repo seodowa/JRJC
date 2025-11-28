@@ -21,6 +21,9 @@ export async function GET(
       Duration,
       Location,
       date_created,
+      additional_hours,
+      date_returned,
+      Payment_Details_ID,
       Customer (
         First_Name,
         Last_Name,
@@ -32,12 +35,23 @@ export async function GET(
         Model_Name,
         Year_Model,
         image,
+        Number_Of_Seats,
+        Car_Class_FK,
         Manufacturer (
           Manufacturer_Name
         )
       ),
       Booking_Status (
         Name
+      ),
+      Payment_Details (
+        Payment_ID,
+        booking_fee,
+        initial_total_payment,
+        additional_fees,
+        total_payment,
+        payment_status,
+        bf_reference_number
       )
     `)
     .eq('Booking_ID', id)

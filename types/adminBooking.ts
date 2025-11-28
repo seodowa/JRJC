@@ -33,6 +33,8 @@ export type SpecificBookingDetails = {
     Model_Name: string;
     Year_Model: number;
     image: string | null;
+    Number_Of_Seats?: number; // Added for car class determination
+    Car_Class_FK?: number; // Added for direct access to car class ID
     Manufacturer: {
       Manufacturer_Name: string;
     };

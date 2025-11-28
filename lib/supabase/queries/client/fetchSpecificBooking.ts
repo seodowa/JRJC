@@ -1,31 +1,5 @@
 import { createClient } from '@/utils/supabase/client';
-
-export type SpecificBookingDetails = {
-  Booking_ID: string;
-  Booking_Start_Date_Time: string;
-  Booking_End_Date_Time: string;
-  Duration: number;
-  Location: string;
-  date_created: string;
-  Customer: {
-    First_Name: string;
-    Last_Name: string;
-    Suffix: string | null;
-    Email: string | null;
-    Contact_Number: string | null;
-  };
-  Car_Models: {
-    Model_Name: string;
-    Year_Model: number;
-    image: string | null;
-    Manufacturer: {
-      Manufacturer_Name: string;
-    };
-  };
-  Booking_Status: {
-    Name: string;
-  };
-};
+import { SpecificBookingDetails } from '@/types/adminBooking'; // Import from central types
 
 export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificBookingDetails | null> => {
   const supabase = createClient();
@@ -53,7 +27,8 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
         Model_Name,
         Year_Model,
         image,
-        Number_Of_Seats, // Add Number_Of_Seats
+        Number_Of_Seats,
+        Car_Class_FK, -- Add Car_Class_FK here
         Manufacturer (
           Manufacturer_Name
         )
@@ -61,7 +36,7 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
       Booking_Status:Booking_Status_ID (
         Name
       ),
-      Payment_Details ( // Fetch nested Payment_Details
+      Payment_Details (
         Payment_ID,
         booking_fee,
         initial_total_payment,
@@ -79,7 +54,7 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
     return null;
   }
 
-  // Cast and transform data, including new fields and nested Payment_Details
+  // Cast and transform data, ensuring types match SpecificBookingDetails
   const transformedData: SpecificBookingDetails = {
     Booking_ID: data.Booking_ID,
     Booking_Start_Date_Time: data.Booking_Start_Date_Time,
@@ -91,26 +66,27 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
     date_returned: data.date_returned,
     Payment_Details_ID: data.Payment_Details_ID,
     Customer: {
-      First_Name: (data.Customer as any).First_Name,
-      Last_Name: (data.Customer as any).Last_Name,
-      Suffix: (data.Customer as any).Suffix,
-      Email: (data.Customer as any).Email,
-      Contact_Number: (data.Customer as any).Contact_Number
+      First_Name: (data.Customer as any)?.First_Name,
+      Last_Name: (data.Customer as any)?.Last_Name,
+      Suffix: (data.Customer as any)?.Suffix,
+      Email: (data.Customer as any)?.Email,
+      Contact_Number: (data.Customer as any)?.Contact_Number
     },
     Car_Models: {
-      Model_Name: (data.Car_Models as any).Model_Name,
-      Year_Model: (data.Car_Models as any).Year_Model,
-      image: (data.Car_Models as any).image,
-      Number_Of_Seats: (data.Car_Models as any).Number_Of_Seats, // Add to transformation
+      Model_Name: (data.Car_Models as any)?.Model_Name,
+      Year_Model: (data.Car_Models as any)?.Year_Model,
+      image: (data.Car_Models as any)?.image,
+      Number_Of_Seats: (data.Car_Models as any)?.Number_Of_Seats,
+      Car_Class_FK: (data.Car_Models as any)?.Car_Class_FK, // Add Car_Class_FK to transformation
       Manufacturer: {
-        Manufacturer_Name: (data.Car_Models as any).Manufacturer_Name
+        Manufacturer_Name: (data.Car_Models as any)?.Manufacturer?.Manufacturer_Name // Corrected access
       }
     },
     Booking_Status: {
-      Name: (data.Booking_Status as any).Name
+      Name: (data.Booking_Status as any)?.Name
     },
-    Payment_Details: data.Payment_Details // Add to transformation
-  }
+    Payment_Details: data.Payment_Details
+  };
 
   return transformedData;
 };

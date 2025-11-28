@@ -6,7 +6,6 @@ import Modal from '@/components/Modal';
 import Image from 'next/image';
 import AsyncButton from "@/components/AsyncButton";
 import ExtendBookingModal from './ExtendBookingModal';
-import FinishBookingModal from './FinishBookingModal'; // Import new modal
 
 interface BookingDetailsModalProps {
   isOpen: boolean;
@@ -16,7 +15,6 @@ interface BookingDetailsModalProps {
   onDecline: (bookingId: string) => void;
   onCancel: (bookingId: string) => void;
   onStart: (bookingId: string) => void;
-  onFinish: (bookingId: string) => void; // This will now trigger parent refresh
   onExtend: (bookingId: string, newEndDate: string) => Promise<void>; 
   isProcessing: boolean;
 }
@@ -29,25 +27,16 @@ const BookingDetailsModal = ({
   onDecline,
   onCancel,
   onStart,
-  onFinish, // This is now primarily for refreshing parent state
   onExtend,
   isProcessing,
 }: BookingDetailsModalProps) => {
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
-  const [isFinishModalOpen, setIsFinishModalOpen] = useState(false); // New state for finish modal
 
   if (!booking) return null;
 
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleString();
-  };
-
-  // Handler for when FinishBookingModal successfully processes
-  const handleFinishSuccess = () => {
-    onFinish(booking.Booking_ID); // Trigger parent refresh
-    setIsFinishModalOpen(false); // Close the finish modal
-    onClose(); // Close the details modal
   };
 
   const getStatusButtons = (status: string) => {
@@ -64,25 +53,6 @@ const BookingDetailsModal = ({
           <>
             <AsyncButton onClick={() => onStart(booking.Booking_ID)} disabled={isProcessing} className="px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50">Start</AsyncButton>
             <AsyncButton onClick={() => onCancel(booking.Booking_ID)} disabled={isProcessing} className="px-4 py-2 border border-gray-400 text-red-500 rounded-md hover:bg-red-400 hover:text-white disabled:opacity-50">Cancel</AsyncButton>
-          </>
-        );
-      case 'Ongoing':
-        return (
-          <>
-            <AsyncButton
-                onClick={() => setIsFinishModalOpen(true)} // Open FinishBookingModal
-                disabled={isProcessing}
-                className="px-4 py-2 bg-[#A1E3F9] rounded-lg hover:bg-blue-400 disabled:opacity-50"
-            >
-                Finish
-            </AsyncButton>
-            <AsyncButton
-              onClick={() => setIsExtendModalOpen(true)} 
-              disabled={isProcessing} 
-              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-green-400 disabled:opacity-50"
-            >
-              Extend
-            </AsyncButton>
           </>
         );
       default:
@@ -121,11 +91,21 @@ const BookingDetailsModal = ({
                 {booking.Payment_Details && (
                   <div className="mt-4 p-3 bg-gray-50 rounded-md">
                     <h4 className="font-semibold text-md text-gray-700 mb-1">Payment Summary</h4>
-                    <p className="text-sm text-gray-600"><strong>Initial Total:</strong> P{booking.Payment_Details.initial_total_payment?.toFixed(2)}</p>
-                    {booking.Payment_Details.additional_fees && booking.Payment_Details.additional_fees > 0 && <p className="text-sm text-red-600"><strong>Late Fees:</strong> P{booking.Payment_Details.additional_fees.toFixed(2)}</p>}
-                    {booking.Payment_Details.total_payment && <p className="text-sm text-gray-800 font-bold"><strong>Final Total:</strong> P{booking.Payment_Details.total_payment.toFixed(2)}</p>}
-                    <p className="text-sm text-gray-600"><strong>Status:</strong> {booking.Payment_Details.payment_status}</p>
-                    {booking.Payment_Details.bf_reference_number && <p className="text-sm text-gray-600"><strong>Ref No:</strong> {booking.Payment_Details.bf_reference_number}</p>}
+                    {(booking.Booking_Status.Name === 'Pending' || booking.Booking_Status.Name === 'Confirmed') ? (
+                      <div className="space-y-1 text-sm">
+                        <p className="text-gray-600"><strong>Booking Fee:</strong> P{booking.Payment_Details.booking_fee?.toFixed(2)}</p>
+                        <p className="text-gray-600"><strong>Initial Total:</strong> P{booking.Payment_Details.initial_total_payment?.toFixed(2)}</p>
+                        {booking.Payment_Details.bf_reference_number && <p className="text-gray-600"><strong>Ref No:</strong> {booking.Payment_Details.bf_reference_number}</p>}
+                      </div>
+                    ) : (
+                      <div className="space-y-1 text-sm">
+                        <p className="text-gray-600"><strong>Initial Total:</strong> P{booking.Payment_Details.initial_total_payment?.toFixed(2)}</p>
+                        {booking.Payment_Details.additional_fees && booking.Payment_Details.additional_fees > 0 && <p className="text-red-600"><strong>Late Fees:</strong> P{booking.Payment_Details.additional_fees.toFixed(2)}</p>}
+                        {booking.Payment_Details.total_payment && <p className="text-gray-800 font-bold"><strong>Final Total:</strong> P{booking.Payment_Details.total_payment.toFixed(2)}</p>}
+                        <p className="text-gray-600"><strong>Status:</strong> {booking.Payment_Details.payment_status}</p>
+                        {booking.Payment_Details.bf_reference_number && <p className="text-gray-600"><strong>Ref No:</strong> {booking.Payment_Details.bf_reference_number}</p>}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -185,16 +165,6 @@ const BookingDetailsModal = ({
           onClose={() => setIsExtendModalOpen(false)}
           booking={booking}
           onConfirm={onExtend}
-        />
-      )}
-
-      {/* Render the Finish Booking Modal */}
-      {isFinishModalOpen && (
-        <FinishBookingModal
-          isOpen={isFinishModalOpen}
-          onClose={() => setIsFinishModalOpen(false)}
-          booking={booking}
-          onSuccess={handleFinishSuccess}
         />
       )}
     </>

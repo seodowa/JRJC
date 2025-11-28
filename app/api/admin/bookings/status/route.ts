@@ -73,17 +73,18 @@ export async function POST(req: Request) {
           emailSubject = 'Booking Completed';
 
           // Extract finish-specific data from payload
-          const { dateReturned, additionalFees, totalPayment, paymentStatus } = payload;
+          const { dateReturned, additionalFees, totalPayment, paymentStatus, additionalHours } = payload;
           
-          if (!dateReturned || additionalFees === undefined || totalPayment === undefined || !paymentStatus) {
+          if (!dateReturned || additionalFees === undefined || totalPayment === undefined || !paymentStatus || additionalHours === undefined) {
             results.push({ success: false, bookingId, error: 'Missing finish booking details in payload' });
             continue;
           }
 
-          // Update Booking_Details with date_returned and new status
+          // Update Booking_Details with date_returned, additional_hours and new status
           bookingDetailsUpdate = { 
             Booking_Status_ID: statusId,
             date_returned: dateReturned,
+            additional_hours: additionalHours, // Added additional_hours here
           };
           break; // Break from switch after preparing update for Booking_Details
         case 'cancel':

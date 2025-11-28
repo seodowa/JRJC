@@ -58,16 +58,15 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
   }
 
   // Determine car class and applicable late fee rate
-  // This requires fetching car class for the booking's car model.
-  // For now, let's assume we can get it from booking.Car_Models.Car_Class_FK
-  // Or if the Car_Models object (already fetched in SpecificBookingDetails) contains Number_Of_Seats
-  // we can determine class on the fly. Let's do that for now.
-  const carSeats = (booking.Car_Models as any)?.Number_Of_Seats; // Need to ensure Number_Of_Seats is fetched for Car_Models
   let carClassId: number | null = null;
-  if (carSeats !== undefined) {
-    carClassId = carSeats <= 5 
-      ? lateFees.find(fee => fee.Car_Class.Class === 'Small Car')?.Car_Class_FK || null
-      : lateFees.find(fee => fee.Car_Class.Class === 'Big Car')?.Car_Class_FK || null;
+  let carClassName: string = 'N/A';
+
+  if (booking.Car_Models && booking.Car_Models.Car_Class_FK) {
+    carClassId = booking.Car_Models.Car_Class_FK;
+    const foundLateFee = lateFees.find(fee => fee.Car_Class_FK === carClassId);
+    if (foundLateFee) {
+      carClassName = foundLateFee.Car_Class.Class;
+    }
   }
   
   const applicableLateFeeRate = lateFees.find(fee => fee.Car_Class_FK === carClassId)?.value || 0;
@@ -92,6 +91,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
 
     const finishPayload: FinishBookingPayload = {
       dateReturned: actualReturn.toISOString(),
+      additionalHours: additionalHours, // Pass additionalHours
       additionalFees: calculatedAdditionalFees,
       totalPayment: finalTotalPayment,
       paymentStatus: calculatedAdditionalFees > 0 ? 'Late Payment Due' : 'Paid', // Or 'Completed'
@@ -138,7 +138,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
               <>
                 <p className="text-sm text-gray-600"><strong>Initial Total Payment:</strong> P{initialTotalPayment.toFixed(2)}</p>
                 <p className="text-sm text-gray-600"><strong>Booking Fee:</strong> P{bookingFee.toFixed(2)}</p>
-                <p className="text-sm text-gray-600"><strong>Late Fee Rate ({carSeats} seats):</strong> P{applicableLateFeeRate.toFixed(2)} / hour</p>
+                <p className="text-sm text-gray-600"><strong>Late Fee Rate ({booking.Car_Models?.Number_Of_Seats || 'N/A'} seats - {carClassName}):</strong> P{applicableLateFeeRate.toFixed(2)} / hour</p>
                 <p className="text-sm text-gray-600"><strong>Additional Hours:</strong> {additionalHours}</p>
                 <p className="text-sm text-red-600 font-semibold"><strong>Calculated Additional Fees:</strong> P{calculatedAdditionalFees.toFixed(2)}</p>
                 <p className="text-lg text-gray-800 font-bold mt-2"><strong>Final Total Payment:</strong> P{finalTotalPayment.toFixed(2)}</p>
