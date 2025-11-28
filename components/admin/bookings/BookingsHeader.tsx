@@ -22,6 +22,7 @@ type BookingsHeaderProps = {
   onStart: () => Promise<void> | void;
   onCancel: () => Promise<void> | void;
   onExtend: () => Promise<void> | void;
+  isExtendDisabled?: boolean;
 };
 
 const BookingsHeader = ({
@@ -38,6 +39,7 @@ const BookingsHeader = ({
   onStart,
   onCancel,
   onExtend,
+  isExtendDisabled = false,
 }: BookingsHeaderProps) => {
   const router = useRouter();
 
@@ -117,7 +119,8 @@ const BookingsHeader = ({
               <>
                 <AsyncButton 
                   onClick={onExtend} 
-                  className="px-4 py-2 shadow-sm text-gray-700 rounded-lg hover:bg-green-400"
+                  disabled={isExtendDisabled}
+                  className={`px-4 py-2 shadow-sm text-gray-700 rounded-lg hover:bg-green-400 ${isExtendDisabled ? 'opacity-50 cursor-not-allowed hover:bg-gray-100' : ''}`}
                 >
                   Extend
                 </AsyncButton>

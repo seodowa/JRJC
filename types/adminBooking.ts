@@ -12,6 +12,7 @@ export type TAdminBooking = {
   carYear: number;
   status: string;
   dateCreated: string;
+  dateReturned?: string | null;
 };
 
 export type SpecificBookingDetails = {

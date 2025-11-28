@@ -6,7 +6,12 @@ import Modal from '@/components/Modal';
 import Image from 'next/image';
 import AsyncButton from "@/components/AsyncButton";
 import { fetchLateFeesService, LateFee } from '@/app/(admin)/services/lateFeeService';
-import { finishBookingsService, FinishBookingPayload } from '@/app/services/bookingService';
+import { 
+  finishBookingsService, 
+  FinishBookingPayload, 
+  markBookingReturnedService, 
+  updatePaymentStatusService 
+} from '@/app/services/bookingService';
 import { toast } from '@/components/toast/use-toast';
 import { useRouter } from 'next/navigation';
 import ExtendBookingModal from './ExtendBookingModal';
@@ -85,16 +90,13 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
   const handleMarkReturned = async () => {
     setIsReturning(true);
     try {
-      // 1. Call API to update date_returned = NOW()
-      const response = await fetch('/api/admin/bookings/return', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId: localBooking.Booking_ID }),
-      });
+      const result = await markBookingReturnedService(localBooking.Booking_ID);
       
-      if (!response.ok) throw new Error('Failed to mark returned');
+      if (!result.success) {
+          throw new Error(result.error || 'Failed to mark returned');
+      }
       
-      const updatedBooking = await response.json();
+      const updatedBooking = result.data;
       
       // 2. Update local state with new DB values (date_returned, additional_hours)
       setLocalBooking(prev => prev ? ({ ...prev, ...updatedBooking }) : null);
@@ -104,8 +106,8 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
       router.refresh();
       setIsReturnConfirmOpen(false); // Close confirm modal
 
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to mark return." });
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message || "Failed to mark return." });
     } finally {
       setIsReturning(false);
     }
@@ -115,19 +117,16 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
     if (!localBooking.Payment_Details?.Payment_ID) return;
     
     try {
-      // Call API to update payment status
-      const response = await fetch('/api/admin/bookings/update-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            paymentId: localBooking.Payment_Details.Payment_ID,
-            status: 'Paid',
-            additionalFees: calculatedLateFees,
-            totalPayment: finalTotal
-        }),
+      const result = await updatePaymentStatusService({
+          paymentId: localBooking.Payment_Details.Payment_ID,
+          status: 'Paid',
+          additionalFees: calculatedLateFees,
+          totalPayment: finalTotal
       });
 
-      if (!response.ok) throw new Error('Failed to update payment');
+      if (!result.success) {
+          throw new Error(result.error || 'Failed to update payment');
+      }
       
       // Update local state
       setLocalBooking(prev => {
@@ -145,8 +144,8 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
       toast({ title: "Payment Updated", description: "Marked as Paid." });
       router.refresh(); // Refresh parent list in background
 
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to update payment." });
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message || "Failed to update payment." });
     }
   };
 
@@ -169,6 +168,14 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
     } finally {
         setIsFinishing(false);
     }
+  };
+
+  const handleLocalExtend = async (bookingId: string, newEndDate: string) => {
+      await onExtend(bookingId, newEndDate);
+      // Update local state to reflect new end date immediately
+      setLocalBooking(prev => prev ? ({ ...prev, Booking_End_Date_Time: newEndDate }) : null);
+      setIsExtendModalOpen(false);
+      router.refresh();
   };
 
   return (
@@ -331,7 +338,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
           isOpen={isExtendModalOpen}
           onClose={() => setIsExtendModalOpen(false)}
           booking={localBooking}
-          onConfirm={onExtend}
+          onConfirm={handleLocalExtend}
         />
       )}
 
@@ -345,6 +352,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
         confirmButtonText="Yes, Return"
         cancelButtonText="Cancel"
         isLoading={isReturning}
+        loadingText="Returning..."
       />
     </>
   );

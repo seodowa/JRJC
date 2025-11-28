@@ -187,6 +187,7 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
         title="Confirm Deletion"
         message={`Are you sure you want to delete the car "${car.brand} ${car.model} (${car.year})"? This action cannot be undone.`}
         isLoading={isDeleting}
+        loadingText="Deleting..."
       />
     </div>
   );

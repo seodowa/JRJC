@@ -7,9 +7,10 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  hideCloseButton?: boolean;
 }
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, hideCloseButton = false }: ModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -24,12 +25,14 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-7 right-7 text-gray-400 hover:text-gray-800 hover:cursor-pointer transition-colors z-99"
-        >
-          <X size={24} />
-        </button>
+        {!hideCloseButton && (
+          <button 
+            onClick={onClose}
+            className="absolute top-7 right-7 text-gray-400 hover:text-gray-800 hover:cursor-pointer transition-colors z-99"
+          >
+            <X size={24} />
+          </button>
+        )}
         
         {/* Content passed into the modal */}
         <div className="p-4">

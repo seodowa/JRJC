@@ -11,6 +11,7 @@ export const fetchAdminBookings = async (query: string = ''): Promise<TAdminBook
       Duration,
       Location,
       date_created,
+      date_returned,
       Customer (
         First_Name,
         Last_Name,
@@ -54,6 +55,7 @@ export const fetchAdminBookings = async (query: string = ''): Promise<TAdminBook
         carYear: booking.Car_Models?.Year_Model || 0,
         status: status,
         dateCreated: booking.date_created || new Date().toISOString(), // Fallback if missing
+        dateReturned: booking.date_returned || null,
       };
   });
 };

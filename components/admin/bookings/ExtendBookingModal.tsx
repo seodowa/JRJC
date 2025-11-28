@@ -7,6 +7,7 @@ import BookingCalendar from '@/components/BookingCalendar';
 import AsyncButton from "@/components/AsyncButton";
 import { SpecificBookingDetails } from '@/types/adminBooking';
 import dayjs from 'dayjs';
+import CloseIcon from '@/components/icons/CloseIcon';
 
 interface ExtendBookingModalProps {
   isOpen: boolean;
@@ -54,9 +55,15 @@ const ExtendBookingModal = ({ isOpen, onClose, booking, onConfirm }: ExtendBooki
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Extend Booking</h2>
+    <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={true}>
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg relative">
+        <div className="flex justify-between items-start mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Extend Booking</h2>
+            <AsyncButton onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
+                <CloseIcon />
+            </AsyncButton>
+        </div>
+        
         <p className="text-sm text-gray-600 mb-6">
           Select a new end date for the booking. The start date is locked.
           <br/>
@@ -86,12 +93,12 @@ const ExtendBookingModal = ({ isOpen, onClose, booking, onConfirm }: ExtendBooki
         </div>
 
         <div className="flex justify-end space-x-3 border-t pt-4">
-          <button
+          <AsyncButton
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
           >
             Cancel
-          </button>
+          </AsyncButton>
           <AsyncButton
             onClick={handleConfirm}
             disabled={!!error}

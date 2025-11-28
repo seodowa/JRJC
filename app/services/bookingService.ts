@@ -53,6 +53,53 @@ export const finishBookingsService = async (bookingIds: string[], finishPayload:
 
 export const cancelBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'cancel');
 
+// --- Individual Admin Actions ---
+
+export const markBookingReturnedService = async (bookingId: string) => {
+  try {
+    const response = await fetch('/api/admin/bookings/return', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId }),
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) throw new Error(data.error || 'Failed to mark returned');
+    
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Mark Returned Service Error:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+interface UpdatePaymentPayload {
+  paymentId: number;
+  status: string;
+  additionalFees: number;
+  totalPayment: number;
+}
+
+export const updatePaymentStatusService = async (payload: UpdatePaymentPayload) => {
+  try {
+    const response = await fetch('/api/admin/bookings/update-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || 'Failed to update payment');
+
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Update Payment Service Error:", error);
+    return { success: false, error: error.message };
+  }
+};
+
 // --- User Actions ---
 
 export const cancelBookingService = async (bookingId: string): Promise<BookingProcessResult> => {

@@ -125,6 +125,14 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     }
   };
 
+  // Check if extend should be disabled
+  const isExtendDisabled = useMemo(() => {
+      if (selectedBookings.length !== 1) return true;
+      const selectedId = selectedBookings[0];
+      const booking = bookings.find(b => b.bookingId === selectedId);
+      return !booking || !!booking.dateReturned;
+  }, [selectedBookings, bookings]);
+
   // --- GENERIC ACTION PROCESSOR ---
   const processAction = (
     actionName: string, 
@@ -156,22 +164,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     const { actionName, serviceFn, idsToProcess } = confirmationState;
     if (!serviceFn) return;
 
-    setIsProcessing(true); // Optional: Global loader, but modal has its own isLoading state which we can pass.
-    // Actually, existing ConfirmationModal uses `isLoading` prop. Let's use a local loading state for it?
-    // But `isProcessing` covers the whole page which is safer. 
-    // Let's use `isProcessing` and keep modal open or close it?
-    // Standard pattern: Keep modal open with loading spinner on button.
-    
-    // Since `isProcessing` triggers the full screen overlay, let's close the modal first OR modify ConfirmationModal logic.
-    // But `ConfirmationModal` has `isLoading` prop.
-    // Let's use a dedicated state for modal loading to avoid double overlays if possible, OR just rely on `isProcessing`.
-    // If `isProcessing` is true, the overlay appears. 
-    // Let's stick to `isProcessing` for consistency with other actions.
-    // So we can close the modal immediately or keep it.
-    // If we keep it, we need to handle loading state inside it.
-    
-    // Let's close it AFTER success to show progress.
-    
+    setIsProcessing(true);
+
     try {
       const results = await serviceFn(idsToProcess);
       
@@ -342,7 +336,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onDecline={handleDecline}
         onCancel={handleCancel}
         onStart={handleStart}
-        onExtend={handleExtendHeader} 
+        onExtend={handleExtendHeader}
+        isExtendDisabled={isExtendDisabled} 
       />
       
       {/* Loading Overlay */}
@@ -410,6 +405,13 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         confirmButtonText={`Yes, ${confirmationState.actionName.charAt(0).toUpperCase() + confirmationState.actionName.slice(1)}`}
         cancelButtonText="Cancel"
         isLoading={isProcessing}
+        loadingText={
+          confirmationState.actionName === 'approve' ? 'Approving...' :
+          confirmationState.actionName === 'decline' ? 'Declining...' :
+          confirmationState.actionName === 'cancel' ? 'Cancelling...' :
+          confirmationState.actionName === 'start' ? 'Starting...' :
+          'Processing...'
+        }
       />
 
       {/* Loading Spinner for Modal Content Fetching */}

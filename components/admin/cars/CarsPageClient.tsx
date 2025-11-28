@@ -80,7 +80,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
   };
 
   // Matches the visual style of the white container in the 2nd picture
-  const cardBaseStyle = "bg-white p-6 rounded-[30px] shadow-sm border border-gray-100";
+  const cardBaseStyle = "bg-white rounded-[30px] shadow-sm border border-gray-100";
 
   return (
     <>
@@ -102,7 +102,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
           {view === 'list' && (
             <motion.div
               // Reduced width from w-[320px] to w-[260px] to give more space to the list
-              className={`relative w-full md:w-[260px] flex-shrink-0 ${cardBaseStyle} flex flex-col`}
+              className={`relative w-full md:w-[260px] flex-shrink-0 p-6 ${cardBaseStyle} flex flex-col`}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
@@ -129,7 +129,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
             
             {/* Header Section (Both Views) - Now visible in List View too if desired, or kept specific to Grid */}
             <motion.div 
-                className="flex items-center justify-between mb-6 flex-shrink-0"
+                className="flex items-center justify-between mb-6 flex-shrink-0 px-6 pt-6"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
@@ -139,13 +139,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
                 </h2>
                 
                 <div className="flex items-center gap-3 w-full max-w-md justify-end">
-                    {/* Optional Filter Icon Button */}
-                    <button className="p-2.5 rounded-xl border border-gray-300 hover:bg-gray-50 text-gray-600 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
-                        </svg>
-                    </button>
-                    <div className="w-64">
+                    <div className="w-full">
                         <SearchBar
                             placeholder="Find Car"
                             onChange={(e) => handleSearch(e.target.value)}

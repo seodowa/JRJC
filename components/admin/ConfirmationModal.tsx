@@ -11,6 +11,7 @@ interface ConfirmationModalProps {
     title: string;
     message: string;
     isLoading?: boolean;
+    loadingText?: string;
     confirmButtonText?: string;
     cancelButtonText?: string;
 }
@@ -22,6 +23,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     title,
     message,
     isLoading = false,
+    loadingText = 'Processing...',
     confirmButtonText = 'Delete',
     cancelButtonText = 'Cancel',
 }) => {
@@ -50,7 +52,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         <AsyncButton
                             onClick={onConfirm}
                             isLoading={isLoading}
-                            loadingText="Deleting..."
+                            loadingText={loadingText}
                             className="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-500 hover:bg-red-600"
                         >
                             {confirmButtonText}

@@ -208,6 +208,7 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
           title="Confirm Deletion"
           message={`Are you sure you want to delete the car "${carToDelete.brand} ${carToDelete.model} (${carToDelete.year})"? This action cannot be undone.`}
           isLoading={isDeleting}
+          loadingText="Deleting..."
         />
       )}
     </>
