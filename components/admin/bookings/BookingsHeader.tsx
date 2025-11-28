@@ -7,8 +7,6 @@ import BookingTabs from './BookingTabs';
 import HistoryIcon from '@/components/icons/HistoryIcon';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useToast } from "@/components/toast/use-toast"; 
-// REMOVED: import { Toaster } from "sonner"; <--- No longer needed here
 
 type BookingsHeaderProps = {
   view: string;
@@ -44,36 +42,9 @@ const BookingsHeader = ({
   onExtend,
 }: BookingsHeaderProps) => {
   const router = useRouter();
-  const { toast } = useToast();
-
-  const handleAction = async (
-    actionFn: () => Promise<void> | void,
-    successTitle: string,
-    successDescription: string
-  ) => {
-    try {
-      await actionFn();
-      
-      toast({
-        title: successTitle,
-        description: successDescription,
-        variant: "default",
-      });
-    } catch (error) {
-      console.error(error);
-      
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred while processing.",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div>
-      {/* REMOVED: <Toaster /> <--- This was causing the error because it exists in Layout */}
-
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{view === 'history' ? 'Bookings History' : 'Manage Bookings'}</h1>
         {view === 'history' ? (
@@ -89,7 +60,6 @@ const BookingsHeader = ({
         )}
       </div>
       
-      {/* ... Rest of the component remains exactly the same ... */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-4">
           <SearchBar
@@ -116,13 +86,13 @@ const BookingsHeader = ({
             {activeTab === 'Pending' && (
               <>
                 <AsyncButton 
-                  onClick={() => handleAction(onDecline, 'Declined', 'The booking has been successfully declined.')} 
+                  onClick={onDecline} 
                   className="px-4 py-2 shadow-sm text-red-500 rounded-lg hover:bg-red-400 hover:text-white"
                 >
                   Decline
                 </AsyncButton>
                 <AsyncButton 
-                  onClick={() => handleAction(onApprove, 'Approved', 'The booking has been successfully approved.')} 
+                  onClick={onApprove} 
                   className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg hover:bg-blue-300"
                 >
                   Approve
@@ -132,13 +102,13 @@ const BookingsHeader = ({
             {activeTab === 'Confirmed' && (
               <>
                 <AsyncButton 
-                  onClick={() => handleAction(onCancel, 'Cancelled', 'The booking has been successfully cancelled.')} 
+                  onClick={onCancel} 
                   className="px-4 py-2 shadow-sm text-red-500 rounded-lg hover:bg-red-400 hover:text-white"
                 >
                   Cancel
                 </AsyncButton>
                 <AsyncButton 
-                  onClick={() => handleAction(onStart, 'Started', 'The booking has officially started.')} 
+                  onClick={onStart} 
                   className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg hover:bg-blue-400"
                 >
                   Start
@@ -148,13 +118,13 @@ const BookingsHeader = ({
             {activeTab === 'Ongoing' && (
               <>
                 <AsyncButton 
-                  onClick={() => handleAction(onExtend, 'Extended', 'The booking duration has been extended.')} 
+                  onClick={onExtend} 
                   className="px-4 py-2 shadow-sm text-gray-700 rounded-lg hover:bg-green-400"
                 >
                   Extend
                 </AsyncButton>
                 <AsyncButton 
-                  onClick={() => handleAction(onFinish, 'Finished', 'The booking has been marked as completed.')} 
+                  onClick={onFinish} 
                   className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg hover:bg-blue-400"
                 >
                   Finish

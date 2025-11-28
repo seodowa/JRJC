@@ -11,14 +11,14 @@ import {
   cancelBookingsService, 
   startBookingsService,
   finishBookingsService,
-  extendBookingService // 1. Import this
+  extendBookingService
 } from '@/app/services/bookingService'; 
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
 import BookingDetailsModal from './BookingDetailsModal'; 
 import { SpecificBookingDetails } from '@/types/adminBooking';
 import { LoadingSpinner } from '@/components/LoadingSpinner'; 
-import { useToast } from "@/components/toast/use-toast"; // Ensure you use your toast hook
+import { useToast } from "@/components/toast/use-toast"; 
 
 type BookingsPageClientProps = {
   bookings: TAdminBooking[];
@@ -41,7 +41,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace, refresh } = useRouter();
-  const { toast } = useToast(); // Initialize toast
+  const { toast } = useToast(); 
 
   // Initialize Statuses
   useEffect(() => {
@@ -101,24 +101,42 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     serviceFn: (ids: string[]) => Promise<any[]>,
     idsToProcess: string[] = selectedBookings
   ) => {
-    if (idsToProcess.length === 0) {
-      toast({ title: "Error", description: `Please select at least one booking to ${actionName}.`, variant: "destructive" });
-      return;
+    // 1. Sanitize IDs (Remove empty strings or nulls)
+    const validIds = idsToProcess.filter(id => id && id.trim() !== '');
+
+    // 2. Validation Check
+    if (validIds.length === 0) {
+      toast({ 
+        title: "No Selection", 
+        description: `Please select at least one booking to ${actionName}.`, 
+        variant: "destructive" 
+      });
+      return; // Stop execution here
     }
 
-    const confirmMessage = `Are you sure you want to ${actionName.toUpperCase()} ${idsToProcess.length} booking(s)?`;
+    const confirmMessage = `Are you sure you want to ${actionName.toUpperCase()} ${validIds.length} booking(s)?`;
     if (!confirm(confirmMessage)) return;
 
     setIsProcessing(true);
 
     try {
-      const results = await serviceFn(idsToProcess);
+      const results = await serviceFn(validIds);
       
+      // 3. Safety Check: If backend returns empty result
+      if (!results || results.length === 0) {
+        toast({ title: "No Changes", description: "No bookings were processed.", variant: "default" });
+        return;
+      }
+
       const successCount = results.filter(r => r.success).length;
       const failCount = results.filter(r => !r.success).length;
 
-      if (failCount === 0) {
+      // 4. Enhanced Success Logic
+      if (failCount === 0 && successCount > 0) {
         toast({ title: "Success", description: `Selected bookings have been successfully ${actionName}ed.`, variant: "default" });
+      } else if (successCount === 0 && failCount === 0) {
+         // Should be caught by the empty result check, but as a fallback
+        toast({ title: "No Operation", description: "No changes were made.", variant: "default" });
       } else {
         toast({ title: "Warning", description: `Action completed with issues: ${successCount} successful, ${failCount} failed.`, variant: "destructive" });
       }
@@ -137,15 +155,22 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
 
   // --- 2. EXTEND HANDLER (Specific for single booking extension) ---
   const handleExtendAction = async (bookingId: string, newEndDate: string) => {
+    // 1. Validation Check
+    if (!bookingId || !newEndDate) {
+        toast({ title: "Error", description: "Invalid booking ID or date.", variant: "destructive" });
+        return;
+    }
+
     setIsProcessing(true);
     try {
         const result = await extendBookingService(bookingId, newEndDate);
-        if (result.success) {
+        
+        if (result && result.success) {
             toast({ title: "Success", description: "Booking extended successfully.", variant: "default" });
             refresh();
             setIsModalOpen(false);
         } else {
-            toast({ title: "Error", description: result.error || "Failed to extend booking", variant: "destructive" });
+            toast({ title: "Error", description: result?.error || "Failed to extend booking", variant: "destructive" });
         }
     } catch (error) {
         toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
@@ -160,7 +185,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleCancel = () => processAction("cancel", cancelBookingsService);
   const handleStart = () => processAction("start", startBookingsService);
   const handleFinish = () => processAction("finish", finishBookingsService);
-  // Header Extend is currently just an alert as extending is usually per-booking logic
+  
   const handleExtendHeader = () => { alert("Please select a specific booking to extend."); };
 
   // --- MODAL FUNCTIONS ---
@@ -198,8 +223,6 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleModalStart = () => selectedBookingIdForModal && processAction("start", startBookingsService, [selectedBookingIdForModal]);
   const handleModalFinish = () => selectedBookingIdForModal && processAction("finish", finishBookingsService, [selectedBookingIdForModal]);
   
-  // 3. Connect the extend handler
-  // Note: We don't wrap this in processAction because it takes different arguments (date)
   const handleModalExtend = (bookingId: string, newEndDate: string) => handleExtendAction(bookingId, newEndDate);
 
   return (
@@ -218,7 +241,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onCancel={handleCancel}
         onStart={handleStart}
         onFinish={handleFinish}
-        onExtend={handleExtendHeader} // Header button
+        onExtend={handleExtendHeader} 
       />
       
       {/* Loading Overlay */}
@@ -251,7 +274,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onCancel={handleModalCancel}
         onStart={handleModalStart}
         onFinish={handleModalFinish}
-        onExtend={handleModalExtend} // Connected here
+        onExtend={handleModalExtend} 
         isProcessing={isProcessing || isModalLoading}
       />
 
