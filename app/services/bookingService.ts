@@ -42,7 +42,7 @@ export const approveBookingsService = async (bookingIds: string[]) => callStatus
 export const declineBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'decline');
 export const startBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'start');
 
-interface FinishBookingPayload {
+export interface FinishBookingPayload {
   dateReturned: string;
   additionalHours: number; // Added
   additionalFees: number; // For the Payment_Details record

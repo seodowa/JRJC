@@ -237,7 +237,6 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleDecline = () => processAction("decline", declineBookingsService);
   const handleCancel = () => processAction("cancel", cancelBookingsService);
   const handleStart = () => processAction("start", startBookingsService);
-  const handleFinish = () => processAction("finish", finishBookingsService);
   
   // Updated Handle Extend Header
   const handleExtendHeader = async () => { 
@@ -343,7 +342,6 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onDecline={handleDecline}
         onCancel={handleCancel}
         onStart={handleStart}
-        onFinish={handleFinish} 
         onExtend={handleExtendHeader} 
       />
       

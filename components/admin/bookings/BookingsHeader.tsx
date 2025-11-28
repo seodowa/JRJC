@@ -21,7 +21,6 @@ type BookingsHeaderProps = {
   onDecline: () => Promise<void> | void;
   onStart: () => Promise<void> | void;
   onCancel: () => Promise<void> | void;
-  onFinish: () => Promise<void> | void;
   onExtend: () => Promise<void> | void;
 };
 
@@ -38,7 +37,6 @@ const BookingsHeader = ({
   onDecline,
   onStart,
   onCancel,
-  onFinish,
   onExtend,
 }: BookingsHeaderProps) => {
   const router = useRouter();

@@ -8,6 +8,7 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
     .from('Booking_Details')
     .select(`
       Booking_ID,
+      Model_ID,
       Booking_Start_Date_Time,
       Booking_End_Date_Time,
       Duration,
@@ -23,12 +24,12 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
         Email,
         Contact_Number
       ),
-      Car_Models:Model_ID (
+      Car_Models (
         Model_Name,
         Year_Model,
         image,
         Number_Of_Seats,
-        Car_Class_FK, -- Add Car_Class_FK here
+        Car_Class_FK,
         Manufacturer (
           Manufacturer_Name
         )
@@ -57,6 +58,7 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
   // Cast and transform data, ensuring types match SpecificBookingDetails
   const transformedData: SpecificBookingDetails = {
     Booking_ID: data.Booking_ID,
+    Model_ID: data.Model_ID,
     Booking_Start_Date_Time: data.Booking_Start_Date_Time,
     Booking_End_Date_Time: data.Booking_End_Date_Time,
     Duration: data.Duration,
@@ -85,7 +87,7 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
     Booking_Status: {
       Name: (data.Booking_Status as any)?.Name
     },
-    Payment_Details: data.Payment_Details
+    Payment_Details: (data.Payment_Details as any)?.[0] || null
   };
 
   return transformedData;
