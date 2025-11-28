@@ -16,6 +16,7 @@ import {
 import BookingsTableView from './BookingsTableView';
 import BookingsHeader from './BookingsHeader';
 import BookingDetailsModal from './BookingDetailsModal'; 
+import ExtendBookingModal from './ExtendBookingModal'; // [!code ++]
 import { SpecificBookingDetails } from '@/types/adminBooking';
 import { LoadingSpinner } from '@/components/LoadingSpinner'; 
 import { useToast } from "@/components/toast/use-toast"; 
@@ -32,11 +33,15 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const [bookingStatuses, setBookingStatuses] = useState<string[]>(['All']);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Modal State
+  // Details Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookingIdForModal, setSelectedBookingIdForModal] = useState<string | null>(null);
   const [modalBookingDetails, setModalBookingDetails] = useState<SpecificBookingDetails | null>(null);
   const [isModalLoading, setIsModalLoading] = useState(false);
+
+  // Header Extend Modal State [!code ++]
+  const [isHeaderExtendOpen, setIsHeaderExtendOpen] = useState(false); // [!code ++]
+  const [headerExtendBooking, setHeaderExtendBooking] = useState<SpecificBookingDetails | null>(null); // [!code ++]
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -101,17 +106,15 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     serviceFn: (ids: string[]) => Promise<any[]>,
     idsToProcess: string[] = selectedBookings
   ) => {
-    // 1. Sanitize IDs (Remove empty strings or nulls)
     const validIds = idsToProcess.filter(id => id && id.trim() !== '');
 
-    // 2. Validation Check
     if (validIds.length === 0) {
       toast({ 
         title: "No Selection", 
         description: `Please select at least one booking to ${actionName}.`, 
         variant: "destructive" 
       });
-      return; // Stop execution here
+      return; 
     }
 
     const confirmMessage = `Are you sure you want to ${actionName.toUpperCase()} ${validIds.length} booking(s)?`;
@@ -122,7 +125,6 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
     try {
       const results = await serviceFn(validIds);
       
-      // 3. Safety Check: If backend returns empty result
       if (!results || results.length === 0) {
         toast({ title: "No Changes", description: "No bookings were processed.", variant: "default" });
         return;
@@ -131,11 +133,9 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       const successCount = results.filter(r => r.success).length;
       const failCount = results.filter(r => !r.success).length;
 
-      // 4. Enhanced Success Logic
       if (failCount === 0 && successCount > 0) {
         toast({ title: "Success", description: `Selected bookings have been successfully ${actionName}ed.`, variant: "default" });
       } else if (successCount === 0 && failCount === 0) {
-         // Should be caught by the empty result check, but as a fallback
         toast({ title: "No Operation", description: "No changes were made.", variant: "default" });
       } else {
         toast({ title: "Warning", description: `Action completed with issues: ${successCount} successful, ${failCount} failed.`, variant: "destructive" });
@@ -155,7 +155,6 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
 
   // --- 2. EXTEND HANDLER (Specific for single booking extension) ---
   const handleExtendAction = async (bookingId: string, newEndDate: string) => {
-    // 1. Validation Check
     if (!bookingId || !newEndDate) {
         toast({ title: "Error", description: "Invalid booking ID or date.", variant: "destructive" });
         return;
@@ -169,6 +168,8 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
             toast({ title: "Success", description: "Booking extended successfully.", variant: "default" });
             refresh();
             setIsModalOpen(false);
+            setIsHeaderExtendOpen(false); // Close header modal if open [!code ++]
+            setHeaderExtendBooking(null); // Clear data [!code ++]
         } else {
             toast({ title: "Error", description: result?.error || "Failed to extend booking", variant: "destructive" });
         }
@@ -186,7 +187,45 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleStart = () => processAction("start", startBookingsService);
   const handleFinish = () => processAction("finish", finishBookingsService);
   
-  const handleExtendHeader = () => { alert("Please select a specific booking to extend."); };
+  // Updated Handle Extend Header [!code ++]
+  const handleExtendHeader = async () => { 
+    if (selectedBookings.length === 0) {
+      toast({ 
+        title: "No Selection", 
+        description: "Please select a booking to extend.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    if (selectedBookings.length > 1) {
+      toast({ 
+        title: "Too Many Selected", 
+        description: "Please select only one booking to extend.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    // Process single selection
+    const bookingId = selectedBookings[0];
+    setIsProcessing(true); // Show global loader while fetching
+    
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch booking details');
+      }
+      const details: SpecificBookingDetails = await response.json();
+      setHeaderExtendBooking(details);
+      setIsHeaderExtendOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch booking for extension:", error);
+      toast({ title: "Error", description: "Failed to load booking details.", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   // --- MODAL FUNCTIONS ---
   const handleOpenModal = useCallback(async (bookingId: string) => {
@@ -245,7 +284,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       />
       
       {/* Loading Overlay */}
-      {isProcessing && !isModalOpen && (
+      {isProcessing && !isModalOpen && !isHeaderExtendOpen && ( // [!code warning]
         <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center rounded-3xl backdrop-blur-sm">
            <div className="bg-white p-6 rounded-xl shadow-2xl border border-gray-100 flex flex-col items-center">
               <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500 mb-4"></div>
@@ -277,6 +316,19 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onExtend={handleModalExtend} 
         isProcessing={isProcessing || isModalLoading}
       />
+
+      {/* Standalone Extend Modal for Header Button */}
+      {isHeaderExtendOpen && headerExtendBooking && ( // [!code ++]
+        <ExtendBookingModal 
+          isOpen={isHeaderExtendOpen}
+          onClose={() => {
+            setIsHeaderExtendOpen(false);
+            setHeaderExtendBooking(null);
+          }}
+          booking={headerExtendBooking}
+          onConfirm={handleExtendAction}
+        />
+      )}
 
       {/* Loading Spinner for Modal Content Fetching */}
       {isModalOpen && isModalLoading && (
