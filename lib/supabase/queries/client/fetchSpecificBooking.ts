@@ -66,5 +66,32 @@ export const fetchSpecificBooking = async (bookingId: string): Promise<SpecificB
     return null;
   }
 
-  return data as SpecificBookingDetails;
+  const transformedData: SpecificBookingDetails = {
+    Booking_ID: data.Booking_ID,
+    Booking_Start_Date_Time: data.Booking_Start_Date_Time,
+    Booking_End_Date_Time: data.Booking_End_Date_Time,
+    Duration: data.Duration,
+    Location: data.Location,
+    date_created: data.date_created,
+    Customer: {
+      First_Name: (data.Customer as any).First_Name,
+      Last_Name: (data.Customer as any).Last_Name,
+      Suffix: (data.Customer as any).Suffix,
+      Email: (data.Customer as any).Email,
+      Contact_Number: (data.Customer as any).Contact_Number
+    },
+    Car_Models: {
+      Model_Name: (data.Car_Models as any).Model_Name,
+      Year_Model: (data.Car_Models as any).Year_Model,
+      image: (data.Car_Models as any).image,
+      Manufacturer: {
+        Manufacturer_Name: (data.Car_Models as any).Manufacturer_Name
+      }
+    },
+    Booking_Status: {
+      Name: (data.Booking_Status as any).Name
+    }
+  }
+
+  return transformedData;
 };

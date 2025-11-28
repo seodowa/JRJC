@@ -41,7 +41,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
   locations,
 }) => {
   const router = useRouter();
-  const [formData, setFormData] = useState<Partial<Car>>(initialFormData);
+  const [formData, setFormData] = useState<Partial<Car>>(initialFormData as any);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,7 +56,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
         setFormData(carToEdit);
         setImagePreview(carToEdit.image || null);
       } else {
-        setFormData(initialFormData);
+        setFormData(initialFormData as any);
         setImagePreview(null);
       }
       setImageFile(null);
@@ -83,7 +83,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
         ...prev,
         price: [
           ...otherPrices,
-          { ...existingLocationPrice, [type]: numericValue }
+          { Car_ID: 0, Price_12_Hours: 0, Price_24_Hours: 0, ...existingLocationPrice, [type]: numericValue }
         ].sort((a, b) => a.Location.localeCompare(b.Location))
       };
     });

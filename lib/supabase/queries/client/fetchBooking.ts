@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
-import { BookingStatus } from "@/types";
+import { BookingStatus, Booking } from "@/types";
 
 const supabase = createClient();
 
@@ -46,7 +46,27 @@ export const fetchBookings = async (filters: Record<string, any> = {}) => {
     throw new Error('Failed to fetch bookings.');
   }
 
-  return data || [];
+  const transformedData: Booking[] = data?.map(booking => {
+    return {
+      Booking_ID: booking.Booking_ID,
+      Booking_Start_Date_Time: booking.Booking_Start_Date_Time,
+      Booking_End_Date_Time: booking.Booking_End_Date_Time,
+      Duration: booking.Duration,
+      Location: booking.Location,
+      Customer_ID: (booking.Customer as any).Customer_ID,
+      Customer_Full_Name: `${(booking.Customer as any).First_Name} ${(booking.Customer as any).Last_Name}`,
+      Booking_Status_Name: (booking.Customer as any).Booking_Status_Name,
+      Model_ID: 0,
+      Model_Name: "",
+      Year_Model: 0,
+      color_code: "",
+      Car_Status: "",
+      Transmission_Type: "",
+      Manufacturer_Name: "",
+    }
+  })
+
+  return transformedData;
 };
 
 export const fetchBookingStatus = async (uuid: string) => {
@@ -80,11 +100,11 @@ export const fetchBookingStatus = async (uuid: string) => {
     }
 
     const transformedData: BookingStatus = {
-      customerFirstName: data.Customer.First_Name,
-      customerLastName: data.Customer.Last_Name,
-      carManufacturer: data.Car_Models.Manufacturer.Manufacturer_Name,
-      carModelName: data.Car_Models.Model_Name,
-      bookingStatus: data.Booking_Status.Name
+      customerFirstName: (data.Customer as any).First_Name,
+      customerLastName: (data.Customer as any).Last_Name,
+      carManufacturer: (data.Car_Models as any).Manufacturer.Manufacturer_Name,
+      carModelName: (data.Car_Models as any).Model_Name,
+      bookingStatus: (data.Booking_Status as any).Name
     };
 
     return transformedData;
