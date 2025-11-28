@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Pencil } from 'lucide-react';
-import { useUser } from '@/app/(admin)/context/UserContext';
+import { UserContext } from '@/app/(admin)/context/UserContext'; // Import Context directly
 import { toast } from '@/components/toast/use-toast';
-import { updateAccountService } from '@/app/(admin)/services/updateAccountService'; // Import the new service
+import { updateAccountService } from '@/app/(admin)/services/updateAccountService';
 
 export default function SettingsPage() {
-  // 1. Consume the user context
-  const user = useUser(); 
+  // 1. Consume the UserContext directly
+  const user = useContext(UserContext);
+  console.log('User from context:', user);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -26,9 +27,7 @@ export default function SettingsPage() {
       setFormData(prev => ({
         ...prev,
         username: user.username || '',
-        // Note: Since your User type currently only has 'username', 
-        // we keep email static or empty until you add email to your UserContext/Session.
-        email: 'theodore@example.com', 
+        email: user.email || '', 
       }));
     }
   }, [user]);
@@ -79,7 +78,6 @@ export default function SettingsPage() {
     setIsLoading(true);
 
     try {
-      // Call the Client-side Service
       const result = await updateAccountService(user.username, {
         username: formData.username,
         email: formData.email,
@@ -91,8 +89,9 @@ export default function SettingsPage() {
             title: "Profile Updated",
             description: "Your account settings have been saved successfully.",
         });
-        // Optional: If username changed, you might want to force reload to update the session/context
-        if (user.username !== formData.username) {
+        
+        // Reload if critical info changed to refresh session
+        if (user.username !== formData.username || user.email !== formData.email) {
              window.location.reload(); 
         }
       } else {
@@ -123,7 +122,6 @@ export default function SettingsPage() {
           >
             Account
           </button>
-          {/* Add more settings tabs here if needed */}
         </nav>
       </div>
 

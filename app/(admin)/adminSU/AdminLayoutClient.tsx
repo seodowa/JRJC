@@ -10,19 +10,36 @@ import { UserProvider } from '@/app/(admin)/context/UserContext';
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(true); // Sidebar is collapsed by default on mobile
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  
+  // UPDATE: Include 'email' in the state type definition
+  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+  
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const res = await fetch('/api/auth/session');
+        // FIX: Add cache busting to ensure we get fresh data after an update
+        const res = await fetch(`/api/auth/session?t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: {
+                'Pragma': 'no-cache',
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+            }
+        });
+        
         if (res.ok) {
           const data = await res.json();
           console.log('User data from session:', data.user);
-          setUser(data.user);
+          
+          // Ensure the API actually returns an email field.
+          // If data.user.email is undefined here, check your /api/auth/session route.
+          setUser({
+            username: data.user.username,
+            email: data.user.email || '', // Fallback to empty string if missing
+          });
         } else {
           setUser(null);
         }
@@ -77,6 +94,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           handleLogout={handleLogout}
         />
         <main className="flex-1 w-full max-w-screen mx-auto sm:p-4 md:p-8 text-gray-800 md:overflow-y-hidden sm:overflow-y-auto">
+            {/* Pass the updated user object (with email) to the Provider */}
             <UserProvider user={user}>
                 {children}
             </UserProvider>
