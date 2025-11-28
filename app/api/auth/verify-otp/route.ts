@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
   const { data: user, error } = await supabase
     .from('Accounts')
-    .select('"ID", "Username", "Account_Type", "verification_token", "verification_token_expires_at"')
+    .select('"ID", "Username", "Email", "Account_Type", "verification_token", "verification_token_expires_at"')
     .eq('"Username"', username)
     .maybeSingle();
 
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
     user: {
       id: user.ID,
       username: user.Username,
+      email: user.Email,
       account_type: user.Account_Type,
     },
     expires,

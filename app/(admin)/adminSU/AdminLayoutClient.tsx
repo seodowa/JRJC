@@ -11,7 +11,7 @@ import { UserProvider } from '@/app/(admin)/context/UserContext';
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true); // Sidebar is collapsed by default on mobile
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
 
