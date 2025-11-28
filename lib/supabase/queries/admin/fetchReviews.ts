@@ -37,7 +37,7 @@ const fetchSpecificCarAdmin = async (car_id: number): Promise<Car> => {
           available: car.Available || true,
           color: car.color_code,
           price: undefined,
-          status: null
+          status: undefined
       }
     ))
     return transformedCar[0];

@@ -25,7 +25,6 @@ export const fetchPendingBookings = async (): Promise<Booking[]> => {
     }
 
     const transformedData: Booking[] = data?.map(booking => {
-      console.log(booking)
       return {
         Booking_ID: booking.Booking_ID,
         Booking_Start_Date_Time: booking.Booking_Start_Date_Time,
