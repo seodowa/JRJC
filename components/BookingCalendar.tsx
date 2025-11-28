@@ -125,7 +125,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
         </div>
 
         <div className="space-y-1">
-          <label className="block text-xs font-medium text-gray-700">New End Date</label>
+          <label className="block text-xs font-medium text-gray-700">End Date</label>
           <MobileDatePicker
             value={endDate ? dayjs(endDate) : null}
             onChange={handleEndDateChange}
