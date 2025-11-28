@@ -15,5 +15,6 @@ export const useUser = () => {
   if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider. Make sure the component is a child of AdminLayoutClient.');
   }
+  console.log('UserContext value:', context);
   return context;
 };

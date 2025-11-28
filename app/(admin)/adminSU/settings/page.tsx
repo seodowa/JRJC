@@ -1,10 +1,233 @@
-const SettingsPage = () => {
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { Pencil } from 'lucide-react';
+import { useUser } from '@/app/(admin)/context/UserContext';
+import { toast } from '@/components/toast/use-toast';
+import { updateAccountService } from '@/app/(admin)/services/updateAccountService'; // Import the new service
+
+export default function SettingsPage() {
+  // 1. Consume the user context
+  const user = useUser(); 
+
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    email: '',
+  });
+
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 2. Update form data when user context becomes available
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        username: user.username || '',
+        // Note: Since your User type currently only has 'username', 
+        // we keep email static or empty until you add email to your UserContext/Session.
+        email: 'theodore@example.com', 
+      }));
+    }
+  }, [user]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast({
+          variant: 'destructive',
+          title: 'File too large',
+          description: 'Please select an image under 10MB.',
+        });
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.username) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "User session not found.",
+        });
+        return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Call the Client-side Service
+      const result = await updateAccountService(user.username, {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (result.success) {
+        toast({
+            title: "Profile Updated",
+            description: "Your account settings have been saved successfully.",
+        });
+        // Optional: If username changed, you might want to force reload to update the session/context
+        if (user.username !== formData.username) {
+             window.location.reload(); 
+        }
+      } else {
+        throw new Error(result.message);
+      }
+
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Failed to update profile.";
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: msg,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Settings</h1>
-      <p>This is where you can change your settings.</p>
+    <div className="flex flex-col md:flex-row gap-6 h-full">
+      {/* Left Settings Navigation Panel */}
+      <div className="w-full md:w-64 bg-white rounded-3xl p-6 shadow-sm h-fit">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Settings</h2>
+        
+        <nav>
+          <button 
+            className="w-full text-left px-6 py-3 rounded-xl bg-sky-200 text-gray-800 font-medium transition-colors"
+          >
+            Account
+          </button>
+          {/* Add more settings tabs here if needed */}
+        </nav>
+      </div>
+
+      {/* Right Account Form Panel */}
+      <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm">
+        <h2 className="text-xl font-bold text-gray-900 mb-8">Account</h2>
+
+        <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-12">
+          {/* Form Fields Column */}
+          <div className="flex-1 space-y-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Username: <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="Enter username"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Password: <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="Enter new password (leave empty to keep current)"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Email: <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="Enter email address"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Profile Picture Column */}
+          <div className="flex flex-col items-center lg:items-start space-y-4">
+            <span className="text-sm font-medium text-gray-700 self-center lg:self-start">
+              Profile Picture:
+            </span>
+            
+            <div 
+              onClick={handleImageClick}
+              className="relative group cursor-pointer w-48 h-48 rounded-full bg-gray-200 overflow-hidden border-4 border-white shadow-sm hover:opacity-90 transition-opacity"
+            >
+              {profileImage ? (
+                <img 
+                  src={profileImage} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-300 text-white">
+                  <Pencil size={48} strokeWidth={2.5} />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
+                </div>
+              )}
+              
+              <input 
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/png, image/jpeg"
+                className="hidden"
+              />
+            </div>
+            
+            <p className="text-xs text-gray-400 text-center w-48">
+              Supports only JPEG or PNG under 10MB
+            </p>
+          </div>
+        </form>
+
+        {/* Update Button Section */}
+        <div className="mt-12 flex justify-end">
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="px-8 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors shadow-sm disabled:opacity-50"
+          >
+            {isLoading ? 'Updating...' : 'Update'}
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default SettingsPage;
+}
