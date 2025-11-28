@@ -123,17 +123,14 @@ const BookingPage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const { totalPrice: initialRentalCost } = calculateRentalDetails(); // Renamed for clarity
+      const { totalPrice: initialRentalCost } = calculateRentalDetails(); 
       const bookingFee = 500;
       const carWashFee = 300;
-      // initialRentalCost is the car rental price
       const initialTotalPayment = bookingFee + carWashFee + (initialRentalCost || 0);
-      // totalPayment is effectively the initialTotalPayment at booking time
       const totalPayment = initialTotalPayment;
 
       const finalPreferenceString = notificationPreferences.join(', ');
 
-      // Construct the payment info object expected by the API/Mutation
       const apiPaymentInfo = {
         bookingFee: bookingFee,
         initialTotalPayment: initialTotalPayment,
@@ -143,9 +140,8 @@ const BookingPage: React.FC = () => {
       const bookingData = {
         personalInfo,
         rentalInfo,
-        paymentInfo: apiPaymentInfo, // Pass the structured payment info
+        paymentInfo: apiPaymentInfo, 
         selectedCar,
-        // We can still pass these if needed for other things, or remove if unused
         initialRentalCost, 
         carWashFee,
         bookingStatusId: 1, 
@@ -211,11 +207,9 @@ const BookingPage: React.FC = () => {
     setPaymentInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- UPDATED: Form Validation Logic ---
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // 1. Trigger browser native validation (shows bubbles)
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
       e.stopPropagation();
@@ -223,7 +217,6 @@ const BookingPage: React.FC = () => {
       return; 
     }
 
-    // 2. Only proceed if valid
     if (currentStep < 3) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -245,27 +238,41 @@ const BookingPage: React.FC = () => {
     const [hours, minutes] = timeString.split(':');
     const hour = parseInt(hours);
     const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour;
+    
+    let displayHour = hour % 12;
+    if (displayHour === 0) displayHour = 12;
+    
     return `${displayHour}:${minutes} ${period}`;
   };
 
   const calculateRentalDetails = () => {
     if (!rentalInfo.startDate || !rentalInfo.endDate || !rentalInfo.time) {
-      return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
+      return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false, isSameDay: false };
     }
 
     const isOutsideRegion10 = rentalInfo.area === "Outside Region 10";
 
     const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
     const endDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
-    const timeDiff = endDateTime.getTime() - startDateTime.getTime();
-    const hours = Math.ceil(timeDiff / (1000 * 3600));
+    
+    const isSameDay = rentalInfo.startDate === rentalInfo.endDate;
 
-    if (hours <= 0) return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false };
+    const timeDiff = endDateTime.getTime() - startDateTime.getTime();
+    let hours = Math.ceil(timeDiff / (1000 * 3600));
+
+    if (hours <= 0 && !isSameDay) {
+        return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false, isSameDay: false };
+    }
 
     const days = Math.ceil(hours / 24);
-    const show12HourOption = hours <= 24 && !isOutsideRegion10;
-    const show24HourOption = hours <= 24;
+    
+    const pickupHour = parseInt(rentalInfo.time.split(':')[0]);
+
+    const show12HourOption = 
+        (!isOutsideRegion10 && hours <= 24 && hours > 0) || 
+        (!isOutsideRegion10 && isSameDay && pickupHour < 12);
+
+    const show24HourOption = (hours <= 24) || isSameDay;
 
     const twelveHourPrice = calculatePrice(rentalInfo.area, "12 hours");
     const twentyFourHourPrice = calculatePrice(rentalInfo.area, "24 hours");
@@ -280,17 +287,21 @@ const BookingPage: React.FC = () => {
     } else if (rentalInfo.duration?.includes("days")) {
       totalPrice = multiDayPrice;
     } else {
-      if (hours <= 12 && show12HourOption) totalPrice = twelveHourPrice;
-      else if (hours <= 24) totalPrice = twentyFourHourPrice;
-      else totalPrice = multiDayPrice;
+      if (rentalInfo.duration === "") {
+         totalPrice = 0;
+      } else {
+        if (hours <= 12 && show12HourOption) totalPrice = twelveHourPrice;
+        else if (hours <= 24) totalPrice = twentyFourHourPrice;
+        else totalPrice = multiDayPrice;
+      }
     }
 
     return { 
-      hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10 
+      hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10, isSameDay
     };
   };
 
-  const { hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10 } = calculateRentalDetails();
+  const { hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10, isSameDay } = calculateRentalDetails();
 
   const calculateReturnTime = () => {
     if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) return { returnDate: "", returnTime: "" };
@@ -302,24 +313,65 @@ const BookingPage: React.FC = () => {
       const days = parseInt(rentalInfo.duration);
       returnDateTime = new Date(startDateTime.getTime() + (days * 24 * 60 * 60 * 1000));
     } else returnDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
+    
     return { returnDate: returnDateTime.toISOString().split('T')[0], returnTime: formatTime(returnDateTime.toTimeString().slice(0, 5)) };
   };
 
-  const { returnTime } = calculateReturnTime();
+  const { returnDate, returnTime } = calculateReturnTime();
 
+  // --- [UPDATED] USE EFFECT: Sync End Date with Duration Selection ---
+  useEffect(() => {
+    if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) return;
+
+    const start = dayjs(`${rentalInfo.startDate}T${rentalInfo.time}`);
+    let newEndDate = "";
+
+    if (rentalInfo.duration === "12 hours") {
+      // 12 hours: Calculate exactly 12h from start.
+      // Automatically reverts to same day if start time allows (e.g., 8am -> 8pm)
+      // Or sets next day if overnight (e.g., 8pm -> 8am)
+      newEndDate = start.add(12, 'hour').format('YYYY-MM-DD');
+    } else if (rentalInfo.duration === "24 hours") {
+      // 24 hours: Calculate exactly 24h from start (Start + 1 Day)
+      newEndDate = start.add(24, 'hour').format('YYYY-MM-DD');
+    }
+
+    // Only update if the calculated end date differs from the current calendar selection
+    if (newEndDate && newEndDate !== rentalInfo.endDate) {
+      setRentalInfo(prev => ({ ...prev, endDate: newEndDate }));
+    }
+  }, [rentalInfo.duration, rentalInfo.startDate, rentalInfo.time]);
+
+
+  // --- AUTO SELECTION LOGIC ---
   useEffect(() => {
     if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
-      const { hours, isOutsideRegion10 } = calculateRentalDetails();
-      if (!rentalInfo.duration || hours > 48) {
-        if (hours <= 12 && !isOutsideRegion10) {
-           setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
-        }
-        else if (hours <= 24) {
-           setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
+      const { hours, isOutsideRegion10, isSameDay, show12HourOption } = calculateRentalDetails();
+      const pickupHour = parseInt(rentalInfo.time.split(':')[0]);
+
+      // If manual dates are selected that imply a 24h cycle (Start != End), 
+      // AND it's not a multi-day trip (>48h), force duration to 24h if not set.
+      if (!rentalInfo.duration || hours > 48 || isSameDay) {
+        if (isSameDay) {
+            // Logic for Same Day selection
+            if (show12HourOption) {
+                 // Don't overwrite if user already selected 12h explicitly
+                 if(rentalInfo.duration !== "12 hours") setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
+            } else {
+                 if(rentalInfo.duration !== "24 hours") setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
+            }
         } 
         else {
-           const days = Math.ceil(hours / 24);
-           setRentalInfo(prev => ({ ...prev, duration: `${days} days` }));
+            if (hours <= 12 && !isOutsideRegion10) {
+                setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
+            }
+            else if (hours <= 24) {
+                setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
+            } 
+            else if (hours > 24) {
+                const days = Math.ceil(hours / 24);
+                setRentalInfo(prev => ({ ...prev, duration: `${days} days` }));
+            }
         }
       }
     }
@@ -330,7 +382,6 @@ const BookingPage: React.FC = () => {
       case 1:
         return (
           <div className="p-6">
-            {/* Added noValidate to handle validation manually via checkValidity() */}
             <form onSubmit={handleSubmit} noValidate>
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
@@ -338,7 +389,6 @@ const BookingPage: React.FC = () => {
                   <InputField label="Last Name" name="lastName" type="text" value={personalInfo.lastName} onChange={handleInputChange} placeholder="Enter your last name" required className="col-span-2 md:col-span-1" />
                   <InputField label="Suffix" name="suffix" type="text" value={personalInfo.suffix} onChange={handleInputChange} placeholder="(e.g., Jr.)" optional={true} />
                   
-                  {/* --- UPDATED: Email Field --- */}
                   <InputField 
                     label="Email" 
                     name="email" 
@@ -346,8 +396,7 @@ const BookingPage: React.FC = () => {
                     value={personalInfo.email} 
                     onChange={handleInputChange} 
                     placeholder="Enter your email" 
-                    optional={true} // This adds the (Optional) text to label
-                    // Fixed Regex: Escaped hyphens (\-) to prevent "Invalid character class" error
+                    optional={true} 
                     pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
                     title="Please enter a valid email address (e.g., user@domain.com)"
                     className="col-span-3 md:col-span-1" 
@@ -413,9 +462,10 @@ const BookingPage: React.FC = () => {
                       <option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option>
                     </select>
                   </div>
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Duration <span className="text-red-500">*</span></label>
-                    {hours > 0 ? (
+                    {(hours > 0 || isSameDay) ? (
                       <select name="duration" value={rentalInfo.duration} onChange={handleRentalInputChange} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" required>
                         <option value="">Select duration</option>
                         {show12HourOption && <option value="12 hours">₱{twelveHourPrice}/12 hours</option>}
@@ -425,8 +475,17 @@ const BookingPage: React.FC = () => {
                     ) : (
                       <input type="text" value="Select dates and time first" disabled className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" />
                     )}
-                    <div className="text-sm text-gray-500 mt-1">{hours > 0 ? <>{hours} hours total • {show12HourOption ? " 12-hour return possible" : show24HourOption ? " 24-hour return possible" : " Multi-day rental"}</> : "Select dates and time to calculate duration"}</div>
+                    <div className="text-sm text-gray-500 mt-1">
+                        {hours > 0 ? (
+                            <>{hours} hours total • {show12HourOption ? " 12-hour return possible" : show24HourOption ? " 24-hour return possible" : " Multi-day rental"}</>
+                        ) : isSameDay ? (
+                            "Same day selected • Choose 12 or 24 hours"
+                        ) : (
+                            "Select dates and time to calculate duration"
+                        )}
+                    </div>
                   </div>
+
                 </div>
               </div>
               <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
@@ -435,6 +494,7 @@ const BookingPage: React.FC = () => {
                   {rentalInfo.startDate && rentalInfo.time && rentalInfo.duration && (
                     <div className="text-xs text-gray-600 mt-1 space-y-1">
                       <div><span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}</div>
+                      {/* FIX: Use returnDate (calculated) instead of rentalInfo.endDate (calendar state) for display */}
                       <div><span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {returnTime}</div>
                       <div><span className="font-medium">Duration:</span> {rentalInfo.duration}</div>
                       <div><span className="font-medium">Vehicle:</span> <span>{selectedCarData?.brand}</span> <span>{selectedCarData?.model}</span> <span>({selectedCarData?.year})</span> • {rentalInfo.area}</div>
