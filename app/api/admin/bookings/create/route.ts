@@ -45,6 +45,27 @@ export async function POST(req: Request) {
 
     const customerId = customerData.Customer_ID;
 
+    // Step 2: Insert into Payment_Details table
+    const { data: paymentDetailsData, error: paymentError } = await supabaseAdmin
+      .from('Payment_Details')
+      .insert([
+        {
+          booking_fee: bookingData.paymentInfo.bookingFee,
+          initial_total_payment: bookingData.paymentInfo.initialTotalPayment,
+          bf_reference_number: bookingData.paymentInfo.bfReferenceNumber,
+          payment_status: 'Not Paid', // Default, will be updated on car return
+        }
+      ])
+      .select('Payment_ID')
+      .single();
+
+    if (paymentError) {
+      console.error("Payment Details Insert Error:", paymentError);
+      throw new Error(`Payment details creation failed: ${paymentError.message}`);
+    }
+
+    const paymentId = paymentDetailsData.Payment_ID;
+
     // Calculate timestamps
     const startDateTime = new Date(`${bookingData.rentalInfo.startDate}T${bookingData.rentalInfo.time}`).toISOString();
     
@@ -62,8 +83,7 @@ export async function POST(req: Request) {
 
     const hasChauffer = bookingData.rentalInfo.selfDrive === "No";
 
-    // Step 2: Insert into Booking_Details table
-    // Note: Since we are using supabaseAdmin, we can set Booking_Status_ID directly to 2 or 3
+    // Step 3: Insert into Booking_Details table
     const { data: bookingDetailsData, error: bookingError } = await supabaseAdmin
       .from('Booking_Details')
       .insert([
@@ -74,8 +94,8 @@ export async function POST(req: Request) {
           Model_ID: bookingData.selectedCar,
           Duration: convertDurationToHours(bookingData.rentalInfo.duration),
           Chauffer: hasChauffer,
-          Payment_Details_URL: bookingData.paymentInfo.referenceNumber,
-          Booking_Status_ID: bookingData.bookingStatusId || 1, // Default to Pending if not provided
+          Payment_Details_ID: paymentId, // Link to the new Payment_Details record
+          Booking_Status_ID: bookingData.bookingStatusId || 1, 
           Location: bookingData.rentalInfo.area,
         }
       ])

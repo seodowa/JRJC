@@ -14,6 +14,19 @@ export interface Booking {
   Car_Status: string; // varchar
   Transmission_Type: string; // varchar
   Manufacturer_Name: string; // varchar
+  additional_hours?: number;
+  date_returned?: string;
+  Payment_Details_ID?: number; // New FK to Payment_Details table
+}
+
+export interface PaymentDetails {
+  Payment_ID: number;
+  booking_fee: number;
+  initial_total_payment: number;
+  additional_fees: number;
+  total_payment: number | null;
+  payment_status: string;
+  bf_reference_number: string; // New field
 }
 
 export interface BookingData {
@@ -32,16 +45,17 @@ export interface BookingData {
     duration: string;
     time: string;
   };
-  paymentInfo: {
-    referenceNumber: string;
+  paymentInfo: { // This structure will now map to creating a PaymentDetails entry
+    bookingFee: number; // For initial payment
+    initialTotalPayment: number; // For initial payment
+    bfReferenceNumber: string; // The reference number for initial payment
   };
   selectedCar: number | null;
-  totalPayment: number;
-  bookingFee: number;
-  carWashFee: number;
-  initialPayment: number;
+  initialRentalCost: number; // Renamed from initialPayment, representing just the car rental cost
+  carWashFee: number; // Still needed for calculation breakdown in UI
   bookingStatusId: number;
 }
+
 
 export interface BookingStatus {
   customerFirstName: string

@@ -34,8 +34,10 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     time: "",
   });
 
-  const [paymentInfo, setPaymentInfo] = useState<BookingData['paymentInfo']>({
-    referenceNumber: "",
+  const [paymentInfo, setPaymentInfo] = useState<{ bfReferenceNumber: string; bookingFee: number; initialTotalPayment: number }>({
+    bfReferenceNumber: "",
+    bookingFee: 0,
+    initialTotalPayment: 0,
   });
 
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "cashless" | null>(null);
@@ -63,11 +65,11 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const { totalPrice } = calculateRentalDetails();
-      const bookingFee = 500;
-      const carWashFee = 300;
-      const initialPayment = totalPrice || 0;
-      const totalPayment = bookingFee + carWashFee + initialPayment;
+      const { totalPrice: initialRentalCost } = calculateRentalDetails(); // Renamed to initialRentalCost for clarity
+      const bookingFeeVal = 500; // Fixed booking fee
+      const carWashFeeVal = 300; // Fixed car wash fee
+      const initialTotalPaymentVal = bookingFeeVal + carWashFeeVal + initialRentalCost; // Sum of all initial components
+      const totalPaymentVal = initialTotalPaymentVal; // Define totalPaymentVal for use in confirmation service
 
       // Determine Booking Status
       const now = new Date();
@@ -87,15 +89,21 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
         statusText = "Confirmed";
       }
 
+      // Update paymentInfo state for the context
+      const updatedPaymentInfo = {
+        bfReferenceNumber: paymentInfo.bfReferenceNumber,
+        bookingFee: bookingFeeVal,
+        initialTotalPayment: initialTotalPaymentVal,
+      };
+
+      // Construct the bookingData payload for the createWalkInBookingService
       const bookingData = { 
         personalInfo, 
         rentalInfo, 
-        paymentInfo, 
+        paymentInfo: updatedPaymentInfo, // Contains all payment details for DB
         selectedCar, 
-        totalPayment, 
-        bookingFee, 
-        carWashFee, 
-        initialPayment,
+        initialRentalCost, // Pass initial rental cost explicitly if needed later
+        carWashFee: carWashFeeVal, // Pass car wash fee explicitly if needed later
         bookingStatusId,
       };
 
@@ -112,18 +120,18 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
       router.refresh();
       sendBookingConfirmationService(
         newBookingId,
-        totalPayment,
+        totalPaymentVal, // Pass the calculated totalPaymentVal
         statusText,
         personalInfo.firstName,
-        personalInfo.email, // Assuming email is available in personalInfo
+        personalInfo.email,
         personalInfo.mobileNumber,
-        paymentInfo.referenceNumber,
-        "SMS" // Only SMS for walk-in confirmations
+        updatedPaymentInfo.bfReferenceNumber, // Pass the bfReferenceNumber
+        "SMS"
       );
       
       setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
       setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
-      setPaymentInfo({ referenceNumber: "" });
+      setPaymentInfo({ bfReferenceNumber: "", bookingFee: 0, initialTotalPayment: 0 }); // Reset paymentInfo
       setPaymentMethod(null);
       setSelectedCar(null);
       setSelectedCarData(null);

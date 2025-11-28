@@ -105,7 +105,11 @@ export const createBooking = async (bookingData: any) => {
         p_duration: convertDurationToHours(bookingData.rentalInfo.duration),
         p_chauffer: hasChauffer,
         p_location: bookingData.rentalInfo.area,
-        p_notification_preference: bookingData.notificationPreference
+        p_notification_preference: bookingData.notificationPreference,
+        // New Payment Parameters
+        p_booking_fee: bookingData.paymentInfo.bookingFee,
+        p_initial_total_payment: bookingData.paymentInfo.initialTotalPayment,
+        p_bf_reference_number: bookingData.paymentInfo.bfReferenceNumber
       });
 
     if (bookingError) {

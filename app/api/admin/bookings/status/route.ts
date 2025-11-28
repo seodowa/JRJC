@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { bookingIds, action } = await req.json();
+    const { bookingIds, action, payload } = await req.json(); // Destructure payload
 
     if (!bookingIds || !Array.isArray(bookingIds) || bookingIds.length === 0) {
       return NextResponse.json({ error: 'Invalid booking IDs' }, { status: 400 });
@@ -44,41 +44,62 @@ export async function POST(req: Request) {
       let smsTemplate = '';
       let emailSubject = '';
 
+      // Prepare updates for Booking_Details table
+      let bookingDetailsUpdate: { [key: string]: any } = {};
+
       // Set Status ID and Templates
       switch (action) {
         case 'approve':
           statusId = 2;
           smsTemplate = 'Hi {name}, Good news! Your booking (ID: {id}) has been APPROVED. See you soon!';
           emailSubject = 'Booking Approved';
+          bookingDetailsUpdate = { Booking_Status_ID: statusId };
           break;
         case 'decline':
           statusId = 6;
           smsTemplate = 'Hi {name}, we regret to inform you that your booking (ID: {id}) has been DECLINED. Please contact us for details.';
           emailSubject = 'Booking Declined';
+          bookingDetailsUpdate = { Booking_Status_ID: statusId };
           break;
         case 'start':
           statusId = 3;
           smsTemplate = 'Hi {name}, your rental (ID: {id}) has officially STARTED. Drive safely!';
           emailSubject = 'Rental Started';
+          bookingDetailsUpdate = { Booking_Status_ID: statusId };
           break;
         case 'finish':
           statusId = 4;
           smsTemplate = 'Hi {name}, your booking (ID: {id}) has been COMPLETED. Thank you for choosing us!';
           emailSubject = 'Booking Completed';
-          break;
+
+          // Extract finish-specific data from payload
+          const { dateReturned, additionalFees, totalPayment, paymentStatus } = payload;
+          
+          if (!dateReturned || additionalFees === undefined || totalPayment === undefined || !paymentStatus) {
+            results.push({ success: false, bookingId, error: 'Missing finish booking details in payload' });
+            continue;
+          }
+
+          // Update Booking_Details with date_returned and new status
+          bookingDetailsUpdate = { 
+            Booking_Status_ID: statusId,
+            date_returned: dateReturned,
+          };
+          break; // Break from switch after preparing update for Booking_Details
         case 'cancel':
           statusId = 5;
           smsTemplate = 'Hi {name}, your booking (ID: {id}) has been CANCELLED by the admin. Please contact us if this is a mistake.';
           emailSubject = 'Booking Cancelled';
+          bookingDetailsUpdate = { Booking_Status_ID: statusId };
           break;
         default:
           return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
       }
 
-      // Update DB
+      // Update DB - Booking_Details
       const { error: updateError } = await supabaseAdmin
         .from('Booking_Details')
-        .update({ Booking_Status_ID: statusId })
+        .update(bookingDetailsUpdate)
         .eq('Booking_ID', bookingId);
 
       if (updateError) {
@@ -86,6 +107,37 @@ export async function POST(req: Request) {
         continue;
       }
 
+      // Handle Payment_Details update only for 'finish' action
+      if (action === 'finish') {
+        const { dateReturned, additionalFees, totalPayment, paymentStatus } = payload;
+        // First, fetch the Payment_Details_ID from the Booking_Details
+        const { data: bookingPaymentData, error: fetchPaymentIdError } = await supabaseAdmin
+          .from('Booking_Details')
+          .select('Payment_Details_ID')
+          .eq('Booking_ID', bookingId)
+          .single();
+
+        if (fetchPaymentIdError || !bookingPaymentData?.Payment_Details_ID) {
+          results.push({ success: false, bookingId, error: fetchPaymentIdError?.message || 'Payment_Details_ID not found for booking' });
+          continue;
+        }
+
+        // Then, update the Payment_Details record
+        const { error: updatePaymentError } = await supabaseAdmin
+          .from('Payment_Details')
+          .update({
+            additional_fees: additionalFees,
+            total_payment: totalPayment,
+            payment_status: paymentStatus,
+          })
+          .eq('Payment_ID', bookingPaymentData.Payment_Details_ID);
+
+        if (updatePaymentError) {
+          results.push({ success: false, bookingId, error: updatePaymentError.message });
+          continue;
+        }
+      }
+      
       // Fetch Customer & Preference
       const { data: bookingData, error: fetchError } = await supabaseAdmin
         .from('Booking_Details')

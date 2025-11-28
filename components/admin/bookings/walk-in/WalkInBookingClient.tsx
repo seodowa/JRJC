@@ -51,7 +51,7 @@ const WalkInBookingLayout = () => {
   const bookingFee = 500;
   const carWashFee = 300;
   const initialPayment = totalPrice || 0;
-  const totalPayment = bookingFee + carWashFee + initialPayment;
+  const initialTotalPayment = bookingFee + carWashFee + initialPayment;
 
   const handleCancelConfirm = () => setShowConfirm(false);
 
@@ -109,7 +109,7 @@ const WalkInBookingLayout = () => {
                   </div>
                   <div className="flex justify-between font-semibold border-t mt-2 pt-2">
                     <span>Total Payment:</span>
-                    <span>₱{totalPayment}</span>
+                    <span>₱{initialTotalPayment}</span>
                   </div>
                 </div>
 

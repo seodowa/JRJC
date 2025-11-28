@@ -20,15 +20,21 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
 
   const handlePaymentInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setPaymentInfo((prev) => ({ ...prev, [name]: value }));
+    // Assuming the input name directly maps to paymentInfo.bfReferenceNumber
+    if (name === "bfReferenceNumber") {
+      setPaymentInfo((prev) => ({ ...prev, bfReferenceNumber: value }));
+    } else {
+        // Fallback for other potential payment info fields, if any
+        setPaymentInfo((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const { totalPrice } = calculateRentalDetails();
+  const { totalPrice: initialRentalCost } = calculateRentalDetails(); // Use initialRentalCost for clarity
   const bookingFee = 500;
   const carWashFee = 300;
-  const initialPayment = totalPrice || 0;
-  const totalPayment = bookingFee + carWashFee + initialPayment;
-
+  const initialTotalPayment = bookingFee + carWashFee + initialRentalCost; // Use initialRentalCost
+  const totalPayment = initialTotalPayment; // For walk-in, this is the total payment
+  
   const handleBook = () => {
     setShowConfirm(true);
   };
@@ -36,13 +42,15 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
   const handlePaymentMethodSelect = (method: "cash" | "cashless") => {
     setPaymentMethod(method);
     if (method === "cash") {
-      setPaymentInfo({ ...paymentInfo, referenceNumber: "Booking Fee Paid through Cash" });
+      setPaymentInfo((prev) => ({ ...prev, bfReferenceNumber: "Booking Fee Paid through Cash" }));
+    } else {
+      setPaymentInfo((prev) => ({ ...prev, bfReferenceNumber: "" })); // Clear for cashless if switching
     }
   };
 
   const handleGoBack = () => {
     setPaymentMethod(null);
-    setPaymentInfo({ ...paymentInfo, referenceNumber: "" });
+    setPaymentInfo((prev) => ({ ...prev, bfReferenceNumber: "" })); // Clear bfReferenceNumber
   };
 
   return (
@@ -86,10 +94,10 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                   <strong>Booking Fee:</strong> ₱{bookingFee}
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>Cost Breakdown:</strong> ₱{initialPayment} (Rental) + ₱{carWashFee} (Car Wash)
+                  <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)
                 </p>
                 <p className="mt-6 text-sm font-semibold text-gray-800">
-                  Total Payment: ₱{totalPayment}
+                  Total Payment: ₱{initialTotalPayment}
                 </p>
                 <p className="mt-4 text-lg font-bold text-green-600">
                   Booking Fee Paid through Cash
@@ -129,12 +137,12 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                     <strong>Booking Fee:</strong> ₱{bookingFee}
                   </p>
                   <p className="text-sm text-gray-700">
-                    <strong>Cost Breakdown:</strong> ₱{initialPayment} (Rental) + ₱{carWashFee} (Car Wash)
+                    <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)
                   </p>
                 </div>
 
                 <p className="mt-6 text-sm font-semibold text-gray-800">
-                  Total Payment: ₱{totalPayment}
+                  Total Payment: ₱{initialTotalPayment}
                 </p>
 
                 <div className="mt-4">
@@ -144,8 +152,8 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                   </label>
                   <input
                     type="text"
-                    name="referenceNumber"
-                    value={paymentInfo.referenceNumber}
+                    name="bfReferenceNumber" // Changed name to match new field
+                    value={paymentInfo.bfReferenceNumber} // Changed value to new field
                     onChange={handlePaymentInputChange}
                     placeholder="Enter GCash reference number"
                     required

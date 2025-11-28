@@ -9,12 +9,12 @@ export type BookingProcessResult = {
 
 // --- Admin Actions (Delegated to Admin API Route) ---
 
-const callStatusApi = async (bookingIds: string[], action: string): Promise<BookingProcessResult[]> => {
+const callStatusApi = async (bookingIds: string[], action: string, payload?: any): Promise<BookingProcessResult[]> => {
   try {
     const response = await fetch('/api/admin/bookings/status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingIds, action }),
+      body: JSON.stringify({ bookingIds, action, payload }), // Pass payload
     });
 
     const data = await response.json();
@@ -41,7 +41,15 @@ const callStatusApi = async (bookingIds: string[], action: string): Promise<Book
 export const approveBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'approve');
 export const declineBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'decline');
 export const startBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'start');
-export const finishBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'finish');
+
+interface FinishBookingPayload {
+  dateReturned: string;
+  additionalFees: number; // For the Payment_Details record
+  totalPayment: number; // For the Payment_Details record
+  paymentStatus: string; // For the Payment_Details record
+}
+export const finishBookingsService = async (bookingIds: string[], finishPayload: FinishBookingPayload) => callStatusApi(bookingIds, 'finish', finishPayload);
+
 export const cancelBookingsService = async (bookingIds: string[]) => callStatusApi(bookingIds, 'cancel');
 
 // --- User Actions ---
@@ -79,11 +87,11 @@ export const sendBookingConfirmationService = async (
   firstName: string,
   email: string,
   mobileNumber: string,
-  referenceNumber: string,
+  bfReferenceNumber: string, // Changed from referenceNumber
   notificationType: string // Changed from strict union to string to allow "SMS, Email"
 ): Promise<{ success: boolean; error?: any }> => {
   try {
-    const message = `Hi ${firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${referenceNumber}. We will notify you once confirmed!`;
+    const message = `Hi ${firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${bfReferenceNumber}. We will notify you once confirmed!`;
     const subject = "Booking Confirmation";
 
     let formattedNumber = mobileNumber;

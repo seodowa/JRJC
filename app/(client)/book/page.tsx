@@ -123,23 +123,31 @@ const BookingPage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const { totalPrice } = calculateRentalDetails();
+      const { totalPrice: initialRentalCost } = calculateRentalDetails(); // Renamed for clarity
       const bookingFee = 500;
       const carWashFee = 300;
-      const initialPayment = totalPrice || 0;
-      const totalPayment = bookingFee + carWashFee + initialPayment;
+      // initialRentalCost is the car rental price
+      const initialTotalPayment = bookingFee + carWashFee + (initialRentalCost || 0);
+      // totalPayment is effectively the initialTotalPayment at booking time
+      const totalPayment = initialTotalPayment;
 
       const finalPreferenceString = notificationPreferences.join(', ');
+
+      // Construct the payment info object expected by the API/Mutation
+      const apiPaymentInfo = {
+        bookingFee: bookingFee,
+        initialTotalPayment: initialTotalPayment,
+        bfReferenceNumber: paymentInfo.referenceNumber
+      };
 
       const bookingData = {
         personalInfo,
         rentalInfo,
-        paymentInfo,
+        paymentInfo: apiPaymentInfo, // Pass the structured payment info
         selectedCar,
-        totalPayment,
-        bookingFee,
+        // We can still pass these if needed for other things, or remove if unused
+        initialRentalCost, 
         carWashFee,
-        initialPayment,
         bookingStatusId: 1, 
         notificationPreference: finalPreferenceString, 
       };

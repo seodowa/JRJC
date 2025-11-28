@@ -260,7 +260,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleModalDecline = () => selectedBookingIdForModal && processAction("decline", declineBookingsService, [selectedBookingIdForModal]);
   const handleModalCancel = () => selectedBookingIdForModal && processAction("cancel", cancelBookingsService, [selectedBookingIdForModal]);
   const handleModalStart = () => selectedBookingIdForModal && processAction("start", startBookingsService, [selectedBookingIdForModal]);
-  const handleModalFinish = () => selectedBookingIdForModal && processAction("finish", finishBookingsService, [selectedBookingIdForModal]);
+  // handleModalFinish is now handled internally by BookingDetailsModal opening FinishBookingModal
   
   const handleModalExtend = (bookingId: string, newEndDate: string) => handleExtendAction(bookingId, newEndDate);
 
@@ -279,7 +279,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onDecline={handleDecline}
         onCancel={handleCancel}
         onStart={handleStart}
-        onFinish={handleFinish}
+        onFinish={handleFinish} // This handleFinish still exists for the bulk action button in header
         onExtend={handleExtendHeader} 
       />
       
@@ -312,7 +312,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
         onDecline={handleModalDecline}
         onCancel={handleModalCancel}
         onStart={handleModalStart}
-        onFinish={handleModalFinish}
+        onFinish={refresh} // Just refresh the page after FinishBookingModal completes
         onExtend={handleModalExtend} 
         isProcessing={isProcessing || isModalLoading}
       />
