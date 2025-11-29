@@ -194,9 +194,15 @@ export async function PUT(req: Request) {
 
         if (oldImageUrl && oldImageUrl !== newImageUrl) {
             try {
-                const filePath = new URL(oldImageUrl).pathname.split('/images/')[1];
+                // Parse the URL and decode it to handle special characters
+                const urlObj = new URL(oldImageUrl);
+                // Supabase public URLs are typically: .../storage/v1/object/public/[bucket]/[path]
+                // We split by '/public/images/' to reliably get the path relative to the bucket root.
+                const pathSegments = urlObj.pathname.split('/public/images/');
                 
-                if (filePath) {
+                if (pathSegments.length > 1) {
+                    const filePath = decodeURIComponent(pathSegments[1]);
+                    
                     const { error: deleteError } = await supabaseAdmin
                         .storage
                         .from('images')
@@ -205,6 +211,8 @@ export async function PUT(req: Request) {
                     if (deleteError) {
                         console.error(`Failed to delete old image from storage: ${deleteError.message}`);
                     }
+                } else {
+                    console.warn(`Could not extract file path from URL: ${oldImageUrl}`);
                 }
             } catch (e) {
                 console.error('Error processing old image deletion:', e);
