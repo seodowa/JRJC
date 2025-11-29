@@ -1,9 +1,8 @@
-
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { getSession } from '@/lib';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { v4 as uuidv4 } from 'uuid';
+import sharp from 'sharp';
 
 export async function POST(req: Request) {
   // 1. Authenticate the user
@@ -20,26 +19,68 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
 
-  // 3. Upload to Supabase Storage using the admin client
-  const fileName = `${uuidv4()}-${imageFile.name}`;
-  const { data, error: uploadError } = await supabaseAdmin.storage
-    .from('images')
-    .upload(fileName, imageFile, {
-      cacheControl: '3600',
-      upsert: false,
-    });
+  try {
+    const arrayBuffer = await imageFile.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayBuffer);
+    let finalBuffer: Buffer = fileBuffer;
+    let contentType = imageFile.type;
+    let fileName = imageFile.name;
 
-  if (uploadError) {
-    return NextResponse.json({ error: `Image upload failed: ${uploadError.message}` }, { status: 500 });
+    // Check if it's an image that needs conversion
+    // We preserve SVG and WebP. We convert other images to WebP.
+    const isSvg = contentType === 'image/svg+xml';
+    const isWebP = contentType === 'image/webp';
+    const isImage = contentType.startsWith('image/');
+
+    if (isImage && !isSvg && !isWebP) {
+      try {
+        finalBuffer = await sharp(fileBuffer)
+          .webp({ quality: 80 }) // Compress to 80% quality
+          .toBuffer();
+        
+        contentType = 'image/webp';
+        
+        // Update filename extension to .webp
+        const lastDotIndex = fileName.lastIndexOf('.');
+        const nameWithoutExt = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
+        fileName = `${nameWithoutExt}.webp`;
+        
+      } catch (conversionError) {
+        console.error('Image conversion failed:', conversionError);
+        // Fallback: If conversion fails, we upload the original file.
+        // This prevents the user flow from breaking.
+        console.warn('Proceeding with original file due to conversion error.');
+      }
+    }
+
+    // 3. Generate unique path
+    const uniquePath = `${uuidv4()}-${fileName}`;
+
+    // 4. Upload to Supabase Storage using the admin client
+    const { data, error: uploadError } = await supabaseAdmin.storage
+      .from('images')
+      .upload(uniquePath, finalBuffer, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: contentType,
+      });
+
+    if (uploadError) {
+      return NextResponse.json({ error: `Image upload failed: ${uploadError.message}` }, { status: 500 });
+    }
+
+    // 5. Get the public URL
+    const { data: { publicUrl } } = supabaseAdmin.storage.from('images').getPublicUrl(data.path);
+
+    if (!publicUrl) {
+      return NextResponse.json({ error: 'Could not get public URL for uploaded image' }, { status: 500 });
+    }
+
+    // 6. Return the URL
+    return NextResponse.json({ publicUrl });
+
+  } catch (error) {
+    console.error('Upload processing error:', error);
+    return NextResponse.json({ error: 'Internal server error during upload processing' }, { status: 500 });
   }
-
-  // 4. Get the public URL
-  const { data: { publicUrl } } = supabaseAdmin.storage.from('images').getPublicUrl(data.path);
-
-  if (!publicUrl) {
-    return NextResponse.json({ error: 'Could not get public URL for uploaded image' }, { status: 500 });
-  }
-
-  // 5. Return the URL
-  return NextResponse.json({ publicUrl });
 }
