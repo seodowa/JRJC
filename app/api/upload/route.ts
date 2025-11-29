@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { v4 as uuidv4 } from 'uuid';
-import sharp from 'sharp';
 
 export async function POST(req: Request) {
   // 1. Authenticate the user
@@ -34,6 +33,9 @@ export async function POST(req: Request) {
 
     if (isImage && !isSvg && !isWebP) {
       try {
+        // Dynamic import to prevent top-level load failures in serverless
+        const { default: sharp } = await import('sharp');
+        
         finalBuffer = await sharp(fileBuffer)
           .webp({ quality: 80 }) // Compress to 80% quality
           .toBuffer();
@@ -48,7 +50,6 @@ export async function POST(req: Request) {
       } catch (conversionError) {
         console.error('Image conversion failed:', conversionError);
         // Fallback: If conversion fails, we upload the original file.
-        // This prevents the user flow from breaking.
         console.warn('Proceeding with original file due to conversion error.');
       }
     }
