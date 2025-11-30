@@ -26,6 +26,7 @@
     "react-color": "^2.19.3",
     "react-datepicker": "^8.7.0",
     "react-dom": "19.1.0",
+    "sharp": "^0.34.5",
     "sonner": "^1.5.0",
     "use-debounce": "^10.0.6",
     "uuid": "^13.0.0"
