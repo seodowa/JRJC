@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
 import dayjs from 'dayjs';
 import SelectCar from '@/components/SelectCar';
 import BookingCalendar from '@/components/BookingCalendar';
@@ -10,7 +10,6 @@ import { Dayjs } from 'dayjs';
 import { useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import AsyncButton from "@/components/AsyncButton";
 import { formatDate, formatTime } from '@/utils/dateUtils';
-import { useRentalCalculation } from '@/hooks/useRentalCalculation';
 import { Dispatch, SetStateAction } from 'react';
 
 interface RentalDetailsFormProps {
@@ -34,10 +33,18 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
     setSelectedTime,
     dateRangeError,
     setDateRangeError,
-    calculatePrice,
+    calculateRentalDetails,
+    calculateReturnTime
   } = useWalkInBooking();
 
-  const { calculateRentalDetails: getCalculatedRentalDetails, calculateReturnTime: getCalculatedReturnTime } = useRentalCalculation({ rentalInfo, calculatePrice });
+  // --- FIX START: Add Mounted State ---
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  // --- FIX END ---
+
   const {
     hours,
     days,
@@ -46,10 +53,11 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
     twentyFourHourPrice,
     multiDayPrice,
     show12HourOption,
-    show24HourOption
-  } = getCalculatedRentalDetails();
+    show24HourOption,
+    isSameDay
+  } = calculateRentalDetails();
 
-  const { returnTime } = getCalculatedReturnTime();
+  const { returnTime, returnDate } = calculateReturnTime();
 
   const handleRentalInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -118,26 +126,33 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Pick-up Time <span className="text-red-500">*</span>
               </label>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileTimePicker
-                  label="Select time"
-                  value={selectedTime}
-                  onChange={(newTime: Dayjs | null) => {
-                    setSelectedTime(newTime);
-                    const timeString = newTime ? newTime.format('HH:mm') : '';
-                    setRentalInfo(prev => ({ ...prev, time: timeString }));
-                  }}
-                  ampm={true}
-                  minutesStep={30}
-                  slotProps={{
-                    textField: {
-                      required: true,
-                      fullWidth: true,
-                      size: "small",
-                    },
-                  }}
-                />
-              </LocalizationProvider>
+              {/* --- FIX START: Conditional Rendering --- */}
+              {isMounted ? (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <MobileTimePicker
+                    label="Select time"
+                    value={selectedTime}
+                    onChange={(newTime: Dayjs | null) => {
+                      setSelectedTime(newTime);
+                      const timeString = newTime ? newTime.format('HH:mm') : '';
+                      setRentalInfo(prev => ({ ...prev, time: timeString }));
+                    }}
+                    ampm={true}
+                    minutesStep={30}
+                    slotProps={{
+                      textField: {
+                        required: true,
+                        fullWidth: true,
+                        size: "small",
+                      },
+                    }}
+                  />
+                </LocalizationProvider>
+              ) : (
+                // Optional: Loading placeholder to prevent layout shift
+                <div className="w-full h-[40px] border border-gray-300 rounded-md bg-gray-50 animate-pulse" />
+              )}
+              {/* --- FIX END --- */}
             </div>
 
            <div className="md:col-span-2">
@@ -196,7 +211,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                 Duration <span className="text-red-500">*</span>
               </label>
               
-              {hours > 0 ? (
+              {(hours > 0 || isSameDay) ? (
                 <select
                   name="duration"
                   value={rentalInfo.duration}
@@ -241,6 +256,8 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                     show24HourOption ? " 24-hour return possible" : 
                     " Multi-day rental"}
                   </>
+                ) : isSameDay ? (
+                    "Same day selected • Choose 12 or 24 hours"
                 ) : (
                   "Select dates and time to calculate duration"
                 )}
@@ -260,7 +277,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                   <span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}
                 </div>
                 <div>
-                  <span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {returnTime}
+                  <span className="font-medium">Return:</span> {formatDate( rentalInfo.endDate)} at {returnTime}
                 </div>
                 <div>
                   <span className="font-medium">Duration:</span> {rentalInfo.duration}
@@ -296,4 +313,3 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
 };
 
 export default RentalDetailsForm;
-
