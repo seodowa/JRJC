@@ -1,8 +1,8 @@
-// middleware.ts
+// proxy.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { decrypt } from '@/lib'; // Import your decrypt function
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only run auth checks on protected routes
