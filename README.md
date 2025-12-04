@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+JRJC Car Rental Booking System 🚗💨
 
-## Getting Started
+A modern web application for browsing, managing, and booking car rentals. Built with React for a responsive frontend and Supabase for a robust, real-time backend.
 
-First, run the development server:
+📋 Project Overview
 
-```bash
+The JRJC Booking System streamlines the vehicle rental process. It allows users to browse available cars, view details, and book rentals for specific dates. It includes real-time availability checks and user authentication managed securely via Supabase.
+
+🛠️ Tech Stack
+
+Frontend: React (Vite), CSS/Tailwind (Assumed)
+
+Backend: Supabase (PostgreSQL)
+
+Authentication: Supabase Auth
+
+Routing: React Router DOM
+
+✨ Key Features
+
+Vehicle Catalog: Browse a list of available cars with images, prices, and specifications.
+
+Smart Booking Engine: Select pick-up and drop-off dates with automatic availability conflicts validation.
+
+User Accounts: Secure sign-up/login to manage personal bookings.
+
+Real-time Updates: Instant reflection of booking status (Preventing double bookings).
+
+Responsive Design: optimized for both desktop and mobile users.
+
+🚀 Getting Started
+
+Prerequisites
+
+Node.js (v16+)
+
+npm or yarn
+
+A Supabase project setup
+
+Installation
+
+Clone the repository:
+
+git clone [https://github.com/your-username/jrjc-booking.git](https://github.com/your-username/jrjc-booking.git)
+cd jrjc-booking
+
+
+Install dependencies:
+
+npm install
+
+
+Environment Setup:
+Create a .env file in the root directory and add your Supabase credentials:
+
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+
+Run the development server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🗄️ Database Schema (Supabase)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project relies on the following tables in Supabase:
 
-## Learn More
+cars: Stores vehicle details (make, model, year, price_per_day, image_url).
 
-To learn more about Next.js, take a look at the following resources:
+bookings: Stores reservation data (car_id, user_id, start_date, end_date, total_price).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+profiles: (Optional) Extended user information linked to auth.users.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🤝 Contributing
 
-## Deploy on Vercel
+Fork the repository.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create a feature branch (git checkout -b feature/NewFeature).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Commit your changes (git commit -m 'Add some NewFeature').
+
+Push to the branch (git push origin feature/NewFeature).
+
+Open a Pull Request.
+
+📜 License
+
+All Rights Reserved.

@@ -16,7 +16,10 @@ const WalkInBookingLayout = () => {
     submitting,
     submitError,
     handleFinalSubmit,
-    calculateRentalDetails
+    calculateRentalDetails,
+    personalInfo,
+    notificationPreferences,
+    handleNotificationToggle
   } = useWalkInBooking();
 
   const personalRef = useRef<HTMLDivElement>(null);
@@ -82,7 +85,7 @@ const WalkInBookingLayout = () => {
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-80 p-6">
+          <div className="bg-white rounded-lg shadow-lg w-96 p-6">
               <>
                 <h2 className="text-lg font-semibold text-gray-900 mb-2 text-center">
                   {submitting ? "Submitting Booking..." : "Confirm Walk-In Booking"}
@@ -94,39 +97,74 @@ const WalkInBookingLayout = () => {
                   </div>
                 )}
 
-                <div className="text-sm text-gray-700 mb-4 p-3 bg-gray-50 rounded-md">
-                  <div className="flex justify-between">
-                    <span>Booking Fee:</span>
-                    <span>₱{bookingFee}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Rental Cost:</span>
-                    <span>₱{initialPayment}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Car Wash Fee:</span>
-                    <span>₱{carWashFee}</span>
-                  </div>
-                  <div className="flex justify-between font-semibold border-t mt-2 pt-2">
-                    <span>Total Payment:</span>
-                    <span>₱{initialTotalPayment}</span>
-                  </div>
-                </div>
+                {!submitting && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Where should we send notifications? <span className="text-red-500">*</span></p>
+                    
+                    <div className="flex gap-4 mb-4">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={notificationPreferences.includes('SMS')} 
+                          onChange={() => handleNotificationToggle('SMS')} 
+                          className="form-checkbox h-4 w-4 text-blue-600 rounded" 
+                        />
+                        <span className="text-sm text-gray-700">SMS</span>
+                      </label>
+                      <label className={`flex items-center space-x-2 ${!personalInfo.email ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                        <input 
+                          type="checkbox" 
+                          checked={notificationPreferences.includes('Email')} 
+                          onChange={() => handleNotificationToggle('Email')} 
+                          disabled={!personalInfo.email} 
+                          className="form-checkbox h-4 w-4 text-blue-600 rounded disabled:bg-gray-300" 
+                        />
+                        <span className="text-sm text-gray-700">Email</span>
+                      </label>
+                    </div>
+                    
+                    {notificationPreferences.length === 0 && (
+                      <p className="text-xs text-red-500 mt-1 mb-2">Please select at least one notification method.</p>
+                    )}
+                    {!personalInfo.email && (
+                      <p className="text-xs text-gray-500 mt-1 mb-2">Provide an email in Step 1 to enable Email notifications.</p>
+                    )}
 
-                <div className="flex justify-between">
+                    <div className="text-sm text-gray-700 p-3 bg-gray-50 rounded-md">
+                      <div className="flex justify-between">
+                        <span>Booking Fee:</span>
+                        <span>₱{bookingFee}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Rental Cost:</span>
+                        <span>₱{initialPayment}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Car Wash Fee:</span>
+                        <span>₱{carWashFee}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold border-t mt-2 pt-2">
+                        <span>Total Payment:</span>
+                        <span>₱{initialTotalPayment}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-between gap-3">
                   <AsyncButton
                     onClick={handleCancelConfirm}
                     disabled={submitting}
-                    className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-md w-[45%] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </AsyncButton>
                   <AsyncButton
                     onClick={handleFinalSubmit}
-                    disabled={submitting}
+                    disabled={submitting || notificationPreferences.length === 0}
                     isLoading={submitting}
                     loadingText="Submitting..."
-                    className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-medium py-2 px-4 rounded-md w-[45%] disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="flex-1 bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-medium py-2 px-4 rounded-md disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     Confirm
                   </AsyncButton>
