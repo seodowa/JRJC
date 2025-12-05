@@ -47,10 +47,17 @@ export async function POST(req: Request) {
         const nameWithoutExt = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
         fileName = `${nameWithoutExt}.webp`;
         
-      } catch (conversionError) {
+      } catch (conversionError: any) {
         console.error('Image conversion failed:', conversionError);
         // Fallback: If conversion fails, we upload the original file.
         console.warn('Proceeding with original file due to conversion error.');
+        
+        // Capture error for debugging
+        return NextResponse.json({
+            publicUrl: await uploadOriginalFile(imageFile),
+            warning: 'Image optimization failed, used original file.',
+            debugError: conversionError.message || String(conversionError)
+        });
       }
     }
 
@@ -84,4 +91,24 @@ export async function POST(req: Request) {
     console.error('Upload processing error:', error);
     return NextResponse.json({ error: 'Internal server error during upload processing' }, { status: 500 });
   }
+}
+
+// Helper to handle the fallback upload cleanly to avoid duplicate code
+async function uploadOriginalFile(file: File) {
+    const { supabaseAdmin } = await import('@/utils/supabase/admin');
+    const { v4: uuidv4 } = await import('uuid');
+    const uniquePath = `${uuidv4()}-${file.name}`;
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    
+    const { data, error } = await supabaseAdmin.storage
+        .from('images')
+        .upload(uniquePath, fileBuffer, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: file.type,
+        });
+        
+    if (error) throw new Error(error.message);
+    const { data: { publicUrl } } = supabaseAdmin.storage.from('images').getPublicUrl(data.path);
+    return publicUrl;
 }
