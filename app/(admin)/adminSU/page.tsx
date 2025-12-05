@@ -31,7 +31,7 @@ export default async function AdminSU() {
                       gap-6 sm:gap-8 md:gap-20 lg:gap-40 xl:gap-60 2xl:gap-80
                       w-full max-w-7xl px-4 sm:px-6 md:px-8">
         <img 
-          src="/images/logo-placeholder.webp" // Placeholder for logo image
+          src="/images/jrjc_logo.png" // Placeholder for logo image
           alt="Logo"
           className="w-full max-w-[150px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-[400px] xl:max-w-[500px]
                      h-auto object-contain"

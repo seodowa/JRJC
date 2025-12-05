@@ -105,7 +105,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1">
-          <label className="block text-xs font-medium text-gray-700">Start Date</label>
+          <label className="block text-sm font-medium text-gray-700">Start Date <span className="text-red-500">*</span></label>
           <MobileDatePicker
             value={startDate ? dayjs(startDate) : null}
             onChange={handleStartDateChange}
@@ -125,7 +125,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
         </div>
 
         <div className="space-y-1">
-          <label className="block text-xs font-medium text-gray-700">End Date</label>
+          <label className="block text-sm font-medium text-gray-700">End Date <span className="text-red-500">*</span></label>
           <MobileDatePicker
             value={endDate ? dayjs(endDate) : null}
             onChange={handleEndDateChange}
