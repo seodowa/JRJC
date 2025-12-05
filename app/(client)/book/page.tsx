@@ -533,7 +533,7 @@ const BookingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex justify-center">
-                    <img src="/images/qr-sample.png" alt="QR Code" className="w-48 h-48 border rounded-md shadow-sm" />
+                    <img src="https://vsyuulkearnnymswbhfc.supabase.co/storage/v1/object/public/images/qr-code.svg" alt="QR Code" className="w-48 h-48 border rounded-md shadow-sm" />
                   </div>
                 </div>
               </div>
