@@ -20,7 +20,8 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
   };
 
   return (
-    <table className="min-w-full text-gray-800 md:table table-fixed">
+    <div className="w-full overflow-x-auto">
+      <table className="min-w-[1000px] text-gray-800 table table-fixed">
       <thead className="rounded-lg border-y border-gray-200 text-sm font-normal">
           <tr>
             {showCheckboxes && (
@@ -100,6 +101,7 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
         ))}
       </tbody>
     </table>
+    </div>
   );
 };
 

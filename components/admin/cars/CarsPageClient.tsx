@@ -47,6 +47,23 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
     loadDropdownData();
   }, []);
 
+  // Force grid view on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768 && view === 'list') {
+        const params = new URLSearchParams(searchParams);
+        params.set('view', 'grid');
+        router.replace(`${pathname}?${params.toString()}`);
+      }
+    };
+
+    // Check on mount
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [view, pathname, router, searchParams]);
+
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
@@ -95,14 +112,14 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
       />
       
       {/* Reduced gap from gap-6 to gap-4 for tighter layout */}
-      <main className="relative flex flex-col md:flex-row gap-4 h-full">
+      <main className="relative flex flex-col md:flex-row gap-4 h-auto md:h-full">
         
         {/* List View Sidebar - Only visible in List View */}
         <AnimatePresence>
           {view === 'list' && (
             <motion.div
               // Reduced width from w-[320px] to w-[260px] to give more space to the list
-              className={`relative w-full md:w-[260px] flex-shrink-0 p-6 ${cardBaseStyle} flex flex-col`}
+              className={`relative w-full md:w-[260px] flex-shrink-0 p-6 ${cardBaseStyle} flex flex-col max-h-[40vh] md:max-h-none`}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
@@ -116,7 +133,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
               </div>
               
               {/* Toggle in Sidebar for List View */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
+              <div className="hidden md:block absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
                 <ViewToggle view={view} setView={handleViewChange} />
               </div>
             </motion.div>
@@ -124,8 +141,8 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex-1 h-full min-h-0">
-          <div className={`relative h-full flex flex-col ${cardBaseStyle} overflow-hidden`}>
+        <div className="flex-1 md:h-full h-auto min-h-0">
+          <div className={`relative md:h-full h-auto flex flex-col ${cardBaseStyle} md:overflow-hidden`}>
             
             {/* Header Section (Both Views) - Now visible in List View too if desired, or kept specific to Grid */}
             <motion.div 
@@ -180,7 +197,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
             {/* Floating Toggle for Grid View */}
             {view === 'grid' && (
                 <motion.div
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
+                    className="hidden md:block absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                 >

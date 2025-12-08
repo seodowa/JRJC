@@ -93,7 +93,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           setIsUserMenuOpen={setIsUserMenuOpen}
           handleLogout={handleLogout}
         />
-        <main className="flex-1 w-full max-w-screen mx-auto sm:p-4 md:p-8 text-gray-800 md:overflow-y-hidden sm:overflow-y-auto">
+        <main className="flex-1 w-full max-w-screen mx-auto p-2 sm:p-4 md:p-8 text-gray-800 overflow-y-auto md:overflow-y-hidden">
             {/* Pass the updated user object (with email) to the Provider */}
             <UserProvider user={user}>
                 {children}
