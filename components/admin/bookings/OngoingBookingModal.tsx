@@ -40,8 +40,18 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
     if (isOpen && booking) {
       setLocalBooking(booking);
       loadLateFees();
+      
+      // Push history state for back button support
+      window.history.pushState({ modalOpen: true }, '', window.location.href);
+      const handlePopState = () => onClose();
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
     }
   }, [isOpen, booking]);
+
+  const handleManualClose = () => {
+    if (isOpen) window.history.back();
+  };
 
   const loadLateFees = async () => {
     try {
@@ -52,7 +62,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
     }
   };
 
-  if (!localBooking) return null;
+  if (!localBooking || !isOpen) return null;
 
   const formatDateTime = (isoString: string) => new Date(isoString).toLocaleString();
 
@@ -162,7 +172,12 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
 
       await finishBookingsService([localBooking.Booking_ID], payload);
       toast({ title: "Booking Finished", description: "Booking moved to history." });
-      onSuccess(); // This closes the modal
+      
+      // Close via back (removes history state)
+      handleManualClose();
+      // Wait a tick then call onSuccess (which might also try to close or refresh)
+      setTimeout(onSuccess, 50);
+
     } catch (error: any) {
         toast({ variant: "destructive", title: "Error", description: error.message || "Failed to finish." });
     } finally {
@@ -180,157 +195,168 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 relative">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Ongoing Booking - {localBooking.Booking_ID}</h2>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 md:p-4">
+        {/* Full screen mobile, Centered Card Desktop */}
+        <div className="relative bg-white md:rounded-lg shadow-xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            
-            {/* Left Column: Booking & Customer Info */}
-            <div className="space-y-4">
-              {/* Booking Info */}
-              <div>
-                <h3 className="font-semibold text-lg text-gray-700 mb-2">Booking Information</h3>
-                <p className="text-sm text-gray-600"><strong>Status:</strong> <span className="font-medium text-green-600">Ongoing</span></p>
-                <p className="text-sm text-gray-600"><strong>Booked On:</strong> {formatDateTime(localBooking.date_created)}</p>
-                <p className="text-sm text-gray-600"><strong>Start:</strong> {formatDateTime(localBooking.Booking_Start_Date_Time)}</p>
-                <p className="text-sm text-gray-600"><strong>End:</strong> {formatDateTime(localBooking.Booking_End_Date_Time)}</p>
-                <p className="text-sm text-gray-600"><strong>Duration:</strong> {localBooking.Duration} hours</p>
-                <p className="text-sm text-gray-600"><strong>Location:</strong> {localBooking.Location}</p>
-                
-                {/* Return Status Area */}
-                <div className="mt-4 pt-2 border-t border-gray-100">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Return Status</h4>
-                    {!localBooking.date_returned ? (
-                        <AsyncButton 
-                            onClick={() => setIsReturnConfirmOpen(true)} 
-                            disabled={isReturning}
-                            className="text-sm bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1.5 px-3 rounded-md transition-colors"
-                        >
-                            {isReturning ? 'Marking...' : 'Mark Returned Now'}
-                        </AsyncButton>
-                    ) : (
-                        <div>
-                            <p className="text-sm text-gray-600"><strong>Returned:</strong> {formatDateTime(localBooking.date_returned)}</p>
-                            {additionalHours > 0 ? (
-                                <p className="text-sm text-red-600 font-medium">Overdue by {additionalHours} hours</p>
-                            ) : (
-                                <p className="text-sm text-green-600 font-medium">Returned on time</p>
-                            )}
-                        </div>
-                    )}
+          {/* Header */}
+          <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 truncate pr-4">Ongoing - {localBooking.Booking_ID}</h2>
+            <button type="button" onClick={handleManualClose} className="text-gray-500 p-2 hover:bg-gray-100 rounded-full">
+               <span className="text-2xl leading-none">&times;</span>
+            </button>
+          </div>
+          
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              
+              {/* Left Column: Booking & Customer Info */}
+              <div className="space-y-4">
+                {/* Booking Info */}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Booking Information</h3>
+                  <p className="text-sm text-gray-600"><strong>Status:</strong> <span className="font-medium text-green-600">Ongoing</span></p>
+                  <p className="text-sm text-gray-600"><strong>Booked On:</strong> {formatDateTime(localBooking.date_created)}</p>
+                  <p className="text-sm text-gray-600"><strong>Start:</strong> {formatDateTime(localBooking.Booking_Start_Date_Time)}</p>
+                  <p className="text-sm text-gray-600"><strong>End:</strong> {formatDateTime(localBooking.Booking_End_Date_Time)}</p>
+                  <p className="text-sm text-gray-600"><strong>Duration:</strong> {localBooking.Duration} hours</p>
+                  <p className="text-sm text-gray-600"><strong>Location:</strong> {localBooking.Location}</p>
+                  
+                  {/* Return Status Area */}
+                  <div className="mt-4 pt-2 border-t border-gray-100">
+                      <h4 className="font-semibold text-sm text-gray-700 mb-2">Return Status</h4>
+                      {!localBooking.date_returned ? (
+                          <AsyncButton 
+                              onClick={() => setIsReturnConfirmOpen(true)} 
+                              disabled={isReturning}
+                              className="text-sm bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1.5 px-3 rounded-md transition-colors"
+                          >
+                              {isReturning ? 'Marking...' : 'Mark Returned Now'}
+                          </AsyncButton>
+                      ) : (
+                          <div>
+                              <p className="text-sm text-gray-600"><strong>Returned:</strong> {formatDateTime(localBooking.date_returned)}</p>
+                              {additionalHours > 0 ? (
+                                  <p className="text-sm text-red-600 font-medium">Overdue by {additionalHours} hours</p>
+                              ) : (
+                                  <p className="text-sm text-green-600 font-medium">Returned on time</p>
+                              )}
+                          </div>
+                      )}
+                  </div>
+                </div>
+
+                {/* Customer Info */}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Customer Information</h3>
+                  <p className="text-sm text-gray-600"><strong>Name:</strong> {localBooking.Customer.First_Name} {localBooking.Customer.Last_Name} {localBooking.Customer.Suffix || ''}</p>
+                  <p className="text-sm text-gray-600"><strong>Email:</strong> {localBooking.Customer.Email || 'N/A'}</p>
+                  <p className="text-sm text-gray-600"><strong>Contact:</strong> {localBooking.Customer.Contact_Number || 'N/A'}</p>
                 </div>
               </div>
 
-              {/* Customer Info */}
-              <div>
-                <h3 className="font-semibold text-lg text-gray-700 mb-2">Customer Information</h3>
-                <p className="text-sm text-gray-600"><strong>Name:</strong> {localBooking.Customer.First_Name} {localBooking.Customer.Last_Name} {localBooking.Customer.Suffix || ''}</p>
-                <p className="text-sm text-gray-600"><strong>Email:</strong> {localBooking.Customer.Email || 'N/A'}</p>
-                <p className="text-sm text-gray-600"><strong>Contact:</strong> {localBooking.Customer.Contact_Number || 'N/A'}</p>
-              </div>
-            </div>
+              {/* Right Column: Car Info & Payment Summary */}
+              <div className="space-y-4">
+                {/* Car Info */}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Car Information</h3>
+                  <p className="text-sm text-gray-600"><strong>Make:</strong> {localBooking.Car_Models.Manufacturer.Manufacturer_Name}</p>
+                  <p className="text-sm text-gray-600"><strong>Model:</strong> {localBooking.Car_Models.Model_Name}</p>
+                  <p className="text-sm text-gray-600"><strong>Year:</strong> {localBooking.Car_Models.Year_Model}</p>
+                </div>
 
-            {/* Right Column: Car Info & Payment Summary */}
-            <div className="space-y-4">
-              {/* Car Info */}
-              <div>
-                <h3 className="font-semibold text-lg text-gray-700 mb-2">Car Information</h3>
-                <p className="text-sm text-gray-600"><strong>Make:</strong> {localBooking.Car_Models.Manufacturer.Manufacturer_Name}</p>
-                <p className="text-sm text-gray-600"><strong>Model:</strong> {localBooking.Car_Models.Model_Name}</p>
-                <p className="text-sm text-gray-600"><strong>Year:</strong> {localBooking.Car_Models.Year_Model}</p>
-              </div>
+                {/* Car Image */}
+                <div>
+                  {localBooking.Car_Models.image ? (
+                    <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden">
+                      <Image
+                        src={localBooking.Car_Models.image}
+                        alt={`${localBooking.Car_Models.Manufacturer.Manufacturer_Name} ${localBooking.Car_Models.Model_Name}`}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="rounded-md"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-40 border border-gray-300 rounded-md flex items-center justify-center bg-gray-50 text-gray-400">
+                      No Image Available
+                    </div>
+                  )}
+                </div>
 
-              {/* Car Image */}
-              <div>
-                {localBooking.Car_Models.image ? (
-                  <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden">
-                    <Image
-                      src={localBooking.Car_Models.image}
-                      alt={`${localBooking.Car_Models.Manufacturer.Manufacturer_Name} ${localBooking.Car_Models.Model_Name}`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="rounded-md"
-                    />
+                {/* Payment Summary (Breakdown) */}
+                <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
+                  <h4 className="font-semibold text-md text-gray-700 mb-2">Payment Summary</h4>
+                  <div className="space-y-1 text-sm">
+                      <div className="flex justify-between text-gray-600">
+                          <span>Initial Total:</span>
+                          <span>P{initialTotal.toFixed(2)}</span>
+                      </div>
+                      {additionalHours > 0 && (
+                          <div className="flex justify-between text-red-600">
+                              <span>Late Fees ({additionalHours}hr):</span>
+                              <span>+ P{calculatedLateFees.toFixed(2)}</span>
+                          </div>
+                      )}
+                      <div className="flex justify-between text-gray-800 font-bold border-t border-gray-300 pt-1 mt-1">
+                          <span>Final Total:</span>
+                          <span>P{finalTotal.toFixed(2)}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
+                          <div className="text-gray-600">
+                              <strong>Status: </strong> 
+                              <span className={`${isPaid ? 'text-green-600' : 'text-red-600'}`}>{localBooking.Payment_Details?.payment_status || 'Not Paid'}</span>
+                          </div>
+                          {/* Mark as Paid Button */}
+                          {!isPaid && localBooking.date_returned && (
+                              <AsyncButton 
+                                  onClick={handleMarkPaid} 
+                                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                              >
+                                  Mark Paid
+                              </AsyncButton>
+                          )}
+                      </div>
+                      {localBooking.Payment_Details?.bf_reference_number && (
+                          <p className="text-xs text-gray-500 mt-1">Ref: {localBooking.Payment_Details.bf_reference_number}</p>
+                      )}
                   </div>
-                ) : (
-                  <div className="w-full h-40 border border-gray-300 rounded-md flex items-center justify-center bg-gray-50 text-gray-400">
-                    No Image Available
-                  </div>
-                )}
-              </div>
-
-              {/* Payment Summary (Breakdown) */}
-              <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
-                <h4 className="font-semibold text-md text-gray-700 mb-2">Payment Summary</h4>
-                <div className="space-y-1 text-sm">
-                    <div className="flex justify-between text-gray-600">
-                        <span>Initial Total:</span>
-                        <span>P{initialTotal.toFixed(2)}</span>
-                    </div>
-                    {additionalHours > 0 && (
-                        <div className="flex justify-between text-red-600">
-                            <span>Late Fees ({additionalHours}hr):</span>
-                            <span>+ P{calculatedLateFees.toFixed(2)}</span>
-                        </div>
-                    )}
-                    <div className="flex justify-between text-gray-800 font-bold border-t border-gray-300 pt-1 mt-1">
-                        <span>Final Total:</span>
-                        <span>P{finalTotal.toFixed(2)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
-                        <div className="text-gray-600">
-                            <strong>Status: </strong> 
-                            <span className={`${isPaid ? 'text-green-600' : 'text-red-600'}`}>{localBooking.Payment_Details?.payment_status || 'Not Paid'}</span>
-                        </div>
-                        {/* Mark as Paid Button */}
-                        {!isPaid && localBooking.date_returned && (
-                            <AsyncButton 
-                                onClick={handleMarkPaid} 
-                                className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
-                            >
-                                Mark Paid
-                            </AsyncButton>
-                        )}
-                    </div>
-                    {localBooking.Payment_Details?.bf_reference_number && (
-                        <p className="text-xs text-gray-500 mt-1">Ref: {localBooking.Payment_Details.bf_reference_number}</p>
-                    )}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-white flex flex-col md:flex-row justify-between items-center gap-3">
             {/* Left Side Actions (Extend) */}
-            <div>
+            <div className="w-full md:w-auto">
                 <AsyncButton
                   onClick={() => setIsExtendModalOpen(true)} 
                   disabled={isFinishing || !!localBooking.date_returned} 
-                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-green-400 disabled:opacity-50 text-gray-800"
+                  className="w-full md:w-auto px-4 py-2 bg-gray-200 rounded-md hover:bg-green-400 disabled:opacity-50 text-gray-800"
                 >
                   Extend
                 </AsyncButton>
             </div>
 
             {/* Right Side Actions (Close & Finish) */}
-            <div className="flex space-x-3">
-                <AsyncButton onClick={onClose} disabled={isFinishing} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+            <div className="flex gap-3 w-full md:w-auto">
+                <AsyncButton onClick={handleManualClose} disabled={isFinishing} className="flex-1 md:flex-none px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-center justify-center">
                     Close
                 </AsyncButton>
                 <AsyncButton 
                     onClick={handleFinish} 
                     disabled={!canFinish || isFinishing} 
-                    className="px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 md:flex-none px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-center justify-center"
                 >
                     Confirm Finish
                 </AsyncButton>
             </div>
           </div>
         </div>
-      </Modal>
+      </div>
 
       {/* Extend Modal */}
       {isExtendModalOpen && (

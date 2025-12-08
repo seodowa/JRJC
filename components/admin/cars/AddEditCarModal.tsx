@@ -50,6 +50,38 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
 
   const isEditMode = !!carToEdit;
 
+  // Handle browser history for "swipe to back" support
+  useEffect(() => {
+    if (isOpen) {
+      // Push a new state so the "back" action closes the modal instead of leaving the page
+      window.history.pushState({ modalOpen: true }, '', window.location.href);
+
+      const handlePopState = () => {
+        // If the user swipes back or clicks browser back, this fires.
+        // The state is already popped, so we just close the modal.
+        onClose();
+      };
+
+      window.addEventListener('popstate', handlePopState);
+
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [isOpen]); // We depend on isOpen so this runs when modal opens
+
+  // Wrapper for manual close actions (Cancel/Confirm buttons)
+  const handleManualClose = () => {
+    // We need to go back in history to remove the state we pushed.
+    // triggering 'history.back()' will fire 'popstate', which calls 'onClose()'.
+    // However, to be safe and avoid loops if logic changes, we can just:
+    // 1. Check if we pushed state (we assume yes if open)
+    // 2. Go back.
+    if (isOpen) {
+        window.history.back();
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       if (isEditMode && carToEdit) {
@@ -119,7 +151,8 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
       } else {
         await createCar(formData, imageFile);
       }
-      onClose();
+      // Success! Now close.
+      handleManualClose(); 
     } catch (error) {
       console.error('Failed to save car:', error);
     } finally {
@@ -141,137 +174,154 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-        {/* Changed max-w-5xl to max-w-4xl and p-8 to p-6 */}
-        <form onSubmit={handleSubmit} className="relative bg-white p-6 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 md:p-4">
+        {/* 
+            Changed layout strategy:
+            - h-full w-full (mobile) -> md:h-auto md:max-h-[90vh] md:max-w-4xl (desktop)
+            - flex flex-col to enable internal scrolling
+        */}
+        <form 
+            onSubmit={handleSubmit} 
+            className="relative bg-white md:rounded-2xl shadow-2xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col"
+        >
           
-          <h2 className="text-xl font-bold text-gray-800 mb-4">{isEditMode ? 'Edit Car' : 'Add Car'}</h2>
+          {/* Header - Fixed at top */}
+          <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
+             <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit Car' : 'Add Car'}</h2>
+             {/* Close button for mobile accessibility/clarity */}
+             <button type="button" onClick={handleManualClose} className="md:hidden text-gray-500 p-2">
+               <span className="text-2xl">&times;</span>
+             </button>
+          </div>
           
-          {/* Changed gap-8 to gap-6 */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            
-            {/* Left Side: Image Uploader - Adjusted width to w-64 (approx 256px) */}
-            <div className="w-full lg:w-64 flex-shrink-0">
-              <div 
-                onClick={handleImageClick}
-                className="w-full aspect-square bg-[#e0e0e0] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden relative hover:opacity-90 transition-opacity"
-              >
-                {imagePreview ? (
-                  <Image src={imagePreview} alt="Car preview" fill className="object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-gray-400">
-                    <CarPlaceholderIcon className="w-20 h-20 mb-2" />
-                  </div>
-                )}
-                <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-              </div>
-            </div>
-
-            {/* Right Side: Form Fields */}
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-              
-              {/* Column 1: Details - Reduced space-y */}
-              <div className="space-y-3">
-                <div>
-                  <Label>Brand:</Label>
-                  <select name="brand" value={formData.brand || ''} onChange={handleInputChange} className={inputClassName}>
-                    <option value="" disabled>Select Brand</option>
-                    {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
-                  </select>
-                </div>
+          {/* Scrollable Body - Takes remaining space */}
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            {/* Changed gap-8 to gap-6 */}
+            <div className="flex flex-col lg:flex-row gap-6">
                 
-                <div>
-                  <Label>Model:</Label>
-                  <input type="text" name="model" value={formData.model || ''} onChange={handleInputChange} className={inputClassName} />
-                </div>
-
-                <div>
-                  <Label>Year Model:</Label>
-                  <input type="number" name="year" value={formData.year || ''} onChange={handleInputChange} className={inputClassName} />
-                </div>
-
-                <div>
-                  <Label>Number of Car Seats:</Label>
-                  <input type="number" name="seats" value={formData.seats || ''} onChange={handleInputChange} className={inputClassName} />
-                </div>
-
-                <div>
-                  <Label>Transmission:</Label>
-                  <select name="transmission" value={formData.transmission || ''} onChange={handleInputChange} className={inputClassName}>
-                    {transmissionTypes.map(type => <option key={type} value={type}>{type}</option>)}
-                  </select>
-                </div>
-
-                <div>
-                  <Label>Fuel Type:</Label>
-                  <select name="fuelType" value={formData.fuelType || ''} onChange={handleInputChange} className={inputClassName}>
-                    {fuelTypes.map(type => <option key={type} value={type}>{type}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {/* Column 2: Color & Pricing - Reduced space-y */}
-              <div className="space-y-4">
-                
-                {/* Color Picker */}
-                <div>
-                  <Label>Color:</Label>
-                  <button 
-                    type="button" 
-                    onClick={() => setIsColorPickerOpen(true)} 
-                    className={`${inputClassName} flex items-center gap-2 text-left bg-white`}
-                  >
-                    <div className="w-5 h-5 rounded-full bg-blue-300 flex items-center justify-center text-white">
-                        <Palette size={12} /> 
+                {/* Left Side: Image Uploader - Adjusted width to w-64 (approx 256px) */}
+                <div className="w-full lg:w-64 flex-shrink-0">
+                <div 
+                    onClick={handleImageClick}
+                    className="w-full aspect-square bg-[#e0e0e0] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden relative hover:opacity-90 transition-opacity"
+                >
+                    {imagePreview ? (
+                    <Image src={imagePreview} alt="Car preview" fill className="object-cover" />
+                    ) : (
+                    <div className="flex flex-col items-center justify-center text-gray-400">
+                        <CarPlaceholderIcon className="w-20 h-20 mb-2" />
                     </div>
-                    <span className="flex-grow text-gray-600 font-medium text-xs">
-                        {formData.color || '#FFFFFF'}
-                    </span>
-                    <div 
-                      className="w-4 h-4 rounded-full border border-gray-200" 
-                      style={{ backgroundColor: formData.color || '#FFFFFF' }}
-                    />
-                  </button>
+                    )}
+                    <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+                </div>
                 </div>
 
-                {/* Pricing Section */}
-                <div className="space-y-2">
-                  <h3 className="font-bold text-sm text-gray-800">Pricing</h3>
-                  
-                  {locations.map(location => (
-                    <div key={location}>
-                      <Label>{location}:</Label>
-                      <div className="flex gap-2">
-                        {location !== "Outside Region 10" && (
-                          <input 
-                            type="number" 
-                            placeholder="₱/12h"
-                            value={formData.price?.find(p => p.Location === location)?.Price_12_Hours || ''}
-                            onChange={(e) => handlePriceChange(location, 'Price_12_Hours', e.target.value)}
-                            className={`${inputClassName} placeholder-gray-400`}
-                          />
-                        )}
-                        <input 
-                          type="number" 
-                          placeholder="₱/24h"
-                          value={formData.price?.find(p => p.Location === location)?.Price_24_Hours || ''}
-                          onChange={(e) => handlePriceChange(location, 'Price_24_Hours', e.target.value)}
-                          className={`${inputClassName} placeholder-gray-400`}
+                {/* Right Side: Form Fields */}
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                
+                {/* Column 1: Details - Reduced space-y */}
+                <div className="space-y-3">
+                    <div>
+                    <Label>Brand:</Label>
+                    <select name="brand" value={formData.brand || ''} onChange={handleInputChange} className={inputClassName}>
+                        <option value="" disabled>Select Brand</option>
+                        {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
+                    </select>
+                    </div>
+                    
+                    <div>
+                    <Label>Model:</Label>
+                    <input type="text" name="model" value={formData.model || ''} onChange={handleInputChange} className={inputClassName} />
+                    </div>
+
+                    <div>
+                    <Label>Year Model:</Label>
+                    <input type="number" name="year" value={formData.year || ''} onChange={handleInputChange} className={inputClassName} />
+                    </div>
+
+                    <div>
+                    <Label>Number of Car Seats:</Label>
+                    <input type="number" name="seats" value={formData.seats || ''} onChange={handleInputChange} className={inputClassName} />
+                    </div>
+
+                    <div>
+                    <Label>Transmission:</Label>
+                    <select name="transmission" value={formData.transmission || ''} onChange={handleInputChange} className={inputClassName}>
+                        {transmissionTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                    </select>
+                    </div>
+
+                    <div>
+                    <Label>Fuel Type:</Label>
+                    <select name="fuelType" value={formData.fuelType || ''} onChange={handleInputChange} className={inputClassName}>
+                        {fuelTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                    </select>
+                    </div>
+                </div>
+
+                {/* Column 2: Color & Pricing - Reduced space-y */}
+                <div className="space-y-4">
+                    
+                    {/* Color Picker */}
+                    <div>
+                    <Label>Color:</Label>
+                    <button 
+                        type="button" 
+                        onClick={() => setIsColorPickerOpen(true)} 
+                        className={`${inputClassName} flex items-center gap-2 text-left bg-white`}
+                    >
+                        <div className="w-5 h-5 rounded-full bg-blue-300 flex items-center justify-center text-white">
+                            <Palette size={12} /> 
+                        </div>
+                        <span className="flex-grow text-gray-600 font-medium text-xs">
+                            {formData.color || '#FFFFFF'}
+                        </span>
+                        <div 
+                        className="w-4 h-4 rounded-full border border-gray-200" 
+                        style={{ backgroundColor: formData.color || '#FFFFFF' }}
                         />
-                      </div>
+                    </button>
                     </div>
-                  ))}
-                </div>
-              </div>
 
+                    {/* Pricing Section */}
+                    <div className="space-y-2">
+                    <h3 className="font-bold text-sm text-gray-800">Pricing</h3>
+                    
+                    {locations.map(location => (
+                        <div key={location}>
+                        <Label>{location}:</Label>
+                        <div className="flex gap-2">
+                            {location !== "Outside Region 10" && (
+                            <input 
+                                type="number" 
+                                placeholder="₱/12h"
+                                value={formData.price?.find(p => p.Location === location)?.Price_12_Hours || ''}
+                                onChange={(e) => handlePriceChange(location, 'Price_12_Hours', e.target.value)}
+                                className={`${inputClassName} placeholder-gray-400`}
+                            />
+                            )}
+                            <input 
+                            type="number" 
+                            placeholder="₱/24h"
+                            value={formData.price?.find(p => p.Location === location)?.Price_24_Hours || ''}
+                            onChange={(e) => handlePriceChange(location, 'Price_24_Hours', e.target.value)}
+                            className={`${inputClassName} placeholder-gray-400`}
+                            />
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+
+                </div>
             </div>
           </div>
 
-          {/* Footer Actions - Reduced margin and padding */}
-          <div className="flex justify-end gap-3 mt-6">
+          {/* Footer Actions - Fixed at bottom */}
+          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-white flex justify-end gap-3">
             <button 
               type="button" 
-              onClick={onClose} 
+              onClick={handleManualClose} 
               className="px-6 py-2 rounded-md text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 transition-colors"
             >
               Cancel
