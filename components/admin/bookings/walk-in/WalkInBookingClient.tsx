@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { WalkInBookingProvider, useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import WalkInBookingNavbar from './WalkInBookingNavbar';
 import PersonalInformationForm from './PersonalInformationForm';
@@ -9,7 +10,9 @@ import PaymentDetails from './PaymentDetails';
 import AsyncButton from "@/components/AsyncButton";
 
 const WalkInBookingLayout = () => {
+  const router = useRouter();
   const {
+    currentStep,
     setCurrentStep,
     showConfirm,
     setShowConfirm,
@@ -59,8 +62,25 @@ const WalkInBookingLayout = () => {
   const handleCancelConfirm = () => setShowConfirm(false);
 
   return (
-    <div className="flex h-full relative">
-      <div className="flex h-84 bg-white rounded-4xl">
+    <div className="flex flex-col md:flex-row h-full relative">
+      
+      {/* Mobile Header - Only visible on small screens */}
+      <div className="md:hidden bg-white p-4 shadow-sm flex items-center justify-between z-10 sticky top-0">
+        <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h1 className="font-bold text-lg text-gray-800">Walk-in Book</h1>
+        </div>
+        <div className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+            Step {currentStep} of 3
+        </div>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex h-full md:h-auto bg-white rounded-4xl mr-4">
         <WalkInBookingNavbar
           scrollToRef={scrollToRef}
           personalRef={personalRef}
@@ -68,17 +88,19 @@ const WalkInBookingLayout = () => {
           paymentRef={paymentRef}
         />
       </div>
-      <div className="flex-1 p-2 overflow-y-auto">
-        <div ref={personalRef}>
+
+      {/* Main Content Area */}
+      <div className="flex-1 p-2 md:p-4 overflow-y-auto">
+        <div ref={personalRef} className="mb-4">
           <PersonalInformationForm onNext={handleNextToRental} />
         </div>
-        <div ref={rentalRef}>
+        <div ref={rentalRef} className="mb-4">
           <RentalDetailsForm
             onBack={handleBackToPersonal}
             onNext={handleNextToPayment}
           />
         </div>
-        <div ref={paymentRef}>
+        <div ref={paymentRef} className="mb-20 md:mb-0">
           <PaymentDetails onBack={handleBackToRental} />
         </div>
       </div>
