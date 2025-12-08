@@ -24,7 +24,7 @@ const WalkInBookingNavbar = ({
   ];
 
   return (
-    <div className="hidden md:flex w-64 bg-white p-4 shadow-md flex-col justify-between rounded-2xl h-full">
+    <div className="hidden md:flex w-64 bg-white p-4 shadow-md flex-col justify-between rounded-2xl">
       <div>
         <h2 className="text-lg font-bold mb-4">Walk-in Book</h2>
         <nav>
