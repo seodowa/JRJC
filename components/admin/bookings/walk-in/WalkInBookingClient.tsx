@@ -80,7 +80,7 @@ const WalkInBookingLayout = () => {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex h-full md:h-auto bg-white rounded-4xl mr-4">
+      <div className="hidden md:flex md:h-fit bg-white rounded-4xl mr-4">
         <WalkInBookingNavbar
           scrollToRef={scrollToRef}
           personalRef={personalRef}
