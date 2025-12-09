@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     const updates: Record<string, any> = {
       Username: formData.username,
       Email: formData.email,
+      profile_image: formData.image,
     };
 
     if (formData.password && formData.password.trim() !== '') {

@@ -23,9 +23,23 @@ export async function POST(req: Request) {
     const fileBuffer = Buffer.from(arrayBuffer);
     const contentType = imageFile.type;
     const fileName = imageFile.name;
+    const category = formData.get('category') as string;
 
-    // 3. Generate unique path
-    const uniquePath = `${uuidv4()}-${fileName}`;
+    // 3. Generate unique path based on category
+    const fileExt = fileName.split('.').pop() || 'png';
+    let uniquePath = '';
+
+    if (category === 'profile') {
+        // Secure naming for profiles: identifiable by username but unique with UUID
+        // Folder: profiles/
+        uniquePath = `profiles/${session.user.username}-${uuidv4()}.${fileExt}`;
+    } else if (category === 'car') {
+        // Folder: cars/
+        uniquePath = `cars/${uuidv4()}-${fileName}`;
+    } else {
+        // Default / Legacy fallback
+        uniquePath = `misc/${uuidv4()}-${fileName}`;
+    }
 
     // 4. Upload to Supabase Storage using the admin client
     // Note: Server-side image optimization (Sharp) is removed for Vercel Free Tier compatibility.

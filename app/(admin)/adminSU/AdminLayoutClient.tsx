@@ -12,8 +12,8 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
   
-  // UPDATE: Include 'email' in the state type definition
-  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+  // UPDATE: Include 'email' and 'profileImage' in the state type definition
+  const [user, setUser] = useState<{ username: string; email: string; profileImage?: string | null } | null>(null);
   
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
@@ -39,6 +39,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           setUser({
             username: data.user.username,
             email: data.user.email || '', // Fallback to empty string if missing
+            profileImage: data.user.profileImage || null,
           });
         } else {
           setUser(null);

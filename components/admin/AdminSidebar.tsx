@@ -11,7 +11,7 @@ import LoadingSpinner from "./LoadingSpinner";
 interface AdminSidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (isCollapsed: boolean) => void;
-  user: { username: string } | null;
+  user: { username: string; profileImage?: string | null } | null;
   handleLogout: () => Promise<void>;
 }
 
@@ -32,7 +32,15 @@ const AdminSidebar = ({ isCollapsed, user, handleLogout }: AdminSidebarProps) =>
     >
     <div className="flex flex-col h-full ">
         <div className="flex flex-col items-center my-8">
-            <div className="w-36 h-36 rounded-full bg-gray-300 mb-4"></div>
+            {user?.profileImage ? (
+                <img 
+                    src={user.profileImage} 
+                    alt={user.username} 
+                    className="w-36 h-36 rounded-full object-cover mb-4 border border-gray-200"
+                />
+            ) : (
+                <div className="w-36 h-36 rounded-full bg-gray-300 mb-4"></div>
+            )}
             <div>
                 {user ? (
                     <span className="font-bold text-2xl justify-self-center">{user.username}</span>

@@ -2,15 +2,13 @@
 
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Pencil } from 'lucide-react';
-import { UserContext } from '@/app/(admin)/context/UserContext'; // Import Context directly
+import { UserContext } from '@/app/(admin)/context/UserContext';
 import { toast } from '@/components/toast/use-toast';
 import { updateAccountService } from '@/app/(admin)/services/updateAccountService';
 
 export default function SettingsPage() {
-  // 1. Consume the UserContext directly
   const user = useContext(UserContext);
-  console.log('User from context:', user);
-
+  
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -18,10 +16,10 @@ export default function SettingsPage() {
   });
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // Track selected file
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 2. Update form data when user context becomes available
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -29,6 +27,10 @@ export default function SettingsPage() {
         username: user.username || '',
         email: user.email || '', 
       }));
+      // Initialize profile image from user data
+      if (user.profileImage) {
+        setProfileImage(user.profileImage);
+      }
     }
   }, [user]);
 
@@ -56,6 +58,9 @@ export default function SettingsPage() {
         return;
       }
       
+      setSelectedFile(file); // Store file for upload on submit
+
+      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImage(reader.result as string);
@@ -78,10 +83,34 @@ export default function SettingsPage() {
     setIsLoading(true);
 
     try {
+      let finalImageUrl = user.profileImage; // Default to existing image
+
+      // 1. Upload new image if selected
+      if (selectedFile) {
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', selectedFile);
+        formDataUpload.append('category', 'profile');
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+
+        if (!uploadRes.ok) {
+           const err = await uploadRes.json();
+           throw new Error(err.error || 'Failed to upload image');
+        }
+
+        const { publicUrl } = await uploadRes.json();
+        finalImageUrl = publicUrl;
+      }
+
+      // 2. Update Account
       const result = await updateAccountService(user.username, {
         username: formData.username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        image: finalImageUrl
       });
 
       if (result.success) {
@@ -90,10 +119,8 @@ export default function SettingsPage() {
             description: "Your account settings have been saved successfully.",
         });
         
-        // Reload if critical info changed to refresh session
-        if (user.username !== formData.username || user.email !== formData.email) {
-             window.location.reload(); 
-        }
+        // Reload to refresh session and UI
+        window.location.reload(); 
       } else {
         throw new Error(result.message);
       }

@@ -27,7 +27,7 @@ export async function GET() {
     // We use the email from the cookie to find the real, current record in the DB
     const { data: account } = await supabaseAdmin
         .from('Accounts')
-        .select('Username, Email')
+        .select('Username, Email, profile_image')
         .eq('Email', session.user.email) 
         .single();
 
@@ -37,7 +37,8 @@ export async function GET() {
             user: {
                 ...session.user, // Keep other session properties (like ID, role, etc.)
                 username: account.Username, // Use the fresh Username from DB
-                email: account.Email        // Use the fresh Email from DB
+                email: account.Email,        // Use the fresh Email from DB
+                profileImage: account.profile_image || null // Use the fresh Profile Image from DB
             }
         });
     }

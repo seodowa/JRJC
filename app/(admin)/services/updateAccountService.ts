@@ -2,6 +2,7 @@ export interface UpdateAccountData {
   username: string;
   email: string;
   password?: string;
+  image?: string | null;
 }
 
 export async function updateAccountService(currentUsername: string, formData: UpdateAccountData) {

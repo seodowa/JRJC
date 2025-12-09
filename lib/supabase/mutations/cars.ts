@@ -15,6 +15,7 @@ const handleApiRequest = async (
     if (imageFile) {
         const formData = new FormData();
         formData.append('file', imageFile);
+        formData.append('category', 'car');
 
         const uploadResponse = await fetch('/api/upload', {
             method: 'POST',
