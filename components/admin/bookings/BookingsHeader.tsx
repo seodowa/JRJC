@@ -45,7 +45,8 @@ const BookingsHeader = ({
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      {/* Changed to flex-row and justify-between for all screen sizes */}
+      <div className="flex flex-row justify-between items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">{view === 'history' ? 'Bookings History' : 'Manage Bookings'}</h1>
         {view === 'history' ? (
           <AsyncButton onClick={() => router.back()} className="px-4 py-2 shadow-sm bg-gray-200 rounded-md hover:bg-[#A1E3F9]">
