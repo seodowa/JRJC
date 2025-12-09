@@ -21,53 +21,18 @@ export async function POST(req: Request) {
   try {
     const arrayBuffer = await imageFile.arrayBuffer();
     const fileBuffer = Buffer.from(arrayBuffer);
-    let finalBuffer: Buffer = fileBuffer;
-    let contentType = imageFile.type;
-    let fileName = imageFile.name;
-
-    // Check if it's an image that needs conversion
-    // We preserve SVG and WebP. We convert other images to WebP.
-    const isSvg = contentType === 'image/svg+xml';
-    const isWebP = contentType === 'image/webp';
-    const isImage = contentType.startsWith('image/');
-
-    if (isImage && !isSvg && !isWebP) {
-      try {
-        // Dynamic import to prevent top-level load failures in serverless
-        const { default: sharp } = await import('sharp');
-        
-        finalBuffer = await sharp(fileBuffer)
-          .webp({ quality: 80 }) // Compress to 80% quality
-          .toBuffer();
-        
-        contentType = 'image/webp';
-        
-        // Update filename extension to .webp
-        const lastDotIndex = fileName.lastIndexOf('.');
-        const nameWithoutExt = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
-        fileName = `${nameWithoutExt}.webp`;
-        
-      } catch (conversionError: any) {
-        console.error('Image conversion failed:', conversionError);
-        // Fallback: If conversion fails, we upload the original file.
-        console.warn('Proceeding with original file due to conversion error.');
-        
-        // Capture error for debugging
-        return NextResponse.json({
-            publicUrl: await uploadOriginalFile(imageFile),
-            warning: 'Image optimization failed, used original file.',
-            debugError: conversionError.message || String(conversionError)
-        });
-      }
-    }
+    const contentType = imageFile.type;
+    const fileName = imageFile.name;
 
     // 3. Generate unique path
     const uniquePath = `${uuidv4()}-${fileName}`;
 
     // 4. Upload to Supabase Storage using the admin client
+    // Note: Server-side image optimization (Sharp) is removed for Vercel Free Tier compatibility.
+    // Images are uploaded in their original format.
     const { data, error: uploadError } = await supabaseAdmin.storage
       .from('images')
-      .upload(uniquePath, finalBuffer, {
+      .upload(uniquePath, fileBuffer, {
         cacheControl: '3600',
         upsert: false,
         contentType: contentType,
@@ -91,24 +56,4 @@ export async function POST(req: Request) {
     console.error('Upload processing error:', error);
     return NextResponse.json({ error: 'Internal server error during upload processing' }, { status: 500 });
   }
-}
-
-// Helper to handle the fallback upload cleanly to avoid duplicate code
-async function uploadOriginalFile(file: File) {
-    const { supabaseAdmin } = await import('@/utils/supabase/admin');
-    const { v4: uuidv4 } = await import('uuid');
-    const uniquePath = `${uuidv4()}-${file.name}`;
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    
-    const { data, error } = await supabaseAdmin.storage
-        .from('images')
-        .upload(uniquePath, fileBuffer, {
-            cacheControl: '3600',
-            upsert: false,
-            contentType: file.type,
-        });
-        
-    if (error) throw new Error(error.message);
-    const { data: { publicUrl } } = supabaseAdmin.storage.from('images').getPublicUrl(data.path);
-    return publicUrl;
 }
