@@ -119,7 +119,8 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
           {view === 'list' && (
             <motion.div
               // Reduced width from w-[320px] to w-[260px] to give more space to the list
-              className={`relative w-full md:w-[260px] flex-shrink-0 p-6 ${cardBaseStyle} flex flex-col max-h-[40vh] md:max-h-none`}
+              // ADDED: hidden md:flex to prevent flash on mobile
+              className={`hidden md:flex relative md:w-[260px] flex-shrink-0 p-6 ${cardBaseStyle} flex-col max-h-[40vh] md:max-h-none`}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
