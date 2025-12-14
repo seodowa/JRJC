@@ -4,8 +4,14 @@ import "@/app/globals.css";
 import React from "react";
 import HamburgerIcon from "./icons/HamburgerIcon";
 import CloseIcon from "./icons/CloseIcon";
+import { useCMS } from "@/app/(client)/context/CMSContext"; // Import useCMS
 
 export default function NavigationBar() {
+    const { getImage } = useCMS(); // Use the hook to get CMS functions
+
+    // Fetch logo URL from CMS
+    const navLogoUrl = getImage('navigation', 'logo', '/images/jrjc_logo.png');
+
     // Mapping of navigation item names to their corresponding anchor IDs
     const navigationLinks = {
         "Booking Tracker": "/tracker", // Assuming this doesn't scroll to a section
@@ -18,7 +24,7 @@ export default function NavigationBar() {
         <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
                            bg-[rgba(255,255,255,0.15)] md:backdrop-blur-lg z-50 overflow-hidden">
             <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50 text-lg font-main-font">
-                <a className="mr-auto" href="/"><img src="/images/jrjc_logo.png" alt="" className="max-h-10"/></a>
+                <a className="mr-auto" href="/"><img src={navLogoUrl} alt="JRJC Logo" className="max-h-10"/></a>
                 <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
                 <label htmlFor="sidebar-active" className="md:hidden">
                     <HamburgerIcon />

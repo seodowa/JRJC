@@ -14,6 +14,7 @@ import { createBooking } from "@/lib/supabase/mutations/createBooking";
 import BookingCalendar from "@/components/BookingCalendar";
 import { sendBookingConfirmationService } from "@/app/services/bookingService";
 import { createClient } from "@/utils/supabase/client"; 
+import { useCMS } from "@/app/(client)/context/CMSContext";
 
 interface PersonalInfo {
   firstName: string;
@@ -37,6 +38,7 @@ interface PaymentInfo {
 }
 
 const BookingPage: React.FC = () => {
+  const { getNumber } = useCMS();
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -124,8 +126,8 @@ const BookingPage: React.FC = () => {
 
     try {
       const { totalPrice: initialRentalCost } = calculateRentalDetails(); 
-      const bookingFee = 500;
-      const carWashFee = 300;
+      const bookingFee = getNumber('fees', 'booking_fee', 500);
+      const carWashFee = getNumber('fees', 'car_wash_fee', 300);
       const initialTotalPayment = bookingFee + carWashFee + (initialRentalCost || 0);
       const totalPayment = initialTotalPayment;
 
@@ -500,8 +502,8 @@ const BookingPage: React.FC = () => {
           </div>
         );
       case 3:
-        const bookingFee = 500;
-        const carWashFee = 300;
+        const bookingFee = getNumber('fees', 'booking_fee', 500);
+        const carWashFee = getNumber('fees', 'car_wash_fee', 300);
         const initialPayment = totalPrice || 0;
         const totalPayment = bookingFee + carWashFee + initialPayment;
 

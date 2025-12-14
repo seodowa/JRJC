@@ -10,10 +10,12 @@ import { formatDate, formatTime } from '@/utils/dateUtils';
 import { createWalkInBookingService } from '@/app/(admin)/services/adminBookingService';
 import { sendBookingConfirmationService } from '@/app/services/bookingService';
 import { WalkInBookingContextType } from '@/types/walkInBookingContext';
+import { useCMS } from "@/app/(client)/context/CMSContext";
 
 const WalkInBookingContext = createContext<WalkInBookingContextType | undefined>(undefined);
 
 export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => {
+  const { getNumber } = useCMS();
   const [personalInfo, setPersonalInfo] = useState<BookingData['personalInfo']>({
     firstName: "",
     lastName: "",
@@ -205,8 +207,8 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     setSubmitError(null);
     try {
       const { totalPrice: initialRentalCost } = calculateRentalDetails(); 
-      const bookingFeeVal = 500; 
-      const carWashFeeVal = 300; 
+      const bookingFeeVal = getNumber('fees', 'booking_fee', 500);
+      const carWashFeeVal = getNumber('fees', 'car_wash_fee', 300); 
       const initialTotalPaymentVal = bookingFeeVal + carWashFeeVal + initialRentalCost; 
       const totalPaymentVal = initialTotalPaymentVal; 
 
