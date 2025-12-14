@@ -135,11 +135,13 @@ export const sendBookingConfirmationService = async (
   firstName: string,
   email: string,
   mobileNumber: string,
-  bfReferenceNumber: string, // Changed from referenceNumber
-  notificationType: string // Changed from strict union to string to allow "SMS, Email"
+  bfReferenceNumber: string,
+  notificationType: string
 ): Promise<{ success: boolean; error?: any }> => {
   try {
-    const message = `Hi ${firstName}, your booking (ID: ${bookingId}) is currently ${status}. Total: P${totalAmount}. Ref: ${bfReferenceNumber}. We will notify you once confirmed!`;
+    // UPDATED: SMS Message with reminders
+    const message = `Hi ${firstName}, booking (ID: ${bookingId}) received. Status: ${status}. Total: P${totalAmount}. Ref: ${bfReferenceNumber}. Reminders: Booking fee is non-refundable. Keep posted and we will notify you once confirmed.`;
+    
     const subject = "Booking Confirmation";
 
     let formattedNumber = mobileNumber;
@@ -160,20 +162,30 @@ export const sendBookingConfirmationService = async (
       );
     } 
     
-    // 2. Check if Email is requested (Independent check, allows both)
+    // 2. Check if Email is requested
     if (notificationType.includes('Email')) {
+      // UPDATED: Email HTML with Reminders section
       const html = `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Booking Confirmation</h2>
+          <h2 style="color: #333;">Booking Received</h2>
           <p>Hi ${firstName},</p>
           <p>Thank you for your booking. We have received your request.</p>
+          
           <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p style="margin: 5px 0;"><strong>Booking ID:</strong> ${bookingId}</p>
             <p style="margin: 5px 0;"><strong>Status:</strong> ${status}</p>
             <p style="margin: 5px 0;"><strong>Total Amount:</strong> P${totalAmount}</p>
             <p style="margin: 5px 0;"><strong>Reference Number:</strong> ${bfReferenceNumber}</p>
           </div>
-          <p>We will review your booking and notify you once it is confirmed.</p>
+
+          <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
+            <p style="font-weight: bold; color: #555;">Reminders:</p>
+            <ul style="color: #666; padding-left: 20px;">
+                <li style="margin-bottom: 5px;">Booking fee is non-refundable.</li>
+                <li>Keep posted and we will notify you once the booking has been confirmed.</li>
+            </ul>
+          </div>
+
           <br/>
           <p>Thank you!</p>
         </div>
@@ -194,7 +206,6 @@ export const sendBookingConfirmationService = async (
     return { success: true };
   } catch (error) {
     console.error("Confirmation Send Error:", error);
-    // Return success: false, but in a real app you might want to know *which* failed
     return { success: false, error };
   }
 };

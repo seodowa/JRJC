@@ -327,16 +327,11 @@ const BookingPage: React.FC = () => {
     let newEndDate = "";
 
     if (rentalInfo.duration === "12 hours") {
-      // 12 hours: Calculate exactly 12h from start.
-      // Automatically reverts to same day if start time allows (e.g., 8am -> 8pm)
-      // Or sets next day if overnight (e.g., 8pm -> 8am)
       newEndDate = start.add(12, 'hour').format('YYYY-MM-DD');
     } else if (rentalInfo.duration === "24 hours") {
-      // 24 hours: Calculate exactly 24h from start (Start + 1 Day)
       newEndDate = start.add(24, 'hour').format('YYYY-MM-DD');
     }
 
-    // Only update if the calculated end date differs from the current calendar selection
     if (newEndDate && newEndDate !== rentalInfo.endDate) {
       setRentalInfo(prev => ({ ...prev, endDate: newEndDate }));
     }
@@ -347,15 +342,10 @@ const BookingPage: React.FC = () => {
   useEffect(() => {
     if (rentalInfo.startDate && rentalInfo.endDate && rentalInfo.time) {
       const { hours, isOutsideRegion10, isSameDay, show12HourOption } = calculateRentalDetails();
-      const pickupHour = parseInt(rentalInfo.time.split(':')[0]);
-
-      // If manual dates are selected that imply a 24h cycle (Start != End), 
-      // AND it's not a multi-day trip (>48h), force duration to 24h if not set.
+      
       if (!rentalInfo.duration || hours > 48 || isSameDay) {
         if (isSameDay) {
-            // Logic for Same Day selection
             if (show12HourOption) {
-                 // Don't overwrite if user already selected 12h explicitly
                  if(rentalInfo.duration !== "12 hours") setRentalInfo(prev => ({ ...prev, duration: "12 hours" }));
             } else {
                  if(rentalInfo.duration !== "24 hours") setRentalInfo(prev => ({ ...prev, duration: "24 hours" }));
@@ -495,7 +485,6 @@ const BookingPage: React.FC = () => {
                   {rentalInfo.startDate && rentalInfo.time && rentalInfo.duration && (
                     <div className="text-xs text-gray-600 mt-1 space-y-1">
                       <div><span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}</div>
-                      {/* FIX: Use returnDate (calculated) instead of rentalInfo.endDate (calendar state) for display */}
                       <div><span className="font-medium">Return:</span> {formatDate(rentalInfo.endDate)} at {returnTime}</div>
                       <div><span className="font-medium">Duration:</span> {rentalInfo.duration}</div>
                       <div><span className="font-medium">Vehicle:</span> <span>{selectedCarData?.brand}</span> <span>{selectedCarData?.model}</span> <span>({selectedCarData?.year})</span> • {rentalInfo.area}</div>
@@ -522,7 +511,7 @@ const BookingPage: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   <div>
-                    <p className="text-sm text-gray-700 mb-4">Please scan the QR Code for GCash Payment and pay the booking fee. For the <strong>total payment</strong>, you may pay through face-to-face.</p>
+                    <p className="text-sm text-gray-700 mb-4">Please scan the QR Code for GCash Payment and pay the <strong>booking fee only.</strong> For the <strong>total payment</strong>, you may pay through face-to-face.</p>
                     <div className="space-y-2 mb-4">
                       <p className="text-sm text-gray-700"><strong>Booking Fee:</strong> ₱{bookingFee}</p>
                       <p className="text-sm text-gray-700"><strong>Cost Breakdown:</strong> ₱{initialPayment} (Rental) + ₱{carWashFee} (Car Wash)</p>
@@ -550,7 +539,8 @@ const BookingPage: React.FC = () => {
                   {bookingSuccess ? (
                     <div className="text-center">
                       <div className="text-green-500 text-4xl mb-4">✓</div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Booking Confirmed!</h2>
+                      {/* UPDATED: Success Title */}
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Booking Sent for Confirmation</h2>
                       <p className="text-sm text-gray-600 mb-4">Your booking has been successfully submitted. Redirecting...</p>
                     </div>
                   ) : (
@@ -559,6 +549,18 @@ const BookingPage: React.FC = () => {
                         {submitting ? "Submitting Booking..." : "Confirmation"}
                       </h2>
                       
+                      {/* UPDATED: Reminders Section */}
+                      {!submitting && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
+                           <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wide mb-1">Reminders</h4>
+                           <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside">
+                             <li>Make sure all your details are correct.</li>
+                             <li>Booking fee is <strong>non-refundable</strong>.</li>
+                             <li>Your booking will be reviewed and you will be notified when it is confirmed.</li>
+                           </ul>
+                        </div>
+                      )}
+
                       {submitError && (
                         <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
                           <p className="text-sm text-red-600">{submitError}</p>
