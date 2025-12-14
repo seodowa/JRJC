@@ -1,6 +1,6 @@
-// proxy.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { decrypt } from '@/lib'; // Import your decrypt function
+import { ALLOWED_ADMIN_ROLES } from '@/lib/auth-config';
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -32,9 +32,12 @@ export async function proxy(request: NextRequest) {
     }
 
     // Optional: Check user role for admin routes
-    if (pathname.startsWith('/adminSU/dashboard')) {
-      const userRole = session.user.account_type;
-      
+    if (pathname.startsWith('/adminSU') && pathname !== '/adminSU') { 
+      const userAccountType = session.user.account_type;
+      if (!ALLOWED_ADMIN_ROLES.includes(userAccountType)) {
+        // Redirect if not an allowed admin role
+        return NextResponse.redirect(new URL('/adminSU', request.url));
+      }
     }
 
     // Valid session — continue

@@ -2,6 +2,7 @@ import AdminLoginForm from "../../../components/admin/AdminLoginForm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decrypt } from "@/lib";
+import { ALLOWED_ADMIN_ROLES } from "@/lib/auth-config";
 
 export default async function AdminSU() {
   const cookieStore = await cookies();
@@ -17,7 +18,10 @@ export default async function AdminSU() {
   }
 
   if (session && new Date() < new Date(session.expires)) {
-    redirect("/adminSU/dashboard");
+    // Only redirect if the user is an admin
+    if (ALLOWED_ADMIN_ROLES.includes(session.user.account_type)) {
+      redirect("/adminSU/dashboard");
+    }
   }
 
   return (

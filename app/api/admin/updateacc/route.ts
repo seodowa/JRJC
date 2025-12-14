@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js'; // Use direct client for A
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
+import bcrypt from 'bcryptjs';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (formData.password && formData.password.trim() !== '') {
-      updates.Password = formData.password;
+      updates.Password = await bcrypt.hash(formData.password, 10);
     }
 
     // CHANGE 2: Use supabaseAdmin to perform the update

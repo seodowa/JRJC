@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { encrypt } from '@/lib';
@@ -8,15 +7,20 @@ import { createHash } from 'crypto';
 
 export async function POST(req: Request) {
   const { username, otp, trustDevice } = await req.json();
-  const supabase = await createClient();
+  // We don't need the standard client for this privileged query anymore
+  // const supabase = await createClient(); 
 
-  const { data: user, error } = await supabase
+  // Use supabaseAdmin to bypass RLS for this privileged operation
+  // This ensures we can join Account_Type even if RLS hides it from anon
+  const { data: user, error } = await supabaseAdmin
     .from('Accounts')
-    .select('"ID", "Username", "Email", "Account_Type", "verification_token", "verification_token_expires_at"')
+    .select(`"ID", "Username", "Email", Account_Type!fk_accounts_account_type (type), "verification_token", "verification_token_expires_at"`)
     .eq('"Username"', username)
     .maybeSingle();
 
   if (error || !user) {
+    // In production, you might want to log the error internally but return a generic message
+    console.error("Login Error:", error);
     return NextResponse.json({ error: 'Invalid user.' }, { status: 401 });
   }
 
@@ -24,6 +28,15 @@ export async function POST(req: Request) {
 
   if (user.verification_token !== hashedOtp || new Date(user.verification_token_expires_at) < new Date()) {
     return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401 });
+  }
+
+  // Safe access for Account_Type with fallback
+  // Cast user to any because the generated types might not yet reflect the explicit join alias perfectly
+  const userAny = user as any;
+  const accountType = userAny.Account_Type?.type || 'unknown';
+
+  if (accountType === 'unknown') {
+      console.warn(`User ${user.Username} has no resolvable Account_Type. Defaulting to 'unknown'.`);
   }
 
   // Create session
@@ -34,7 +47,7 @@ export async function POST(req: Request) {
       id: user.ID,
       username: user.Username,
       email: user.Email,
-      account_type: user.Account_Type,
+      account_type: accountType,
     },
     expires,
   });

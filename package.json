@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.57.4",
     "@types/nodemailer": "^7.0.2",
     "@types/react-color": "^3.0.13",
+    "bcryptjs": "^3.0.3",
     "dayjs": "^1.11.18",
     "framer-motion": "^12.23.24",
     "jose": "^6.1.0",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19",

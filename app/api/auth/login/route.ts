@@ -5,6 +5,8 @@ import { sendOtpEmail } from '@/lib/nodemailer(smtp)/email';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createHash } from 'crypto';
 
+import bcrypt from 'bcryptjs';
+
 export async function POST(req: Request) {
   const { username, password } = await req.json();
   const supabase = await createClient();
@@ -19,7 +21,11 @@ export async function POST(req: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  if (!user || user.Password !== password) {  // Capital 'P'
+
+  // Securely verify password using bcrypt
+  const isValidPassword = user && user.Password ? await bcrypt.compare(password, user.Password) : false;
+
+  if (!user || !isValidPassword) {
     return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
   }
 
