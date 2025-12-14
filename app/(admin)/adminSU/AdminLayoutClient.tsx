@@ -14,8 +14,8 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
   
-  // UPDATE: Include 'id', 'email', and 'profileImage' in the state type definition
-  const [user, setUser] = useState<{ id?: number; username: string; email: string; profileImage?: string | null } | null>(null);
+  // UPDATE: Include 'id', 'email', 'profileImage', and 'account_type' in the state type definition
+  const [user, setUser] = useState<{ id?: number; username: string; email: string; profileImage?: string | null; account_type: string } | null>(null);
   
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
@@ -45,6 +45,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
             username: data.user.username,
             email: data.user.email || '', // Fallback to empty string if missing
             profileImage: data.user.profileImage || null,
+            account_type: data.user.account_type,
           });
         } else {
           // If the response is not OK (e.g., 401 Unauthorized from our getSession check),

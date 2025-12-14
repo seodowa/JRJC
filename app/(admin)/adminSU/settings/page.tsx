@@ -5,6 +5,7 @@ import { Pencil } from 'lucide-react';
 import { UserContext } from '@/app/(admin)/context/UserContext';
 import { toast } from '@/components/toast/use-toast';
 import { updateAccountService } from '@/app/(admin)/services/updateAccountService';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const user = useContext(UserContext);
@@ -143,12 +144,21 @@ export default function SettingsPage() {
       <div className="w-full md:w-64 bg-white rounded-3xl p-6 shadow-sm h-fit">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Settings</h2>
         
-        <nav>
+        <nav className="space-y-2">
           <button 
             className="w-full text-left px-6 py-3 rounded-xl bg-sky-200 text-gray-800 font-medium transition-colors"
           >
             Account
           </button>
+          
+          {user?.account_type === 'owner' && (
+            <Link 
+              href="/adminSU/cms" 
+              className="block w-full text-left px-6 py-3 rounded-xl text-gray-600 hover:bg-gray-100 font-medium transition-colors"
+            >
+              Content Management
+            </Link>
+          )}
         </nav>
       </div>
 
