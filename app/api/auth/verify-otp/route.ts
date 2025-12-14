@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   // This ensures we can join Account_Type even if RLS hides it from anon
   const { data: user, error } = await supabaseAdmin
     .from('Accounts')
-    .select(`"ID", "Username", "Email", Account_Type!fk_accounts_account_type (type), "verification_token", "verification_token_expires_at"`)
+    .select(`"ID", "Username", "Email", "profile_image", Account_Type!fk_accounts_account_type (type), "verification_token", "verification_token_expires_at"`)
     .eq('"Username"', username)
     .maybeSingle();
 
@@ -47,6 +47,7 @@ export async function POST(req: Request) {
       id: user.ID,
       username: user.Username,
       email: user.Email,
+      profileImage: user.profile_image,
       account_type: accountType,
     },
     expires,
