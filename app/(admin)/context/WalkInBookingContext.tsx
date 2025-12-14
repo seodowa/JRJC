@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import dayjs, { Dayjs } from 'dayjs';
 import { Car, BookingData } from "@/types";
 import { useCarPricing } from '@/hooks/useCarPricing';
+import { useRentalCalculation } from '@/hooks/useRentalCalculation';
 import { useToast } from "@/components/toast/use-toast";
 import { formatDate, formatTime } from '@/utils/dateUtils';
 import { createWalkInBookingService } from '@/app/(admin)/services/adminBookingService';
@@ -57,6 +58,10 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
   const { toast } = useToast();
   const router = useRouter();
 
+  // Get Dynamic Fees
+  const bookingFee = getNumber('fees', 'booking_fee', 500);
+  const carWashFee = getNumber('fees', 'car_wash_fee', 300);
+
   // Handle Notification Toggles
   const handleNotificationToggle = (type: string) => {
     setNotificationPreferences((prev) => {
@@ -68,81 +73,7 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     });
   };
 
-  const calculateRentalDetails = useCallback(() => {
-    if (!rentalInfo.startDate || !rentalInfo.endDate || !rentalInfo.time) {
-      return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false, isSameDay: false, twelveHourPrice: 0, twentyFourHourPrice: 0, multiDayPrice: 0 };
-    }
-
-    const isOutsideRegion10 = rentalInfo.area === "Outside Region 10";
-    const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
-    const endDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
-    const isSameDay = rentalInfo.startDate === rentalInfo.endDate;
-
-    const timeDiff = endDateTime.getTime() - startDateTime.getTime();
-    let hours = Math.ceil(timeDiff / (1000 * 3600));
-
-    if (hours <= 0 && !isSameDay) {
-        return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false, isSameDay: false, twelveHourPrice: 0, twentyFourHourPrice: 0, multiDayPrice: 0 };
-    }
-
-    const days = Math.ceil(hours / 24);
-    const pickupHour = parseInt(rentalInfo.time.split(':')[0]);
-
-    const show12HourOption = 
-        (!isOutsideRegion10 && hours <= 24 && hours > 0) || 
-        (!isOutsideRegion10 && isSameDay && pickupHour < 12);
-
-    const show24HourOption = (hours <= 24) || isSameDay;
-
-    const twelveHourPrice = calculatePrice(rentalInfo.area, "12 hours");
-    const twentyFourHourPrice = calculatePrice(rentalInfo.area, "24 hours");
-    const multiDayPrice = days * twentyFourHourPrice;
-
-    let totalPrice = 0;
-
-    if (rentalInfo.duration === "12 hours") {
-      totalPrice = twelveHourPrice;
-    } else if (rentalInfo.duration === "24 hours") {
-      totalPrice = twentyFourHourPrice;
-    } else if (rentalInfo.duration?.includes("days")) {
-      totalPrice = multiDayPrice;
-    } else {
-      if (rentalInfo.duration === "") {
-         totalPrice = 0;
-      } else {
-        if (hours <= 12 && show12HourOption) totalPrice = twelveHourPrice;
-        else if (hours <= 24) totalPrice = twentyFourHourPrice;
-        else totalPrice = multiDayPrice;
-      }
-    }
-
-    return { 
-      hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10, isSameDay
-    };
-  }, [rentalInfo, calculatePrice]);
-
-  const calculateReturnTime = useCallback(() => {
-    if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) return { returnDate: "", returnTime: "" };
-    
-    const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
-    let returnDateTime;
-
-    if (rentalInfo.duration === "12 hours") {
-        returnDateTime = new Date(startDateTime.getTime() + (12 * 60 * 60 * 1000));
-    } else if (rentalInfo.duration === "24 hours") {
-        returnDateTime = new Date(startDateTime.getTime() + (24 * 60 * 60 * 1000));
-    } else if (rentalInfo.duration?.includes("days")) {
-      const days = parseInt(rentalInfo.duration);
-      returnDateTime = new Date(startDateTime.getTime() + (days * 24 * 60 * 60 * 1000));
-    } else {
-        returnDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
-    }
-    
-    return { 
-        returnDate: returnDateTime.toISOString().split('T')[0], 
-        returnTime: formatTime(returnDateTime.toTimeString().slice(0, 5)) 
-    };
-  }, [rentalInfo]);
+  const { calculateRentalDetails, calculateReturnTime } = useRentalCalculation({ rentalInfo, calculatePrice });
 
   // --- EFFECT 1: Sync End Date with Duration Selection ---
   useEffect(() => {
@@ -332,8 +263,10 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     calculateRentalDetails,
     calculateReturnTime,
     showConfirm, setShowConfirm,
-    notificationPreferences, setNotificationPreferences, // Export state
-    handleNotificationToggle // Export handler
+    notificationPreferences, setNotificationPreferences,
+    handleNotificationToggle,
+    bookingFee,
+    carWashFee
   };
 
   return (

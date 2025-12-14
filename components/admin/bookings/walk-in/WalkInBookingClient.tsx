@@ -22,7 +22,9 @@ const WalkInBookingLayout = () => {
     calculateRentalDetails,
     personalInfo,
     notificationPreferences,
-    handleNotificationToggle
+    handleNotificationToggle,
+    bookingFee,
+    carWashFee
   } = useWalkInBooking();
 
   const personalRef = useRef<HTMLDivElement>(null);
@@ -54,8 +56,6 @@ const WalkInBookingLayout = () => {
   };
 
   const { totalPrice } = calculateRentalDetails();
-  const bookingFee = 500;
-  const carWashFee = 300;
   const initialPayment = totalPrice || 0;
   const initialTotalPayment = bookingFee + carWashFee + initialPayment;
 

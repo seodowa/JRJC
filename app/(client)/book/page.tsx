@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import InputField from "@/components/InputField";
 import SelectCar from "@/components/SelectCar";
 import { useCarPricing } from "@/hooks/useCarPricing";
+import { useRentalCalculation } from "@/hooks/useRentalCalculation";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -247,77 +248,9 @@ const BookingPage: React.FC = () => {
     return `${displayHour}:${minutes} ${period}`;
   };
 
-  const calculateRentalDetails = () => {
-    if (!rentalInfo.startDate || !rentalInfo.endDate || !rentalInfo.time) {
-      return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false, isSameDay: false };
-    }
-
-    const isOutsideRegion10 = rentalInfo.area === "Outside Region 10";
-
-    const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
-    const endDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
-    
-    const isSameDay = rentalInfo.startDate === rentalInfo.endDate;
-
-    const timeDiff = endDateTime.getTime() - startDateTime.getTime();
-    let hours = Math.ceil(timeDiff / (1000 * 3600));
-
-    if (hours <= 0 && !isSameDay) {
-        return { hours: 0, days: 0, totalPrice: 0, show12HourOption: false, show24HourOption: false, isOutsideRegion10: false, isSameDay: false };
-    }
-
-    const days = Math.ceil(hours / 24);
-    
-    const pickupHour = parseInt(rentalInfo.time.split(':')[0]);
-
-    const show12HourOption = 
-        (!isOutsideRegion10 && hours <= 24 && hours > 0) || 
-        (!isOutsideRegion10 && isSameDay && pickupHour < 12);
-
-    const show24HourOption = (hours <= 24) || isSameDay;
-
-    const twelveHourPrice = calculatePrice(rentalInfo.area, "12 hours");
-    const twentyFourHourPrice = calculatePrice(rentalInfo.area, "24 hours");
-    const multiDayPrice = days * twentyFourHourPrice;
-
-    let totalPrice = 0;
-
-    if (rentalInfo.duration === "12 hours") {
-      totalPrice = twelveHourPrice;
-    } else if (rentalInfo.duration === "24 hours") {
-      totalPrice = twentyFourHourPrice;
-    } else if (rentalInfo.duration?.includes("days")) {
-      totalPrice = multiDayPrice;
-    } else {
-      if (rentalInfo.duration === "") {
-         totalPrice = 0;
-      } else {
-        if (hours <= 12 && show12HourOption) totalPrice = twelveHourPrice;
-        else if (hours <= 24) totalPrice = twentyFourHourPrice;
-        else totalPrice = multiDayPrice;
-      }
-    }
-
-    return { 
-      hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10, isSameDay
-    };
-  };
+  const { calculateRentalDetails, calculateReturnTime } = useRentalCalculation({ rentalInfo, calculatePrice });
 
   const { hours, days, totalPrice, twelveHourPrice, twentyFourHourPrice, multiDayPrice, show12HourOption, show24HourOption, isOutsideRegion10, isSameDay } = calculateRentalDetails();
-
-  const calculateReturnTime = () => {
-    if (!rentalInfo.startDate || !rentalInfo.time || !rentalInfo.duration) return { returnDate: "", returnTime: "" };
-    const startDateTime = new Date(`${rentalInfo.startDate}T${rentalInfo.time}`);
-    let returnDateTime;
-    if (rentalInfo.duration === "12 hours") returnDateTime = new Date(startDateTime.getTime() + (12 * 60 * 60 * 1000));
-    else if (rentalInfo.duration === "24 hours") returnDateTime = new Date(startDateTime.getTime() + (24 * 60 * 60 * 1000));
-    else if (rentalInfo.duration?.includes("days")) {
-      const days = parseInt(rentalInfo.duration);
-      returnDateTime = new Date(startDateTime.getTime() + (days * 24 * 60 * 60 * 1000));
-    } else returnDateTime = new Date(`${rentalInfo.endDate}T${rentalInfo.time}`);
-    
-    return { returnDate: returnDateTime.toISOString().split('T')[0], returnTime: formatTime(returnDateTime.toTimeString().slice(0, 5)) };
-  };
 
   const { returnDate, returnTime } = calculateReturnTime();
 

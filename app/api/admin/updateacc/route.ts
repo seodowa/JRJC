@@ -2,6 +2,8 @@ import { supabaseAdmin } from '@/utils/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { verifyAdmin, unauthorizedResponse } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { encrypt } from '@/lib';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
@@ -29,7 +31,6 @@ export async function POST(request: NextRequest) {
     };
 
     // If accountType is provided, add it to the updates.
-    // The database trigger will handle the role_last_changed_at timestamp automatically.
     if (formData.accountType) {
         updates.Account_Type = formData.accountType;
     }
@@ -42,7 +43,8 @@ export async function POST(request: NextRequest) {
       .from('Accounts')
       .update(updates)
       .eq('Username', currentUsername)
-      .select('Username'); // Only select what's needed for revalidation
+      .select(`ID, Username, Email, profile_image, Account_Type!fk_accounts_account_type(type)`)
+      .single();
 
     if (error) {
       console.error('Database Update Error:', error);
@@ -52,15 +54,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-
-    // If data is empty, it means no user was found with that username
-    if (!data || data.length === 0) {
+    if (!data) {
         console.error(`Update failed: No row found for username "${currentUsername}"`);
         return NextResponse.json(
             { success: false, message: 'Account not found.' },
             { status: 404 }
         );
     }
+
+    // Refresh Session
+    const userAny = data as any;
+    const accountType = userAny.Account_Type?.type || 'unknown';
+
+    // Extend session expiration (e.g., reset to original duration or default 24h)
+    // Here we default to 24h for the refreshed session for simplicity, 
+    // or we could try to read the old exp claim if we wanted to preserve it exactly.
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); 
+
+    const newSession = await encrypt({
+      user: {
+        id: data.ID,
+        username: data.Username,
+        email: data.Email,
+        profileImage: data.profile_image,
+        account_type: accountType,
+      },
+      expires,
+    });
+
+    (await cookies()).set('session', newSession, { expires, httpOnly: true });
 
     revalidatePath('/adminSU/settings');
 

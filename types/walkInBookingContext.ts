@@ -70,4 +70,7 @@ export interface WalkInBookingContextType {
   
   showConfirm: boolean;
   setShowConfirm: React.Dispatch<React.SetStateAction<boolean>>;
+
+  bookingFee: number;
+  carWashFee: number;
 }
