@@ -1,11 +1,16 @@
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { DashboardCarData } from "@/types";
+import { verifyAdmin } from '@/lib/auth';
 
 export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
+  const session = await verifyAdmin();
+  if (!session) return [];
+
   const [carsResult, bookingsResult] = await Promise.all([
     supabaseAdmin
       .from('Car_Models')
-      .select(`
+      .select(
+        `
         Model_ID,
         Model_Name,
         Year_Model,
@@ -18,12 +23,14 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
         Manufacturer (
           Manufacturer_Name
         )
-      `)
+      `
+      )
       .eq('is_deleted', false),
-      
+
     supabaseAdmin
       .from('Booking_Details')
-      .select(`
+      .select(
+        `
         Model_ID,
         Duration,
         Location,
@@ -32,8 +39,9 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
           Last_Name,
           Suffix
         )
-      `)
-      .eq('Booking_Status_ID', 3) // Ongoing
+      `
+      )
+      .eq('Booking_Status_ID', 3), // Ongoing
   ]);
 
   if (carsResult.error) {
@@ -45,7 +53,7 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
   const carsData = carsResult.data || [];
 
   const bookingMap = new Map();
-  ongoingBookings.forEach(booking => {
+  ongoingBookings.forEach((booking) => {
     bookingMap.set(booking.Model_ID, booking);
   });
 
@@ -55,13 +63,15 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
     let effectiveStatusId = car.status_id;
 
     if (ongoingBooking) {
-      effectiveStatusId = 2; 
+      effectiveStatusId = 2;
 
       const customer = ongoingBooking.Customer as any;
-      const fullName = customer 
-        ? [customer.First_Name, customer.Last_Name, customer.Suffix].filter(Boolean).join(' ') 
+      const fullName = customer
+        ? [customer.First_Name, customer.Last_Name, customer.Suffix]
+            .filter(Boolean)
+            .join(' ')
         : 'Unknown Customer';
-      
+
       bookingDetails = {
         Customer_Full_Name: fullName,
         Duration: ongoingBooking.Duration,
@@ -80,5 +90,5 @@ export async function fetchDashboardCars(): Promise<DashboardCarData[]> {
     };
   });
 
-  return (cars as DashboardCarData[]);
+  return cars as DashboardCarData[];
 }

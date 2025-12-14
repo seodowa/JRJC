@@ -1,12 +1,15 @@
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { Car, Review } from "@/types";
-import { fetchSpecificCar } from "@/lib/supabase/queries/client/fetchCars"; 
-// Note: We can reuse the client-side specific car fetch if it's public, 
-// OR we should duplicate fetchSpecificCar in admin if needed. 
+import { verifyAdmin } from "@/lib/auth";
+// Note: We can reuse the client-side specific car fetch if it's public,
+// OR we should duplicate fetchSpecificCar in admin if needed.
 // For reviews, usually just reading is fine, but let's stick to admin for admin pages.
 // Ideally, we duplicate fetchSpecificCar here too.
 
-const fetchSpecificCarAdmin = async (car_id: number): Promise<Car> => {
+const fetchSpecificCarAdmin = async (car_id: number): Promise<Car | null> => {
+    const session = await verifyAdmin();
+    if (!session) return null;
+
     const { data: carData, error: carsError } = await supabaseAdmin
       .from("Car_Models")
       .select(`
@@ -44,6 +47,9 @@ const fetchSpecificCarAdmin = async (car_id: number): Promise<Car> => {
 }
 
 export const fetchAllReviews = async (): Promise<Review[]> => {
+    const session = await verifyAdmin();
+    if (!session) return [];
+    
     try {
         const { data: reviewsData, error:reviewsError } = await supabaseAdmin
         .from("Reviews")
@@ -54,7 +60,7 @@ export const fetchAllReviews = async (): Promise<Review[]> => {
         }
 
         const transformedReviews: Review[] = await Promise.all(reviewsData?.map(async (review) => {
-            const carReviewed: Car | undefined = review.car_id ? await fetchSpecificCarAdmin(review.car_id) : undefined;
+            const carReviewed: Car | null = review.car_id ? await fetchSpecificCarAdmin(review.car_id) : null;
 
             return ({
                 id: review.id,

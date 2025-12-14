@@ -1,29 +1,20 @@
 import AdminLoginForm from "../../../components/admin/AdminLoginForm";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { decrypt } from "@/lib";
+import { getSession } from "@/lib";
 import { ALLOWED_ADMIN_ROLES } from "@/lib/auth-config";
 
 export default async function AdminSU() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
-  let session;
+  // Use the centralized, secure getSession() function.
+  // This function now handles decryption, expiration, AND stale-session checks.
+  const session = await getSession();
 
-  if (sessionCookie) {
-    try {
-      session = await decrypt(sessionCookie);
-    } catch (error) {
-      // Invalid session, show login page
-    }
+  // If the session is valid and the user has an admin role, redirect to the dashboard.
+  if (session?.user && ALLOWED_ADMIN_ROLES.includes(session.user.account_type)) {
+    redirect("/adminSU/dashboard");
   }
 
-  if (session && new Date() < new Date(session.expires)) {
-    // Only redirect if the user is an admin
-    if (ALLOWED_ADMIN_ROLES.includes(session.user.account_type)) {
-      redirect("/adminSU/dashboard");
-    }
-  }
-
+  // Otherwise, the session is invalid, stale, or the user is not an admin.
+  // In all these cases, we should show the login form.
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center justify-center relative

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { decrypt, getSession } from '@/lib';
 import { supabaseAdmin } from '@/utils/supabase/admin';
+import { verifyAdmin, unauthorizedResponse } from '@/lib/auth';
 
 interface PriceItem {
     Location: string;
@@ -61,10 +60,10 @@ const getLocationIds = async (locationNames: string[]): Promise<Map<string, numb
 };
 
 export async function GET(req: Request) {
-  // 1. Authenticate using the centralized getSession function
-  const session = await getSession();
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // 1. Authenticate using the centralized verifyAdmin function
+  const session = await verifyAdmin();
+  if (!session) {
+    return unauthorizedResponse();
   }
 
   const { searchParams } = new URL(req.url);
@@ -146,10 +145,10 @@ export async function GET(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  // 1. Authenticate using the centralized getSession function
-  const session = await getSession();
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // 1. Authenticate using the centralized verifyAdmin function
+  const session = await verifyAdmin();
+  if (!session) {
+    return unauthorizedResponse();
   }
 
   try {
@@ -307,10 +306,10 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-    // 1. Authenticate using the centralized getSession function
-    const session = await getSession();
-    if (!session?.user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // 1. Authenticate using the centralized verifyAdmin function
+    const session = await verifyAdmin();
+    if (!session) {
+        return unauthorizedResponse();
     }
 
     try {

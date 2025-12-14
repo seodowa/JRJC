@@ -1,13 +1,13 @@
 // app/api/admin/cars/status/route.ts
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib';
 import { supabaseAdmin } from '@/utils/supabase/admin';
+import { verifyAdmin, unauthorizedResponse } from '@/lib/auth';
 
 export async function PUT(request: Request) {
-    // 1. Authenticate using the centralized getSession function
-    const session = await getSession();
-    if (!session?.user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // 1. Authenticate using the centralized verifyAdmin function
+    const session = await verifyAdmin();
+    if (!session) {
+        return unauthorizedResponse();
     }
 
     // 2. Parse request body

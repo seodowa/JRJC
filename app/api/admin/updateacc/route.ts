@@ -1,10 +1,16 @@
-import { createClient } from '@supabase/supabase-js'; // Use direct client for Admin access
+import { supabaseAdmin } from '@/utils/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-
+import { verifyAdmin, unauthorizedResponse } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
+  // 1. Verify Admin Session & Role
+  const session = await verifyAdmin();
+  if (!session) {
+    return unauthorizedResponse();
+  }
+
   try {
     const body = await request.json();
     const { currentUsername, formData } = body;
@@ -16,29 +22,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // CHANGE 1: Create a Supabase Admin client using the Service Role Key.
-    // This client BYPASSES all Row Level Security (RLS) policies.
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
     const updates: Record<string, any> = {
       Username: formData.username,
       Email: formData.email,
       profile_image: formData.image,
     };
 
+    // If accountType is provided, add it to the updates.
+    // The database trigger will handle the role_last_changed_at timestamp automatically.
+    if (formData.accountType) {
+        updates.Account_Type = formData.accountType;
+    }
+
     if (formData.password && formData.password.trim() !== '') {
       updates.Password = await bcrypt.hash(formData.password, 10);
     }
 
-    // CHANGE 2: Use supabaseAdmin to perform the update
     const { data, error } = await supabaseAdmin
       .from('Accounts')
       .update(updates)
       .eq('Username', currentUsername)
-      .select();
+      .select('Username'); // Only select what's needed for revalidation
 
     if (error) {
       console.error('Database Update Error:', error);
@@ -47,6 +51,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
 
     // If data is empty, it means no user was found with that username
     if (!data || data.length === 0) {

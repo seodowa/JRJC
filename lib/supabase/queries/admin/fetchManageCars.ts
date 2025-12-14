@@ -1,7 +1,11 @@
 import { supabaseAdmin } from "@/utils/supabase/admin";
 import { Car, CarPricing, CarStatus } from "@/types";
+import { verifyAdmin } from "@/lib/auth";
 
 export const fetchDisplayManageCars = async (): Promise<Car[]> => {
+    const session = await verifyAdmin();
+    if (!session) return [];
+
     // Uses supabaseAdmin to bypass RLS
     const { data, error } = await supabaseAdmin
         .from('Car_Models')

@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/utils/supabase/admin';
+import { verifyAdmin, unauthorizedResponse } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await verifyAdmin();
+  if (!session) {
+    return unauthorizedResponse();
+  }
   const { id } = await params;
 
   if (!id) {

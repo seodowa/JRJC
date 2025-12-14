@@ -1,10 +1,15 @@
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { Booking } from '@/types/booking';
+import { verifyAdmin } from '@/lib/auth';
 
 export async function fetchOngoingBookings(): Promise<Booking[]> {
+  const session = await verifyAdmin();
+  if (!session) return [];
+
   const { data: bookingsData, error: bookingsError } = await supabaseAdmin
     .from('Booking_Details')
-    .select(`
+    .select(
+      `
       Booking_ID,
       Booking_Start_Date_Time,
       Booking_End_Date_Time,
@@ -28,8 +33,9 @@ export async function fetchOngoingBookings(): Promise<Booking[]> {
           Manufacturer_Name
         )
       )
-    `)
-    .eq('Booking_Status_ID', 3); 
+    `
+    )
+    .eq('Booking_Status_ID', 3);
 
   if (bookingsError) {
     console.error('Error fetching ongoing bookings:', bookingsError);
@@ -44,10 +50,14 @@ export async function fetchOngoingBookings(): Promise<Booking[]> {
 
   const statusName = statusData?.Name || 'Ongoing';
 
-  const bookings = bookingsData?.map(booking => {
+  const bookings = bookingsData?.map((booking) => {
     const customer = booking.Customer as any;
-    const fullName = customer ? [customer.First_Name, customer.Last_Name, customer.Suffix].filter(Boolean).join(' ') : 'Unknown Customer';
-    
+    const fullName = customer
+      ? [customer.First_Name, customer.Last_Name, customer.Suffix]
+          .filter(Boolean)
+          .join(' ')
+      : 'Unknown Customer';
+
     const carModel = booking.Car_Models as any;
     const transmission = carModel?.Transmission_Types;
     const manufacturer = carModel?.Manufacturer;
@@ -59,7 +69,7 @@ export async function fetchOngoingBookings(): Promise<Booking[]> {
       Booking_Status_Name: statusName,
       Model_Name: carModel?.Model_Name || 'N/A',
       Year_Model: carModel?.Year_Model || 0,
-      color_code: carModel?.color_code || '#808080', 
+      color_code: carModel?.color_code || '#808080',
       Car_Status: carModel?.Car_Status?.status || 'N/A',
       Transmission_Type: transmission?.Name || 'N/A',
       Manufacturer_Name: manufacturer?.Manufacturer_Name || 'N/A',

@@ -1,8 +1,13 @@
 // app/api/admin/bookings/extend/route.ts
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/utils/supabase/admin';
+import { verifyAdmin, unauthorizedResponse } from '@/lib/auth';
 
 export async function POST(req: Request) {
+  const session = await verifyAdmin();
+  if (!session) {
+    return unauthorizedResponse();
+  }
   try {
     const { bookingId, newEndDate } = await req.json();
 

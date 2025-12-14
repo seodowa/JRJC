@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { sendOtpEmail } from '@/lib/nodemailer(smtp)/email';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createHash } from 'crypto';
+import { ALLOWED_ADMIN_ROLES } from '@/lib/auth-config';
 
 import bcrypt from 'bcryptjs';
 
@@ -28,6 +29,27 @@ export async function POST(req: Request) {
   if (!user || !isValidPassword) {
     return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
   }
+
+  // --- START: Role-Based Access Check ---
+  const { data: accountDetails, error: roleError } = await supabaseAdmin
+    .from('Accounts')
+    .select('Account_Type!inner(type)')
+    .eq('ID', user.ID)
+    .single();
+
+  if (roleError || !accountDetails) {
+    return NextResponse.json({ error: "Could not verify user role." }, { status: 500 });
+  }
+
+  const accountType = (accountDetails.Account_Type as any)?.type;
+  
+  if (!ALLOWED_ADMIN_ROLES.includes(accountType)) {
+    return NextResponse.json(
+      { error: "Access Denied: You do not have permission to access this resource." },
+      { status: 403 }
+    );
+  }
+  // --- END: Role-Based Access Check ---
 
   // Generate a 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();

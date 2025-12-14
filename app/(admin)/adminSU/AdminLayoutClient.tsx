@@ -8,12 +8,14 @@ import { logout } from '@/app/(admin)/services/auth/auth';
 import { toast } from "@/components/toast/use-toast";
 import { UserProvider } from '@/app/(admin)/context/UserContext';
 
+import AuthRefresher from '@/components/admin/AuthRefresher';
+
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
   
-  // UPDATE: Include 'email' and 'profileImage' in the state type definition
-  const [user, setUser] = useState<{ username: string; email: string; profileImage?: string | null } | null>(null);
+  // UPDATE: Include 'id', 'email', and 'profileImage' in the state type definition
+  const [user, setUser] = useState<{ id?: number; username: string; email: string; profileImage?: string | null } | null>(null);
   
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
@@ -32,25 +34,36 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         
         if (res.ok) {
           const data = await res.json();
-          console.log('User data from session:', data.user);
+          if (!data.user) {
+            // If user data is null, the session is invalid. Redirect.
+            window.location.href = '/adminSU';;
+            return;
+          }
           
-          // Ensure the API actually returns an email field.
-          // If data.user.email is undefined here, check your /api/auth/session route.
           setUser({
+            id: data.user.id,
             username: data.user.username,
             email: data.user.email || '', // Fallback to empty string if missing
             profileImage: data.user.profileImage || null,
           });
         } else {
+          // If the response is not OK (e.g., 401 Unauthorized from our getSession check),
+          // the session is invalid. Redirect to login.
           setUser(null);
+          window.location.href = '/adminSU';;
         }
       } catch (error) {
         console.error('Failed to fetch session', error);
         setUser(null);
+        window.location.href = '/adminSU';; // Also redirect on network error
       }
     };
-    fetchSession();
-  }, [pathname]);
+
+    // Only run the session check if we are NOT on the login page.
+    if (pathname !== '/adminSU') {
+      fetchSession();
+    }
+  }, [pathname, router]); // Add router to dependency array
 
   const handleLogout = async () => {
       try {
@@ -60,7 +73,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           const message = e instanceof Error ? e.message : 'Logout failed';
           toast({ variant: 'destructive', title: 'Logout failed', description: message });
       } finally {
-          router.push('/adminSU');
+          window.location.href = '/adminSU';;
       }
   };
 
@@ -72,6 +85,9 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
 
   return (
     <div className="flex bg-gray-100 h-screen">
+      {/* Real-time listener for session invalidation */}
+      <AuthRefresher userId={user?.id} />
+
       {/* Backdrop for mobile */}
       {!isCollapsed && (
         <div

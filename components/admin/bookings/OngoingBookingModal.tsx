@@ -310,7 +310,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
                               <span className={`${isPaid ? 'text-green-600' : 'text-red-600'}`}>{localBooking.Payment_Details?.payment_status || 'Not Paid'}</span>
                           </div>
                           {/* Mark as Paid Button */}
-                          {!isPaid && localBooking.date_returned && (
+                          {!isPaid && localBooking.date_returned && localBooking.Payment_Details && (
                               <AsyncButton 
                                   onClick={handleMarkPaid} 
                                   className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
