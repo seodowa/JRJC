@@ -23,8 +23,34 @@ export async function verifyAdmin() {
 }
 
 /**
+ * Verifies if the current user has a valid session and is specifically an 'owner'.
+ * Returns the session object if valid, otherwise returns null.
+ */
+export async function verifyOwner() {
+    const session = await getSession();
+    
+    if (!session || !session.user) {
+      return null;
+    }
+  
+    // Strict check for 'owner' role
+    if (session.user.account_type !== 'owner') {
+      return null; 
+    }
+  
+    return session;
+  }
+
+/**
  * Returns a standard Next.js 401 Unauthorized response.
  */
 export function unauthorizedResponse() {
   return NextResponse.json({ error: 'Unauthorized: Insufficient permissions' }, { status: 401 });
 }
+
+/**
+ * Returns a standard Next.js 403 Forbidden response (authenticated but not owner).
+ */
+export function forbiddenResponse() {
+    return NextResponse.json({ error: 'Forbidden: Owner access required' }, { status: 403 });
+  }

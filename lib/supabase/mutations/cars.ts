@@ -1,5 +1,6 @@
 // lib/supabase/mutations/cars.ts
 import { Car } from '@/types';
+import { convertImageToWebP } from '@/utils/imageUtils';
 
 // In lib/supabase/mutations/cars.ts
 
@@ -13,8 +14,11 @@ const handleApiRequest = async (
 
     // 1. If there's a new image, upload it first
     if (imageFile) {
+        // Convert to WebP
+        const fileToUpload = await convertImageToWebP(imageFile);
+
         const formData = new FormData();
-        formData.append('file', imageFile);
+        formData.append('file', fileToUpload);
         formData.append('category', 'car');
 
         const uploadResponse = await fetch('/api/upload', {

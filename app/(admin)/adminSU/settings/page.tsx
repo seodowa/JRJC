@@ -6,6 +6,7 @@ import { UserContext } from '@/app/(admin)/context/UserContext';
 import { toast } from '@/components/toast/use-toast';
 import { updateAccountService } from '@/app/(admin)/services/updateAccountService';
 import Link from 'next/link';
+import { convertImageToWebP } from '@/utils/imageUtils';
 
 export default function SettingsPage() {
   const user = useContext(UserContext);
@@ -88,8 +89,11 @@ export default function SettingsPage() {
 
       // 1. Upload new image if selected
       if (selectedFile) {
+        // Convert to WebP
+        const fileToUpload = await convertImageToWebP(selectedFile);
+
         const formDataUpload = new FormData();
-        formDataUpload.append('file', selectedFile);
+        formDataUpload.append('file', fileToUpload);
         formDataUpload.append('category', 'profile');
 
         const uploadRes = await fetch('/api/upload', {

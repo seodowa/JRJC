@@ -80,3 +80,48 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal server error during upload processing' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  // 1. Only admins can delete files via this generic route
+  const adminSession = await verifyAdmin();
+  if (!adminSession) {
+    return unauthorizedResponse();
+  }
+
+  try {
+    const { url } = await req.json();
+    if (!url) {
+      return NextResponse.json({ error: 'No URL provided' }, { status: 400 });
+    }
+
+    // 2. Extract path from URL
+    // Format: .../storage/v1/object/public/images/folder/filename
+    // We need: folder/filename
+    const pathParts = url.split('/images/');
+    if (pathParts.length < 2) {
+      // Fallback: try to match just the filename if it's a relative path or different structure
+      // But for safety, we expect the standard Supabase URL structure
+      console.warn('Invalid URL format for deletion:', url);
+      return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+    }
+    
+    // The path is everything after the last '/images/'
+    const storagePath = pathParts[pathParts.length - 1];
+
+    // 3. Delete from Storage
+    const { error } = await supabaseAdmin.storage
+      .from('images')
+      .remove([storagePath]);
+
+    if (error) {
+      console.error('Storage deletion error:', error);
+      return NextResponse.json({ error: `Failed to delete file: ${error.message}` }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+
+  } catch (error) {
+    console.error('Delete processing error:', error);
+    return NextResponse.json({ error: 'Internal server error during file deletion' }, { status: 500 });
+  }
+}
