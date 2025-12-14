@@ -177,13 +177,14 @@ const CMSClientPage: React.FC = () => {
 
             {/* Fees Section */}
             <ContentSection
-              title="Booking Fees"
+              title="Booking Fees & Payment"
               sectionKey="fees"
               contentMap={contentMap.fees || {}}
               onUpdate={handleUpdate}
               fields={[
                 { key: 'booking_fee', label: 'Booking Fee (PHP)', type: 'number', placeholder: '500' },
                 { key: 'car_wash_fee', label: 'Car Wash Fee (PHP)', type: 'number', placeholder: '300' },
+                { key: 'payment_qr_code', label: 'Payment QR Code', type: 'image_url' },
               ]}
             />
 

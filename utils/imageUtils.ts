@@ -11,6 +11,12 @@
  */
 export const convertImageToWebP = (file: File): Promise<File> => {
   return new Promise((resolve, reject) => {
+    // Exclude SVG files from WebP conversion
+    if (file.type === 'image/svg+xml') {
+      resolve(file);
+      return;
+    }
+
     if (!file.type.startsWith('image/')) {
       resolve(file); // Not an image, return original file
       return;

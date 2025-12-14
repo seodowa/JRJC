@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useWalkInBooking } from "@/app/(admin)/context/WalkInBookingContext";
 import AsyncButton from "@/components/AsyncButton";
+import { useCMS } from "@/app/(client)/context/CMSContext";
 
 interface PaymentDetailsProps {
   onBack: () => void;
 }
 
 const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
+  const { getImage } = useCMS();
   const {
     paymentInfo,
     calculateRentalDetails,
@@ -35,6 +37,8 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
   const initialTotalPayment = bookingFee + carWashFee + initialRentalCost; // Use initialRentalCost
   const totalPayment = initialTotalPayment; // For walk-in, this is the total payment
   
+  const qrCodeUrl = getImage('fees', 'payment_qr_code') || "/images/qr-sample.png";
+
   const handleBook = () => {
     setShowConfirm(true);
   };
@@ -164,7 +168,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
 
               <div className="flex justify-center">
                 <img
-                  src="/images/qr-sample.png"
+                  src={qrCodeUrl}
                   alt="QR Code"
                   className="w-48 h-48 border rounded-md shadow-sm"
                 />

@@ -38,7 +38,7 @@ interface PaymentInfo {
 }
 
 const BookingPage: React.FC = () => {
-  const { getNumber } = useCMS();
+  const { getNumber, getImage } = useCMS();
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -506,6 +506,7 @@ const BookingPage: React.FC = () => {
         const carWashFee = getNumber('fees', 'car_wash_fee', 300);
         const initialPayment = totalPrice || 0;
         const totalPayment = bookingFee + carWashFee + initialPayment;
+        const qrCodeUrl = getImage('fees', 'payment_qr_code') || "https://vsyuulkearnnymswbhfc.supabase.co/storage/v1/object/public/images/qr-code.svg";
 
         return (
           <div className="relative p-6">
@@ -525,7 +526,7 @@ const BookingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex justify-center">
-                    <img src="https://vsyuulkearnnymswbhfc.supabase.co/storage/v1/object/public/images/qr-code.svg" alt="QR Code" className="w-48 h-48 border rounded-md shadow-sm" />
+                    <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48 border rounded-md shadow-sm" />
                   </div>
                 </div>
               </div>
