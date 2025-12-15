@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/utils/supabase/admin';
-import { sendSMS } from '@/lib/sms'; // Assuming this utility exists and works server-side
+import { sendSMS } from '@/lib/sms';
+import { createHash } from 'crypto';
 
 // Helper for email (reusing the pattern from admin route)
 const sendEmail = async (to: string, subject: string, html: string) => {
@@ -18,10 +19,14 @@ const sendEmail = async (to: string, subject: string, html: string) => {
 
 export async function POST(req: Request) {
   try {
-    const { bookingId } = await req.json();
+    const { bookingId, otp } = await req.json();
 
     if (!bookingId) {
       return NextResponse.json({ error: 'Booking ID is required' }, { status: 400 });
+    }
+
+    if (!otp) {
+        return NextResponse.json({ error: 'OTP is required' }, { status: 400 });
     }
 
     console.log(`Attempting to cancel booking: ${bookingId}`);
@@ -32,6 +37,8 @@ export async function POST(req: Request) {
       .select(`
         Booking_Status_ID,
         Notification_Preference,
+        cancellation_otp,
+        cancellation_otp_expiry,
         Customer (Contact_Number, First_Name, Email)
       `)
       .eq('Booking_ID', bookingId)
@@ -41,17 +48,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
+    // OTP Verification
+    const hashedOtp = createHash('sha256').update(otp).digest('hex');
+    
+    if (booking.cancellation_otp !== hashedOtp) {
+        return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
+    }
+
+    if (new Date() > new Date(booking.cancellation_otp_expiry)) {
+        return NextResponse.json({ error: 'OTP has expired' }, { status: 400 });
+    }
+
+
     // Check if cancellable (1=Pending, 2=Confirmed)
-    // Prevent cancelling if already started (3), completed (4), or declined (6)
     const validStatuses = [1, 2]; 
     if (!validStatuses.includes(booking.Booking_Status_ID)) {
        return NextResponse.json({ error: 'Booking cannot be cancelled in its current status' }, { status: 400 });
     }
 
-    // 2. Update Status to 5 (Cancelled)
+    // 2. Update Status to 5 (Cancelled) and Clear OTP
     const { error: updateError } = await supabaseAdmin
       .from('Booking_Details')
-      .update({ Booking_Status_ID: 5 })
+      .update({ 
+          Booking_Status_ID: 5,
+          cancellation_otp: null,
+          cancellation_otp_expiry: null
+      })
       .eq('Booking_ID', bookingId);
 
     if (updateError) {

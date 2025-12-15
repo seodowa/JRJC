@@ -1,65 +1,110 @@
-'use client'
+'use client';
 
 import { fetchBookingStatus } from "@/lib/supabase/queries/client/fetchBooking";
 import { BookingStatus } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import { cancelBookingService } from "@/app/services/bookingService"; // Import the service
+import { cancelBookingService, requestCancelOTPService } from "@/app/services/bookingService";
+import OTPModal from "@/components/OTPModal";
+import ConfirmationModal from "@/components/ConfirmationModal";
+import { useToast } from "@/components/toast/use-toast";
 
 export default function BookingTrackerPage() {
     const [booking, setBooking] = useState<BookingStatus | null>(null);
     const [uuid, setUUID] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false); 
-    const [isCancelling, setIsCancelling] = useState(false); 
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { toast } = useToast();
+
+    // Modal States
+    const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isSendingOtp, setIsSendingOtp] = useState(false);
+    const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
     
     const handleUUIDSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-
-        if (inputRef.current)
-            setUUID(inputRef.current.value);
+        if (inputRef.current) setUUID(inputRef.current.value);
     }
 
-    // --- NEW: Handle Cancel Logic using Service ---
-    const handleCancel = async () => {
+    // --- Step 1: Open Confirmation Modal ---
+    const handleCancelClick = () => {
         if (!booking || !uuid) return;
+        setIsConfirmModalOpen(true);
+    };
 
-        if (!confirm("Are you sure you want to cancel your booking? This action cannot be undone.")) return;
-
-        setIsCancelling(true);
-
+    // --- Step 2: Request OTP (After Confirmation) ---
+    const requestCancelOtp = async () => {
+        setIsConfirmModalOpen(false); // Close confirmation modal
+        setIsSendingOtp(true);
         try {
-            // Call the service instead of inline logic
-            const result = await cancelBookingService(uuid);
-
+            const result = await requestCancelOTPService(uuid);
             if (result.success) {
-                alert("Booking cancelled successfully.");
-                // Update local state to reflect change immediately
-                setBooking(prev => prev ? { ...prev, bookingStatus: "Cancelled" } : null);
+                toast({
+                    title: "OTP Sent",
+                    description: "An OTP has been sent to your registered contact method.",
+                });
+                setIsOtpModalOpen(true);
             } else {
-                throw result.error || new Error("Failed to cancel booking.");
+                throw new Error(result.error || "Failed to send OTP.");
             }
-
-        } catch (err) {
-            console.error("Error cancelling booking:", err);
-            alert("Failed to cancel booking. Please try again or contact support.");
+        } catch (err: any) {
+            console.error("Error requesting OTP:", err);
+            toast({
+                variant: "destructive",
+                title: "Failed to Send OTP",
+                description: err.message || "Please try again.",
+            });
         } finally {
-            setIsCancelling(false);
+            setIsSendingOtp(false);
         }
     };
 
+    // --- Step 3: Handle OTP Submission ---
+    const handleOtpSubmit = async (otp: string) => {
+        if (!booking || !uuid) return;
+
+        setIsVerifyingOtp(true);
+
+        try {
+            const result = await cancelBookingService(uuid, otp);
+            if (result.success) {
+                toast({
+                    title: "Booking Cancelled",
+                    description: "Your booking has been cancelled successfully.",
+                });
+                setBooking(prev => prev ? { ...prev, bookingStatus: "Cancelled" } : null);
+                setIsOtpModalOpen(false);
+                setUUID(""); 
+                if (inputRef.current) inputRef.current.value = "";
+            } else {
+                throw new Error(result.error || "Failed to cancel booking.");
+            }
+        } catch (err: any) {
+            console.error("Error cancelling booking with OTP:", err);
+            toast({
+                variant: "destructive",
+                title: "Cancellation Failed",
+                description: err.message || "Failed to verify OTP or cancel booking.",
+            });
+        } finally {
+            setIsVerifyingOtp(false);
+        }
+    };
+
+    const handleResendCode = async () => {
+        await requestCancelOtp();
+    };
+
     const BookingStatusDisplay = () => {
-        // 1. Handle Loading State
         if (isLoading) {
             return <div>Loading booking details...</div>;
         }
 
-        // 2. Handle Error State
         if (error) {
             return <div className="text-red-500">{error}</div>;
         }
 
-        // 3. Handle Success (Data Found)
         if (booking) {
             const canCancel = booking.bookingStatus !== 'Cancelled' && booking.bookingStatus !== 'Completed' && booking.bookingStatus !== 'Declined';
 
@@ -83,21 +128,19 @@ export default function BookingTrackerPage() {
                         </span>
                     </p>
 
-                    {/* Show Cancel Button only if booking is active */}
                     {canCancel && (
                         <button 
-                            onClick={handleCancel}
-                            disabled={isCancelling}
+                            onClick={handleCancelClick}
+                            disabled={isSendingOtp}
                             className="mt-6 bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600 disabled:bg-red-300 transition-colors"
                         >
-                            {isCancelling ? 'Processing...' : 'Cancel Booking'}
+                            {isSendingOtp ? 'Sending OTP...' : 'Cancel Booking'}
                         </button>
                     )}
                 </div>
             );
         }
 
-        // 4. Handle "Not Found" State
         return <div className="text-gray-500">You can track your booking here.</div>;
     }
 
@@ -130,7 +173,6 @@ export default function BookingTrackerPage() {
         }
     }, [uuid]); 
 
-
     return (
         <div className="flex justify-center items-start min-h-screen bg-main-color md:bg-transparent md:bg-gradient-to-b from-main-color from-80% md:from-60% lg:from-40% to-transparent -mt-12 pt-9 md:pt-12 relative overflow-hidden font-main-font">
             <img src="/images/BG.webp" className="opacity-20 min-w-full absolute bottom-0 -z-2" />
@@ -156,6 +198,27 @@ export default function BookingTrackerPage() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={requestCancelOtp}
+                title="Cancel Booking"
+                message="Are you sure you want to cancel your booking? An OTP will be sent to your registered contact method."
+                confirmButtonText="Yes, Proceed"
+                cancelButtonText="No, Keep it"
+            />
+
+            <OTPModal
+                isOpen={isOtpModalOpen}
+                onClose={() => setIsOtpModalOpen(false)}
+                onSubmit={handleOtpSubmit}
+                isSubmitting={isVerifyingOtp}
+                onResend={handleResendCode}
+                isResending={isSendingOtp}
+                title="JRJC BOOKING"
+                showTrustDeviceOption={false} // Hide for public cancellation
+            />
         </div>
     );
 }

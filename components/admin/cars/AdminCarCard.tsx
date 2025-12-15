@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Car, CarStatus } from "@/types";
 import AsyncButton from "@/components/AsyncButton";
-import ConfirmationModal from "@/components/admin/ConfirmationModal";
+import ConfirmationModal from "@/components/ConfirmationModal";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon";
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/toast/use-toast';

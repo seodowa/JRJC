@@ -18,7 +18,7 @@ import BookingsHeader from './BookingsHeader';
 import BookingDetailsModal from './BookingDetailsModal'; 
 import OngoingBookingModal from './OngoingBookingModal'; 
 import ExtendBookingModal from './ExtendBookingModal'; 
-import ConfirmationModal from '../ConfirmationModal'; // Import ConfirmationModal
+import ConfirmationModal from '@/components/ConfirmationModal'; // Import ConfirmationModal
 import { SpecificBookingDetails } from '@/types/adminBooking';
 import { LoadingSpinner } from '@/components/LoadingSpinner'; 
 import { useToast } from "@/components/toast/use-toast"; 

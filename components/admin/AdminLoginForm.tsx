@@ -6,7 +6,7 @@ import { login } from "@/app/(admin)/services/auth/auth";
 import { useToast } from "@/components/toast/use-toast";
 import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
 import AsyncButton from "@/components/AsyncButton";
-import OTPModal from "./OTPModal";
+import OTPModal from "@/components/OTPModal"; // Corrected import path
 
 const AdminLoginForm: React.FC = () => {
     const [username, setUsername] = useState("");
@@ -155,6 +155,7 @@ const AdminLoginForm: React.FC = () => {
                 isSubmitting={isSubmittingOtp}
                 onResend={handleResendCode}
                 isResending={isResending}
+                title="JRJC ADMIN" // Pass the title
             />
         </>
     );

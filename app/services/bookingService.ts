@@ -102,12 +102,33 @@ export const updatePaymentStatusService = async (payload: UpdatePaymentPayload) 
 
 // --- User Actions ---
 
-export const cancelBookingService = async (bookingId: string): Promise<BookingProcessResult> => {
+export const requestCancelOTPService = async (bookingId: string) => {
+  try {
+    const response = await fetch('/api/bookings/cancel/request-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to request OTP');
+    }
+
+    return { success: true, message: data.message };
+  } catch (error: any) {
+    console.error("Request OTP Error:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const cancelBookingService = async (bookingId: string, otp: string): Promise<BookingProcessResult> => {
   try {
     const response = await fetch('/api/bookings/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId }),
+      body: JSON.stringify({ bookingId, otp }),
     });
 
     const data = await response.json();

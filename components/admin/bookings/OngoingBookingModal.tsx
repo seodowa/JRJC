@@ -15,7 +15,7 @@ import {
 import { toast } from '@/components/toast/use-toast';
 import { useRouter } from 'next/navigation';
 import ExtendBookingModal from './ExtendBookingModal';
-import ConfirmationModal from '../ConfirmationModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 interface OngoingBookingModalProps {
   isOpen: boolean;

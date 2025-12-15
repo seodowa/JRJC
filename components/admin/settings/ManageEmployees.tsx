@@ -13,7 +13,7 @@ import {
 } from '@/app/(admin)/services/manageEmployeeService';
 import { toast } from '@/components/toast/use-toast';
 import { Loader2, Pencil, Trash2, Plus } from 'lucide-react';
-import ConfirmationModal from '@/components/admin/ConfirmationModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 import { convertImageToWebP } from '@/utils/imageUtils';
 import EmployeeFormModal from './EmployeeFormModal';
 

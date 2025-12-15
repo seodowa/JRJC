@@ -13,9 +13,20 @@ interface OtpModalProps {
     isSubmitting: boolean;
     onResend: () => Promise<void>;
     isResending: boolean;
+    title?: string;
+    showTrustDeviceOption?: boolean; // New prop
 }
 
-const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting, onResend, isResending }) => {
+const OTPModal: React.FC<OtpModalProps> = ({
+    isOpen,
+    onClose,
+    onSubmit,
+    isSubmitting,
+    onResend,
+    isResending,
+    title = "JRJC ADMIN",
+    showTrustDeviceOption = true // Default to true for existing admin usage
+}) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const [trustDevice, setTrustDevice] = useState(false);
     const [cooldown, setCooldown] = useState(0);
@@ -24,8 +35,12 @@ const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmit
     useEffect(() => {
         if (isOpen) {
             setCooldown(180); // 3 minutes
+            // Reset trustDevice checkbox state when modal opens
+            if (!showTrustDeviceOption) {
+                setTrustDevice(false);
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, showTrustDeviceOption]);
 
     useEffect(() => {
         if (cooldown > 0) {
@@ -39,13 +54,12 @@ const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmit
     }
 
     const handleOtpChange = (element: HTMLInputElement, index: number) => {
-        if (isNaN(Number(element.value))) return; // Only allow numbers
+        if (isNaN(Number(element.value))) return;
 
         const newOtp = [...otp];
         newOtp[index] = element.value;
         setOtp(newOtp);
 
-        // Focus next input
         if (element.nextSibling && element.value) {
             (element.nextSibling as HTMLInputElement).focus();
         }
@@ -69,7 +83,8 @@ const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmit
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        void onSubmit(otp.join(""), trustDevice);
+        // Pass trustDevice conditionally, default to false if option is not shown
+        void onSubmit(otp.join(""), showTrustDeviceOption ? trustDevice : false);
     };
 
     const handleResend = async () => {
@@ -80,7 +95,7 @@ const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmit
     return (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
             <div className="relative bg-[#E6F5F3] p-4 sm:p-8 rounded-2xl shadow-xl w-full max-w-md">
-                <h1 className="absolute top-4 left-4 font-bold text-lg sm:text-xl">JRJC ADMIN</h1>
+                <h1 className="absolute top-4 left-4 font-bold text-lg sm:text-xl">{title}</h1>
                 <button type="button" onClick={onClose} className="absolute top-4 right-4 hover:bg-[#8BFFF1]/50 hover:rounded-lg">
                     <CloseIcon />
                 </button>
@@ -110,23 +125,25 @@ const OTPModal: React.FC<OtpModalProps> = ({ isOpen, onClose, onSubmit, isSubmit
                                 );
                             })}
                         </div>
-                        <div className="flex items-center justify-center my-4">
-                            <label htmlFor="trustDevice" className="flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    id="trustDevice"
-                                    className="hidden peer"
-                                    checked={trustDevice}
-                                    onChange={(e) => setTrustDevice(e.target.checked)}
-                                />
-                                <span className="w-5 h-5 border-2 border-gray-300 rounded-sm grid place-items-center peer-checked:bg-[#8BFFF1] peer-checked:border-[#8BFFF1]">
-                                    {trustDevice && <CheckmarkButtonIcon className="w-3 h-3" />}
-                                </span>
-                                <span className="ml-2 block text-sm text-gray-900">
-                                    Trust this device for 30 days
-                                </span>
-                            </label>
-                        </div>
+                        {showTrustDeviceOption && ( // Conditionally render
+                            <div className="flex items-center justify-center my-4">
+                                <label htmlFor="trustDevice" className="flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        id="trustDevice"
+                                        className="hidden peer"
+                                        checked={trustDevice}
+                                        onChange={(e) => setTrustDevice(e.target.checked)}
+                                    />
+                                    <span className="w-5 h-5 border-2 border-gray-300 rounded-sm grid place-items-center peer-checked:bg-[#8BFFF1] peer-checked:border-[#8BFFF1]">
+                                        {trustDevice && <CheckmarkButtonIcon className="w-3 h-3" />}
+                                    </span>
+                                    <span className="ml-2 block text-sm text-gray-900">
+                                        Trust this device for 30 days
+                                    </span>
+                                </label>
+                            </div>
+                        )}
                         <div className="text-center my-4">
                             <button type="button" onClick={handleResend} disabled={cooldown > 0 || isResending} className="text-sm text-gray-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed">
                                 {isResending ? "Sending..." : cooldown > 0 ? `Resend Code in ${Math.floor(cooldown / 60)}:${(cooldown % 60).toString().padStart(2, '0')}` : "Resend Code"}

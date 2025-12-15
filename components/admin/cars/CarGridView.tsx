@@ -7,7 +7,7 @@ import AsyncButton from "@/components/AsyncButton";
 import PlusIcon from "@/components/icons/PlusIcon";
 import CarPlaceholderIcon from "@/components/icons/CarPlaceholderIcon";
 import { useState } from "react";
-import ConfirmationModal from "@/components/admin/ConfirmationModal";
+import ConfirmationModal from "@/components/ConfirmationModal";
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/toast/use-toast';
 import { deleteCar, updateCarStatus } from '@/lib/supabase/mutations/cars';
