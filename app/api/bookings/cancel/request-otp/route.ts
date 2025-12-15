@@ -17,6 +17,24 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
+// Helper to fetch SMS templates from CMS
+const fetchSMSTemplates = async () => {
+    const { data, error } = await supabaseAdmin
+        .from('cms_content')
+        .select('key, value')
+        .eq('section', 'sms');
+    
+    if (error) {
+        console.error("Error fetching SMS templates:", error);
+        return {};
+    }
+    
+    return data.reduce((acc, item) => {
+        acc[item.key] = item.value;
+        return acc;
+    }, {} as Record<string, string>);
+};
+
 export async function POST(req: Request) {
   try {
     const { bookingId } = await req.json();
@@ -24,6 +42,9 @@ export async function POST(req: Request) {
     if (!bookingId) {
       return NextResponse.json({ error: 'Booking ID is required' }, { status: 400 });
     }
+
+    // Fetch SMS templates dynamically
+    const smsTemplates = await fetchSMSTemplates();
 
     // 1. Fetch Booking and Customer
     const { data: booking, error: fetchError } = await supabaseAdmin
@@ -68,7 +89,14 @@ export async function POST(req: Request) {
     if (booking.Customer) {
       const customer = booking.Customer as any;
       const firstName = customer.First_Name || 'Customer';
-      const message = `Your cancellation OTP for booking ${bookingId} is ${otp}. This code expires in 10 minutes.`;
+      
+      // Use template from CMS, with a fallback
+      const messageTemplate = smsTemplates['cancellation_otp_request'] || 'Your cancellation OTP for booking {id} is {otp}. This code expires in 10 minutes.';
+      const message = messageTemplate
+        .replace('{name}', firstName)
+        .replace('{id}', bookingId)
+        .replace('{otp}', otp);
+
       const subject = "Cancellation Verification Code";
       const preference = booking.Notification_Preference || 'SMS';
 

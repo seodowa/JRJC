@@ -23,6 +23,24 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
+// Helper to fetch SMS templates from CMS
+const fetchSMSTemplates = async () => {
+    const { data, error } = await supabaseAdmin
+        .from('cms_content')
+        .select('key, value')
+        .eq('section', 'sms');
+    
+    if (error) {
+        console.error("Error fetching SMS templates:", error);
+        return {};
+    }
+    
+    return data.reduce((acc, item) => {
+        acc[item.key] = item.value;
+        return acc;
+    }, {} as Record<string, string>);
+};
+
 export async function POST(req: Request) {
   // 1. Verify Admin Session & Role
   const session = await verifyAdmin();
@@ -36,6 +54,9 @@ export async function POST(req: Request) {
     if (!bookingIds || !Array.isArray(bookingIds) || bookingIds.length === 0) {
       return NextResponse.json({ error: 'Invalid booking IDs' }, { status: 400 });
     }
+
+    // Fetch SMS templates dynamically
+    const smsTemplates = await fetchSMSTemplates();
 
     const results = [];
 
@@ -52,8 +73,8 @@ export async function POST(req: Request) {
       switch (action) {
         case 'approve':
           statusId = 2;
-          // Updated SMS with Reminders
-          smsTemplate = 'Hi {name}, Good news! Your booking (ID: {id}) has been APPROVED. Reminders:\n- Fuel must be returned to the same level when received\n- No pets are allowed inside the car\n- Strictly no smoking\nSee you soon!';
+          // Use template from CMS, with a fallback
+          smsTemplate = smsTemplates['booking_approved'] || 'Hi {name}, Good news! Your booking (ID: {id}) has been APPROVED. Reminders:\n- Fuel must be returned to the same level when received\n- No pets are allowed inside the car\n- Strictly no smoking\nSee you soon!';
           
           emailSubject = 'Booking Approved';
           // Rich HTML for Email
@@ -75,7 +96,7 @@ export async function POST(req: Request) {
 
         case 'decline':
           statusId = 6;
-          smsTemplate = 'Hi {name}, we regret to inform you that your booking (ID: {id}) has been DECLINED. Please contact us for details.';
+          smsTemplate = smsTemplates['booking_declined'] || 'Hi {name}, we regret to inform you that your booking (ID: {id}) has been DECLINED. Please contact us for details.';
           emailSubject = 'Booking Declined';
           emailBodyTemplate = `<p>We regret to inform you that your booking (ID: {id}) has been <strong>DECLINED</strong>. Please contact us for details.</p>`;
           bookingDetailsUpdate = { Booking_Status_ID: statusId };
@@ -83,7 +104,7 @@ export async function POST(req: Request) {
 
         case 'start':
           statusId = 3;
-          smsTemplate = 'Hi {name}, your rental (ID: {id}) has officially STARTED. Drive safely!';
+          smsTemplate = smsTemplates['rental_started'] || 'Hi {name}, your rental (ID: {id}) has officially STARTED. Drive safely!';
           emailSubject = 'Rental Started';
           emailBodyTemplate = `<p>Your rental (ID: {id}) has officially <strong>STARTED</strong>. Drive safely!</p>`;
           bookingDetailsUpdate = { Booking_Status_ID: statusId };
@@ -91,8 +112,8 @@ export async function POST(req: Request) {
 
         case 'finish':
           statusId = 4;
-          // Updated SMS with Review Link
-          smsTemplate = 'Hi {name}, your booking (ID: {id}) has been COMPLETED. Thank you for choosing us! Please rate your experience here: https://jrjc.vercel.app/compose-review';
+          // Use template from CMS, with a fallback
+          smsTemplate = smsTemplates['booking_completed'] || 'Hi {name}, your booking (ID: {id}) has been COMPLETED. Thank you for choosing us! Please rate your experience here: https://jrjc.vercel.app/compose-review';
           
           emailSubject = 'Booking Completed';
           // Rich HTML with Button/Link
@@ -124,7 +145,7 @@ export async function POST(req: Request) {
 
         case 'cancel':
           statusId = 5;
-          smsTemplate = 'Hi {name}, your booking (ID: {id}) has been CANCELLED by the admin. Please contact us if this is a mistake.';
+          smsTemplate = smsTemplates['booking_cancelled_by_admin'] || 'Hi {name}, your booking (ID: {id}) has been CANCELLED by the admin. Please contact us if this is a mistake.';
           emailSubject = 'Booking Cancelled';
           emailBodyTemplate = `<p>Your booking (ID: {id}) has been <strong>CANCELLED</strong> by the admin. Please contact us if this is a mistake.</p>`;
           bookingDetailsUpdate = { Booking_Status_ID: statusId };

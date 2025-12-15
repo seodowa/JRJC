@@ -17,6 +17,24 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
+// Helper to fetch SMS templates from CMS
+const fetchSMSTemplates = async () => {
+    const { data, error } = await supabaseAdmin
+        .from('cms_content')
+        .select('key, value')
+        .eq('section', 'sms');
+    
+    if (error) {
+        console.error("Error fetching SMS templates:", error);
+        return {};
+    }
+    
+    return data.reduce((acc, item) => {
+        acc[item.key] = item.value;
+        return acc;
+    }, {} as Record<string, string>);
+};
+
 export async function POST(req: Request) {
   try {
     const { bookingId, otp } = await req.json();
@@ -28,6 +46,9 @@ export async function POST(req: Request) {
     if (!otp) {
         return NextResponse.json({ error: 'OTP is required' }, { status: 400 });
     }
+
+    // Fetch SMS templates dynamically
+    const smsTemplates = await fetchSMSTemplates();
 
     console.log(`Attempting to cancel booking: ${bookingId}`);
 
@@ -85,7 +106,13 @@ export async function POST(req: Request) {
     if (booking.Customer) {
       const customer = booking.Customer as any;
       const firstName = customer.First_Name || 'Customer';
-      const message = `Hi ${firstName}, your booking (ID: ${bookingId}) has been successfully CANCELLED. We hope to see you again next time.`;
+      
+      // Use template from CMS, with a fallback
+      const messageTemplate = smsTemplates['booking_cancelled_by_user'] || 'Hi {name}, your booking (ID: {id}) has been successfully CANCELLED. We hope to see you again next time.';
+      const message = messageTemplate
+        .replace('{name}', firstName)
+        .replace('{id}', bookingId);
+
       const subject = "Booking Cancelled";
       const preference = booking.Notification_Preference || 'SMS';
 
