@@ -66,26 +66,3 @@ export async function getSession() {
 }
 
 
-export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get("session")?.value;
-  if (!session) return;
-
-  // No need to update the session on every request if we set expiration on creation.
-  // The middleware can be simplified or removed if this was its only purpose.
-  // For now, leaving the logic commented out as it might be used for other things.
-  /*
-  const parsed = await decrypt(session);
-  if (!parsed) return;
-
-  parsed.expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-  const res = NextResponse.next();
-  res.cookies.set({
-    name: "session",
-    value: await encrypt(parsed),
-    httpOnly: true,
-    expires: parsed.expires,
-  });
-  return res;
-  */
-  return NextResponse.next();
-}
