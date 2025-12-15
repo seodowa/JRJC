@@ -156,6 +156,7 @@ const AdminLoginForm: React.FC = () => {
                 onResend={handleResendCode}
                 isResending={isResending}
                 title="JRJC ADMIN" // Pass the title
+                descriptionText="Enter the code we just sent you via email."
             />
         </>
     );

@@ -15,6 +15,7 @@ interface OtpModalProps {
     isResending: boolean;
     title?: string;
     showTrustDeviceOption?: boolean; // New prop
+    descriptionText?: string; // New prop for custom description
 }
 
 const OTPModal: React.FC<OtpModalProps> = ({
@@ -25,7 +26,8 @@ const OTPModal: React.FC<OtpModalProps> = ({
     onResend,
     isResending,
     title = "JRJC ADMIN",
-    showTrustDeviceOption = true // Default to true for existing admin usage
+    showTrustDeviceOption = true, // Default to true for existing admin usage
+    descriptionText = "Enter the code we just sent you via email." // Default text
 }) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const [trustDevice, setTrustDevice] = useState(false);
@@ -104,7 +106,7 @@ const OTPModal: React.FC<OtpModalProps> = ({
                     <div className="flex justify-center my-6">
                         <OTPVerificationIcon size={64} />
                     </div>
-                    <p className="mb-6">Enter the code we just sent you via email.</p>
+                    <p className="mb-6">{descriptionText}</p>
                     <form onSubmit={handleSubmit}>
                         <div className="flex justify-center gap-1 sm:gap-2 mb-4">
                             {otp.map((data, index) => {

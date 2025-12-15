@@ -218,6 +218,7 @@ export default function BookingTrackerPage() {
                 isResending={isSendingOtp}
                 title="JRJC BOOKING"
                 showTrustDeviceOption={false} // Hide for public cancellation
+                descriptionText="Enter the code we just sent you via sms."
             />
         </div>
     );
