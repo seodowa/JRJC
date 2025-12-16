@@ -30,6 +30,7 @@ const BookingDetailsModal = ({
   isProcessing,
 }: BookingDetailsModalProps) => {
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [validIdUrl, setValidIdUrl] = useState<string | null>(null);
 
   // Handle browser history for "swipe to back" support
   useEffect(() => {
@@ -47,6 +48,27 @@ const BookingDetailsModal = ({
       };
     }
   }, [isOpen]);
+
+  // Fetch Signed URL for ID
+  useEffect(() => {
+    if (booking?.valid_id_path) {
+      const fetchSignedUrl = async () => {
+        try {
+          const res = await fetch('/api/admin/bookings/signed-url', {
+            method: 'POST',
+            body: JSON.stringify({ path: booking.valid_id_path })
+          });
+          const data = await res.json();
+          if (data.signedUrl) setValidIdUrl(data.signedUrl);
+        } catch (e) {
+          console.error("Failed to fetch ID URL", e);
+        }
+      };
+      fetchSignedUrl();
+    } else {
+        setValidIdUrl(null);
+    }
+  }, [booking]);
 
   const handleManualClose = () => {
     if (isOpen) {
@@ -108,12 +130,12 @@ const BookingDetailsModal = ({
                 <div>
                   <h3 className="font-semibold text-lg text-gray-700 mb-2">Booking Information</h3>
                   <p className="text-sm text-gray-600"><strong>Status:</strong> <span className={`font-medium ${
-                    booking.Booking_Status.Name === 'Pending' ? 'text-yellow-600' :
-                    booking.Booking_Status.Name === 'Confirmed' ? 'text-blue-600' :
-                    booking.Booking_Status.Name === 'Ongoing' ? 'text-green-600' :
-                    booking.Booking_Status.Name === 'Completed' ? 'text-gray-600' :
+                    booking.Booking_Status?.Name === 'Pending' ? 'text-yellow-600' :
+                    booking.Booking_Status?.Name === 'Confirmed' ? 'text-blue-600' :
+                    booking.Booking_Status?.Name === 'Ongoing' ? 'text-green-600' :
+                    booking.Booking_Status?.Name === 'Completed' ? 'text-gray-600' :
                     'text-red-600'
-                  }`}>{booking.Booking_Status.Name}</span></p>
+                  }`}>{booking.Booking_Status?.Name || 'Unknown'}</span></p>
                   <p className="text-sm text-gray-600"><strong>Booked On:</strong> {formatDateTime(booking.date_created)}</p>
                   <p className="text-sm text-gray-600"><strong>Start:</strong> {formatDateTime(booking.Booking_Start_Date_Time)}</p>
                   <p className="text-sm text-gray-600"><strong>End:</strong> {formatDateTime(booking.Booking_End_Date_Time)}</p>
@@ -150,6 +172,33 @@ const BookingDetailsModal = ({
                   <p className="text-sm text-gray-600"><strong>Name:</strong> {booking.Customer.First_Name} {booking.Customer.Last_Name} {booking.Customer.Suffix || ''}</p>
                   <p className="text-sm text-gray-600"><strong>Email:</strong> {booking.Customer.Email || 'N/A'}</p>
                   <p className="text-sm text-gray-600"><strong>Contact:</strong> {booking.Customer.Contact_Number || 'N/A'}</p>
+                </div>
+
+                {/* Valid Government ID */}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Valid Government ID</h3>
+                  {validIdUrl ? (
+                    <div className="relative w-full h-48 border border-gray-300 rounded-md overflow-hidden cursor-pointer group" onClick={() => window.open(validIdUrl, '_blank')}>
+                      <Image
+                        src={validIdUrl}
+                        alt="Customer ID"
+                        fill
+                        style={{ objectFit: 'contain' }}
+                        className="rounded-md"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <span className="bg-white/80 px-2 py-1 rounded text-xs font-medium text-gray-800">Click to Open</span>
+                      </div>
+                    </div>
+                  ) : booking.valid_id_path ? (
+                      <div className="w-full h-48 border border-gray-300 rounded-md flex items-center justify-center bg-gray-50 text-gray-500 text-sm">
+                        Loading ID...
+                      </div>
+                  ) : (
+                    <div className="w-full h-12 border border-dashed border-gray-300 rounded-md flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+                      No ID uploaded
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -189,7 +238,7 @@ const BookingDetailsModal = ({
           {/* Footer Actions - Fixed */}
           <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-white flex flex-col md:flex-row justify-end gap-3">
             <div className="flex gap-3 w-full md:w-auto">
-              {getStatusButtons(booking.Booking_Status.Name)}
+              {getStatusButtons(booking.Booking_Status?.Name || '')}
               <AsyncButton onClick={handleManualClose} className="flex-1 md:flex-none px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-center justify-center">Close</AsyncButton>
             </div>
           </div>

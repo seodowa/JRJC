@@ -29,6 +29,7 @@ export async function GET(
       additional_hours,
       date_returned,
       Payment_Details_ID,
+      valid_id_path,
       Customer (
         First_Name,
         Last_Name,

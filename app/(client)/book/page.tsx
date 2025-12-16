@@ -60,6 +60,10 @@ const BookingPage: React.FC = () => {
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
     referenceNumber: "",
   });
+  
+  const [validIdPath, setValidIdPath] = useState<string | null>(null);
+  const [isUploadingId, setIsUploadingId] = useState(false);
+  const [idUploadError, setIdUploadError] = useState<string | null>(null);
 
   const [selectedCar, setSelectedCar] = useState<number | null>(null);
   const { pricingData, loading, error, calculatePrice } = useCarPricing(selectedCar);
@@ -116,6 +120,49 @@ const BookingPage: React.FC = () => {
     });
   };
 
+  const handleIdUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        setIdUploadError("Only image files are allowed.");
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+        setIdUploadError("File size exceeds 5MB limit.");
+        return;
+    }
+
+    setIsUploadingId(true);
+    setIdUploadError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', 'secure_id');
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to upload ID");
+      }
+
+      setValidIdPath(data.path);
+    } catch (error) {
+      console.error("ID Upload Error:", error);
+      setIdUploadError(error instanceof Error ? error.message : "Upload failed");
+      e.target.value = ''; 
+    } finally {
+      setIsUploadingId(false);
+    }
+  };
+
   const handleFinalSubmit = async () => {
     if (!selectedCar) {
       setSubmitError("Please select a car");
@@ -146,14 +193,14 @@ const BookingPage: React.FC = () => {
         paymentInfo: apiPaymentInfo, 
         selectedCar,
         initialRentalCost, 
-        carWashFee,
-        bookingStatusId: 1, 
-        notificationPreference: finalPreferenceString, 
-      };
-
-      const result = await createBooking(bookingData);
-      
-      const newBookingId = result.booking.Booking_ID;
+                carWashFee, 
+                bookingStatusId: 1, 
+                notificationPreference: finalPreferenceString, 
+                validIdPath // Secure ID Path
+              };
+        
+              const result = await createBooking(bookingData);
+              const newBookingId = result.booking.Booking_ID;
       const statusText = "Pending";
 
       setBookingSuccess(true);
@@ -174,6 +221,7 @@ const BookingPage: React.FC = () => {
         setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
         setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
         setPaymentInfo({ referenceNumber: "" });
+        setValidIdPath(null); // Reset ID path
         setSelectedCar(null);
         setSelectedCarData(null);
         setCurrentStep(1);
@@ -328,6 +376,23 @@ const BookingPage: React.FC = () => {
                   />
                   
                   <InputField label="Mobile Number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-2 md:col-span-1" />
+                  
+          {/* Valid Government ID Upload */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-semibold mb-2">
+              Valid Government ID (Image) <span className="text-red-500">*</span>
+            </label>
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleIdUpload}
+                        required={!validIdPath} // Required if not yet uploaded
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    {isUploadingId && <p className="text-xs text-blue-500 mt-1">Uploading...</p>}
+                    {validIdPath && !isUploadingId && <p className="text-xs text-green-600 mt-1">ID uploaded successfully.</p>}
+                    {idUploadError && <p className="text-xs text-red-500 mt-1">{idUploadError}</p>}
+                  </div>
                 </div>
               </div>
               <div className="flex justify-end mt-8 pt-6 border-t border-gray-100">

@@ -287,7 +287,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       setModalBookingDetails(details);
 
       // Logic to determine which modal to open based on status
-      if (details.Booking_Status.Name === 'Ongoing') {
+      if (details.Booking_Status?.Name === 'Ongoing') {
         setIsOngoingModalOpen(true);
         setIsModalOpen(false); 
       } else {

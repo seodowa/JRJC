@@ -6,6 +6,10 @@ import { Car, CarPricing, BookingData } from "@/types";
 export interface WalkInBookingContextType {
   personalInfo: BookingData['personalInfo'];
   setPersonalInfo: React.Dispatch<React.SetStateAction<BookingData['personalInfo']>>;
+  
+  validIdPath: string | null;
+  setValidIdPath: React.Dispatch<React.SetStateAction<string | null>>;
+
   rentalInfo: BookingData['rentalInfo'];
   setRentalInfo: React.Dispatch<React.SetStateAction<BookingData['rentalInfo']>>;
   

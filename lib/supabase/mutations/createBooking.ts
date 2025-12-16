@@ -110,7 +110,9 @@ export const createBooking = async (bookingData: any) => {
         // New Payment Parameters
         p_booking_fee: bookingData.paymentInfo.bookingFee,
         p_initial_total_payment: bookingData.paymentInfo.initialTotalPayment,
-        p_bf_reference_number: bookingData.paymentInfo.bfReferenceNumber
+        p_bf_reference_number: bookingData.paymentInfo.bfReferenceNumber,
+        // Secure ID Path
+        p_valid_id_path: bookingData.validIdPath
       });
 
     if (bookingError) {

@@ -31,6 +31,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
   const [isFinishing, setIsFinishing] = useState(false);
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [isReturnConfirmOpen, setIsReturnConfirmOpen] = useState(false);
+  const [validIdUrl, setValidIdUrl] = useState<string | null>(null);
   
   // Local state to track updates before final finish
   const [localBooking, setLocalBooking] = useState<SpecificBookingDetails | null>(null);
@@ -48,6 +49,27 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
       return () => window.removeEventListener('popstate', handlePopState);
     }
   }, [isOpen, booking]);
+
+  // Fetch Signed URL for ID
+  useEffect(() => {
+    if (booking?.valid_id_path) {
+      const fetchSignedUrl = async () => {
+        try {
+          const res = await fetch('/api/admin/bookings/signed-url', {
+            method: 'POST',
+            body: JSON.stringify({ path: booking.valid_id_path })
+          });
+          const data = await res.json();
+          if (data.signedUrl) setValidIdUrl(data.signedUrl);
+        } catch (e) {
+          console.error("Failed to fetch ID URL", e);
+        }
+      };
+      fetchSignedUrl();
+    } else {
+        setValidIdUrl(null);
+    }
+  }, [booking]);
 
   const handleManualClose = () => {
     if (isOpen) window.history.back();
@@ -253,6 +275,33 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
                   <p className="text-sm text-gray-600"><strong>Name:</strong> {localBooking.Customer.First_Name} {localBooking.Customer.Last_Name} {localBooking.Customer.Suffix || ''}</p>
                   <p className="text-sm text-gray-600"><strong>Email:</strong> {localBooking.Customer.Email || 'N/A'}</p>
                   <p className="text-sm text-gray-600"><strong>Contact:</strong> {localBooking.Customer.Contact_Number || 'N/A'}</p>
+                </div>
+
+                {/* Valid Government ID */}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Valid Government ID</h3>
+                  {validIdUrl ? (
+                    <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden cursor-pointer group" onClick={() => window.open(validIdUrl, '_blank')}>
+                      <Image
+                        src={validIdUrl}
+                        alt="Customer ID"
+                        fill
+                        style={{ objectFit: 'contain' }}
+                        className="rounded-md"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <span className="bg-white/80 px-2 py-1 rounded text-xs font-medium text-gray-800">Click to Open</span>
+                      </div>
+                    </div>
+                  ) : localBooking.valid_id_path ? (
+                      <div className="w-full h-40 border border-gray-300 rounded-md flex items-center justify-center bg-gray-50 text-gray-500 text-sm">
+                        Loading ID...
+                      </div>
+                  ) : (
+                    <div className="w-full h-12 border border-dashed border-gray-300 rounded-md flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+                      No ID uploaded
+                    </div>
+                  )}
                 </div>
               </div>
 

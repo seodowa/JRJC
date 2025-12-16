@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import { useWalkInBooking } from "@/app/(admin)/context/WalkInBookingContext";
 import AsyncButton from "@/components/AsyncButton";
 
@@ -8,7 +9,52 @@ interface PersonalInformationFormProps {
 }
 
 const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
-  const { personalInfo, setPersonalInfo } = useWalkInBooking();
+  const { personalInfo, setPersonalInfo, validIdPath, setValidIdPath } = useWalkInBooking();
+  const [isUploadingId, setIsUploadingId] = useState(false);
+  const [idUploadError, setIdUploadError] = useState<string | null>(null);
+
+  const handleIdUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        setIdUploadError("Only image files are allowed.");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        setIdUploadError("File size exceeds 5MB limit.");
+        return;
+    }
+
+    setIsUploadingId(true);
+    setIdUploadError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', 'secure_id');
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to upload ID");
+      }
+
+      setValidIdPath(data.path);
+    } catch (error) {
+      console.error("ID Upload Error:", error);
+      setIdUploadError(error instanceof Error ? error.message : "Upload failed");
+      e.target.value = '';
+    } finally {
+      setIsUploadingId(false);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -118,6 +164,24 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
             />
           </div>
         </div>
+        
+      {/* Valid Government ID Upload */}
+      <div className="mb-4">
+        <label className="block text-gray-700 font-semibold mb-2">
+          Valid Government ID (Image): <span className="text-red-500">*</span>
+        </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleIdUpload}
+              required={!validIdPath}
+              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            {isUploadingId && <p className="text-xs text-blue-500 mt-1">Uploading...</p>}
+            {validIdPath && !isUploadingId && <p className="text-xs text-green-600 mt-1">ID uploaded successfully.</p>}
+            {idUploadError && <p className="text-xs text-red-500 mt-1">{idUploadError}</p>}
+        </div>
+
         <div className="flex justify-end mt-6">
           <AsyncButton
             type="submit" // Trigger form submit to run validation

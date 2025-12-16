@@ -40,6 +40,8 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
     initialTotalPayment: 0,
   });
 
+  const [validIdPath, setValidIdPath] = useState<string | null>(null);
+
   // New State for Notification Preferences
   const [notificationPreferences, setNotificationPreferences] = useState<string[]>(['SMS']);
 
@@ -175,7 +177,8 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
         initialRentalCost, 
         carWashFee: carWashFeeVal, 
         bookingStatusId,
-        notificationPreference: finalPreferenceString // Added here
+        notificationPreference: finalPreferenceString, // Added here
+        validIdPath // Secure ID Path
       };
 
       const result = await createWalkInBookingService(bookingData);
@@ -204,6 +207,7 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
       setPersonalInfo({ firstName: "", lastName: "", suffix: "", email: "", mobileNumber: "" });
       setRentalInfo({ area: "", startDate: "", endDate: "", selfDrive: "", duration: "", time: "" });
       setPaymentInfo({ bfReferenceNumber: "", bookingFee: 0, initialTotalPayment: 0 });
+      setValidIdPath(null);
       setPaymentMethod(null);
       setSelectedCar(null);
       setSelectedCarData(null);
@@ -242,6 +246,7 @@ export const WalkInBookingProvider = ({ children }: { children: ReactNode }) => 
 
   const value = {
     personalInfo, setPersonalInfo,
+    validIdPath, setValidIdPath,
     rentalInfo, setRentalInfo,
     paymentInfo, setPaymentInfo,
     paymentMethod, setPaymentMethod,

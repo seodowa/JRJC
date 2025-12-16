@@ -97,6 +97,8 @@ export async function POST(req: Request) {
           Payment_Details_ID: paymentId, // Link to the new Payment_Details record
           Booking_Status_ID: bookingData.bookingStatusId || 1, 
           Location: bookingData.rentalInfo.area,
+          valid_id_path: bookingData.validIdPath || null,
+          Notification_Preference: bookingData.notificationPreference || null
         }
       ])
       .select()

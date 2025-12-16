@@ -43,8 +43,10 @@ export type SpecificBookingDetails = {
   Booking_Status: {
     Name: string;
   };
-  additional_hours: number | null;
-  date_returned: string | null;
-  Payment_Details_ID: number | null; // Foreign Key to Payment_Details
-  Payment_Details?: PaymentDetails | null; // Nested payment details object, if fetched
-};
+    additional_hours: number | null;
+    date_returned: string | null;
+    Payment_Details_ID: number | null; // Foreign Key to Payment_Details
+    Payment_Details?: PaymentDetails | null; // Nested payment details object, if fetched
+    valid_id_path?: string | null;
+  };
+  

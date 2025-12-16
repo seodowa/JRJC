@@ -17,6 +17,7 @@ export interface Booking {
   additional_hours?: number;
   date_returned?: string;
   Payment_Details_ID?: number; // New FK to Payment_Details table
+  valid_id_path?: string; // Path to secure ID image
 }
 
 export interface PaymentDetails {
@@ -54,6 +55,8 @@ export interface BookingData {
   initialRentalCost: number; // Renamed from initialPayment, representing just the car rental cost
   carWashFee: number; // Still needed for calculation breakdown in UI
   bookingStatusId: number;
+  notificationPreference?: string;
+  validIdPath?: string; // Path to uploaded ID
 }
 
 
