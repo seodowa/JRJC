@@ -166,8 +166,8 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         </div>
         
       {/* Valid Government ID Upload */}
-      <div className="mb-4">
-        <label className="block text-gray-700 font-semibold mb-2">
+      <div className="pt-4">
+        <label className="block text-gray-700">
           Valid Government ID (Image): <span className="text-red-500">*</span>
         </label>
             <input
