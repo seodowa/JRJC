@@ -79,12 +79,10 @@ const ReviewsPageClient = ({ reviews, cars }: { reviews: Review[]; cars: Car[] }
             )}
           </div>
         </div>
-        <div className="grid grid-cols-12 gap-x-6 px-6 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div className="col-span-4">Review</div>
+        <div className="hidden md:grid grid-cols-12 gap-x-6 px-6 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div className="col-span-6">Review Content</div>
             <div className="col-span-2">Rating</div>
-            <div className="col-span-2">Date</div>
-            <div className="col-span-2">Car Used</div>
-            <div className="col-span-2">Helpful Count</div>
+            <div className="col-span-4">Review Details</div>
         </div>
       </header>
       <main className="flex-grow overflow-y-auto px-4 sm:px-6 lg:px-8">

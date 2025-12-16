@@ -31,23 +31,44 @@ const ReviewsTableView = ({ reviews }: { reviews: Review[] }) => {
   return (
     <div className="divide-y divide-gray-200">
       {reviews.map((review) => (
-        <div key={review.id} className="grid grid-cols-12 gap-x-6 px-6 py-4">
-          <div className="col-span-4 whitespace-normal">
-            <div className="text-sm font-bold text-gray-900">{review.title}</div>
-            <div className="text-sm text-gray-500 my-2">{review.comment}</div>
-            <div className="text-sm text-gray-700">by {review.userName}</div>
+        <div key={review.id} className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-x-6 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+          {/* Review Content */}
+          <div className="col-span-12 md:col-span-6 space-y-2 md:space-y-1">
+            <div className="flex justify-between items-start md:block">
+                <h3 className="text-sm font-bold text-gray-900">{review.title}</h3>
+                <div className="md:hidden">
+                    <StarRating rating={review.rating} />
+                </div>
+            </div>
+            
+            <p className="text-sm text-gray-600 line-clamp-3 md:line-clamp-2">{review.comment}</p>
+            <p className="text-xs text-gray-400">by <span className="text-gray-700 font-medium">{review.userName}</span></p>
           </div>
-          <div className="col-span-2">
+          
+          {/* Rating (Desktop Only) */}
+          <div className="hidden md:flex col-span-2 items-start pt-1">
             <StarRating rating={review.rating} />
           </div>
-          <div className="col-span-2 text-sm text-gray-500">
-            {formatDate(review.createdAt)}
-          </div>
-          <div className="col-span-2 text-sm text-gray-500">
-            {review.car ? `${review.car.brand} ${review.car.model} ${review.car.year}` : 'N/A'}
-          </div>
-          <div className="col-span-2 text-sm text-gray-500">
-            {review.helpfulCount}
+
+          {/* Booking Details */}
+          <div className="col-span-12 md:col-span-4 flex flex-col space-y-2 mt-2 md:mt-0">
+            <div className="flex items-center justify-between md:justify-start">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${review.car ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {review.car ? `${review.car.brand} ${review.car.model} ${review.car.year}` : 'No Car Linked'}
+                </span>
+                <span className="md:hidden text-xs text-gray-500">
+                    {formatDate(review.createdAt)}
+                </span>
+            </div>
+            
+            <div className="flex items-center text-xs text-gray-500 space-x-4">
+                <span className="hidden md:inline">
+                    {formatDate(review.createdAt)}
+                </span>
+                <span>
+                    {review.helpfulCount} helpful
+                </span>
+            </div>
           </div>
         </div>
       ))}
