@@ -261,6 +261,12 @@ const BookingPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    if (currentStep === 1 && !validIdPath) {
+       setIdUploadError("Please upload a valid government ID.");
+       // We can also scroll to the element if needed, but the error message is close enough
+       return;
+    }
+
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
       e.stopPropagation();
@@ -378,21 +384,37 @@ const BookingPage: React.FC = () => {
                   <InputField label="Mobile Number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-2 md:col-span-1" />
                   
           {/* Valid Government ID Upload */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold mb-2">
+          <div className="col-span-3 md:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Valid Government ID (Image) <span className="text-red-500">*</span>
             </label>
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleIdUpload}
-                        required={!validIdPath} // Required if not yet uploaded
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    />
-                    {isUploadingId && <p className="text-xs text-blue-500 mt-1">Uploading...</p>}
-                    {validIdPath && !isUploadingId && <p className="text-xs text-green-600 mt-1">ID uploaded successfully.</p>}
-                    {idUploadError && <p className="text-xs text-red-500 mt-1">{idUploadError}</p>}
-                  </div>
+            
+            <div className={`relative flex items-center w-full border rounded-lg overflow-hidden transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'}`}>
+                <label 
+                    htmlFor="id-upload" 
+                    className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-3 text-base border-r border-gray-300 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                >
+                    Browse
+                </label>
+                <div className="flex-1 px-4 py-3 text-gray-500 truncate bg-white">
+                    {isUploadingId ? (
+                        <span className="text-blue-500">Uploading...</span>
+                    ) : validIdPath ? (
+                        <span className="text-green-600 font-medium">ID uploaded successfully</span>
+                    ) : (
+                        "No file chosen"
+                    )}
+                </div>
+                <input 
+                    id="id-upload"
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleIdUpload}
+                    className="hidden"
+                />
+            </div>
+            {idUploadError && <p className="text-xs text-red-500 mt-1">{idUploadError}</p>}
+          </div>
                 </div>
               </div>
               <div className="flex justify-end mt-8 pt-6 border-t border-gray-100">

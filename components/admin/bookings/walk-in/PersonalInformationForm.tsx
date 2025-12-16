@@ -69,6 +69,12 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
   // Logic to trigger browser validation before moving to Next step
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!validIdPath) {
+        setIdUploadError("Please upload a valid government ID.");
+        return;
+    }
+
     const form = e.currentTarget;
     
     // Check if the HTML5 constraints (required, pattern) are met
@@ -167,20 +173,36 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         
       {/* Valid Government ID Upload */}
       <div className="pt-4">
-        <label className="block text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Valid Government ID (Image): <span className="text-red-500">*</span>
         </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleIdUpload}
-              required={!validIdPath}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        
+        <div className={`relative flex items-center w-full border rounded-lg overflow-hidden transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'}`}>
+            <label 
+                htmlFor="admin-id-upload" 
+                className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-3 text-base border-r border-gray-300 hover:bg-gray-200 transition-colors whitespace-nowrap"
+            >
+                Browse
+            </label>
+            <div className="flex-1 px-4 py-3 text-gray-500 truncate bg-white">
+                {isUploadingId ? (
+                    <span className="text-blue-500">Uploading...</span>
+                ) : validIdPath ? (
+                    <span className="text-green-600 font-medium">ID uploaded successfully</span>
+                ) : (
+                    "No file chosen"
+                )}
+            </div>
+            <input 
+                id="admin-id-upload"
+                type="file" 
+                accept="image/*" 
+                onChange={handleIdUpload}
+                className="hidden"
             />
-            {isUploadingId && <p className="text-xs text-blue-500 mt-1">Uploading...</p>}
-            {validIdPath && !isUploadingId && <p className="text-xs text-green-600 mt-1">ID uploaded successfully.</p>}
-            {idUploadError && <p className="text-xs text-red-500 mt-1">{idUploadError}</p>}
         </div>
+        {idUploadError && <p className="text-xs text-red-500 mt-1">{idUploadError}</p>}
+      </div>
 
         <div className="flex justify-end mt-6">
           <AsyncButton
