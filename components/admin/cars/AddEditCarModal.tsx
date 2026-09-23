@@ -170,11 +170,11 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
   );
 
   // Helper for input styles - slightly smaller padding (py-1.5)
-  const inputClassName = "w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500";
+  const inputClassName = "field";
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 md:p-4">
+      <div className="fixed inset-0 bg-ink/40 flex justify-center items-center z-50 md:p-4">
         {/* 
             Changed layout strategy:
             - h-full w-full (mobile) -> md:h-auto md:max-h-[90vh] md:max-w-4xl (desktop)
@@ -182,12 +182,12 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
         */}
         <form 
             onSubmit={handleSubmit} 
-            className="relative bg-white md:rounded-2xl shadow-2xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col"
+            className="relative bg-surface md:rounded-md shadow-2xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col"
         >
           
           {/* Header - Fixed at top */}
           <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
-             <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit Car' : 'Add Car'}</h2>
+             <h2 className="text-xl font-medium">{isEditMode ? 'Edit Car' : 'Add Car'}</h2>
              {/* Close button for mobile accessibility/clarity */}
              <button type="button" onClick={handleManualClose} className="md:hidden text-gray-500 p-2">
                <span className="text-2xl">&times;</span>
@@ -285,7 +285,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
 
                     {/* Pricing Section */}
                     <div className="space-y-2">
-                    <h3 className="font-bold text-sm text-gray-800">Pricing</h3>
+                    <h3 className="font-display font-medium text-sm">Pricing</h3>
                     
                     {locations.map(location => (
                         <div key={location}>

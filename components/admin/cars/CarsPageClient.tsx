@@ -97,7 +97,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
   };
 
   // Matches the visual style of the white container in the 2nd picture
-  const cardBaseStyle = "bg-white rounded-[30px] shadow-sm border border-gray-100";
+  const cardBaseStyle = "bg-surface rounded-md border border-line";
 
   return (
     <>
@@ -126,7 +126,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
               exit={{ x: -20, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <h2 className="text-xl font-bold mb-6 text-gray-800 flex-shrink-0">Manage Cars</h2>
+              <h2 className="mb-6 flex-shrink-0 text-3xl leading-none font-normal tracking-[-0.03em]">Cars</h2>
               
               {/* Scrollable Sidebar Content */}
               <div className="flex-1 overflow-y-auto pb-20 custom-scrollbar">
@@ -152,8 +152,8 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
                 animate={{ opacity: 1, y: 0 }}
             >
                 {/* Only show title here if in Grid view, otherwise it's in the sidebar */}
-                <h2 className="text-2xl font-bold text-gray-800">
-                    {view === 'grid' ? 'Manage Cars' : ''}
+                <h2 className="text-4xl leading-none font-normal tracking-[-0.03em]">
+                    {view === 'grid' ? 'Cars' : ''}
                 </h2>
                 
                 <div className="flex items-center gap-3 w-full max-w-md justify-end">
@@ -203,7 +203,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
                     animate={{ y: 0, opacity: 1 }}
                 >
                     {/* FIX: Removed backdrop-blur-sm and bg-white/80, replaced with solid bg-white */}
-                    <div className="bg-white p-1 rounded-full shadow-lg border border-gray-100">
+                    <div className="rounded-md border border-line bg-surface p-1 shadow-lg">
                         <ViewToggle view={view} setView={handleViewChange} />
                     </div>
                 </motion.div>

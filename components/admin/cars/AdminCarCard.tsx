@@ -66,7 +66,7 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
 
   return (
     // Changed gap-6 to gap-4 and p-6 to p-5 for tighter layout
-    <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 p-5 bg-white rounded-[24px] border border-gray-200 shadow-sm items-start">
+    <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 p-5 bg-white rounded-md border border-gray-200 shadow-sm items-start">
       
       {/* 1. Image Section - Reduced width from w-48 to w-40 */}
       <div className="w-full md:w-40 h-40 flex-shrink-0 bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100">
@@ -87,7 +87,7 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
       <div className="flex-1 w-full min-w-0"> {/* min-w-0 ensures flex child truncates properly */}
         
         {/* Header Title */}
-        <h3 className="text-xl font-bold text-gray-800 mb-3 truncate">
+        <h3 className="font-display text-xl font-medium mb-3 truncate">
             {car.brand} {car.model} <span className="text-gray-600 font-semibold">{car.year}</span>
         </h3>
 

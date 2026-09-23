@@ -14,7 +14,7 @@ export default function SettingsPage() {
     <div className="flex flex-col md:flex-row gap-6 h-full">
       {/* Left Settings Navigation Panel */}
       <div className="w-full md:w-64 bg-white rounded-3xl p-6 shadow-sm h-fit">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Settings</h2>
+        <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl mb-8">Settings</h1>
         
         <nav className="space-y-2">
           <button 

@@ -91,7 +91,7 @@ const CMSClientPage: React.FC = () => {
     <div className="flex flex-col h-full bg-white">
       {/* Fixed Header */}
       <div className="p-8 pb-4 flex-none bg-white border-b border-gray-200 z-10">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Content Management System</h1>
+        <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl mb-6">Site content</h1>
         
         {/* Section Navigation */}
         <div className="flex overflow-x-auto pb-2 -mx-1 hide-scrollbar">
@@ -99,7 +99,7 @@ const CMSClientPage: React.FC = () => {
             <button
               key={section.key}
               onClick={() => scrollToSection(section.key)}
-              className="mx-1 px-4 py-2 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-600 rounded-full text-sm font-medium transition-colors whitespace-nowrap"
+              className="mx-1 px-4 py-2 border border-line hover:border-ink text-ink rounded-md text-sm font-medium transition-colors whitespace-nowrap"
             >
               {section.label}
             </button>
@@ -111,7 +111,7 @@ const CMSClientPage: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-8 pt-4">
         {loadingInitial ? (
           <div className="flex justify-center items-center h-64">
-             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+             <div className="animate-spin rounded-full h-12 w-12 border-2 border-line border-t-forest"></div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

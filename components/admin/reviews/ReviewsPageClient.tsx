@@ -55,10 +55,10 @@ const ReviewsPageClient = ({ reviews, cars }: { reviews: Review[]; cars: Car[] }
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-3xl shadow-md">
+    <div className="h-full flex flex-col">
       <header className="flex-shrink-0 p-4 sm:p-6 lg:p-8 border-b border-gray-200">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">See Reviews</h1>
+          <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">Reviews</h1>
           <div className="relative"> {/* Added relative for dropdown positioning */}
             <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}

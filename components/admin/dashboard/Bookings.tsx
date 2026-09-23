@@ -24,27 +24,30 @@ const Bookings = ({ bookings }: BookingsProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-2xl font-bold mb-2 flex-shrink-0">Pending Bookings</h2>
+      <div className="mb-2 flex flex-shrink-0 items-baseline justify-between">
+        <h2 className="text-2xl">Pending</h2>
+        <span className="num text-xs text-ink-2">{bookings.length}</span>
+      </div>
       
       <div className="overflow-y-auto flex-grow">
         {bookings.length === 0 ? (
-          <p className="text-gray-500">No pending bookings at the moment.</p>
+          <p className="text-ink-2">Nothing waiting for approval.</p>
         ) : (
-          <div className="space-y-4">
+          <ul>
             {bookings.map((booking) => (
-              <div key={booking.Booking_ID} className="p-3 bg-gray-50 rounded-lg">
-                <p className="font-semibold text-gray-800">
+              <li key={booking.Booking_ID} className="border-b border-line py-3">
+                <p className="font-medium">
                   {getFullName(booking)}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="num text-xs text-ink-2">
                   {formatDate(booking.Booking_Start_Date_Time)} - {formatDate(booking.Booking_End_Date_Time)}
                 </p>
                 <p className="text-sm text-gray-500">
                   {booking.Duration} hours - {booking.Location}
                 </p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </div>

@@ -159,7 +159,7 @@ export default function ManageEmployees() {
   if (error) {
     return (
       <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm text-red-600">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Manage Employees</h2>
+        <h2 className="text-xl font-medium mb-4">Manage Employees</h2>
         <p>Error: {error}</p>
       </div>
     );
@@ -168,7 +168,7 @@ export default function ManageEmployees() {
   return (
     <div className="flex-1 bg-white rounded-3xl p-4 md:p-8 shadow-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className="text-xl font-bold text-gray-900">Manage Employees</h2>
+        <h2 className="text-xl font-medium">Manage Employees</h2>
         <button
           onClick={handleOpenCreate}
           className="w-full md:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -185,14 +185,14 @@ export default function ManageEmployees() {
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="border-b border-ink">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">ID</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Profile</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Username</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Email</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Type</th>
+                  <th className="num px-6 py-3.5 text-right text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">

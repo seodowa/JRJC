@@ -217,13 +217,13 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 md:p-4">
+      <div className="fixed inset-0 bg-ink/40 flex justify-center items-center z-50 md:p-4">
         {/* Full screen mobile, Centered Card Desktop */}
         <div className="relative bg-white md:rounded-lg shadow-xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col">
           
           {/* Header */}
           <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 truncate pr-4">Ongoing - {localBooking.Booking_ID}</h2>
+            <h2 className="text-xl md:text-2xl font-medium truncate pr-4">Ongoing - {localBooking.Booking_ID}</h2>
             <button type="button" onClick={handleManualClose} className="text-gray-500 p-2 hover:bg-gray-100 rounded-full">
                <span className="text-2xl leading-none">&times;</span>
             </button>
@@ -398,7 +398,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
                 <AsyncButton 
                     onClick={handleFinish} 
                     disabled={!canFinish || isFinishing} 
-                    className="flex-1 md:flex-none px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-center justify-center"
+                    className="flex-1 md:flex-none px-4 py-2 bg-forest text-white rounded-md hover:bg-forest-hover disabled:opacity-50 disabled:cursor-not-allowed text-center justify-center"
                 >
                     Confirm Finish
                 </AsyncButton>

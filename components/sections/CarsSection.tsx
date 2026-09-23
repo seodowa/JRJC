@@ -1,23 +1,24 @@
-import "@/app/globals.css";
 import CarCard from "../CarCard";
-import Carousel from "../Carousel";
+import SectionHeader from "../ui/SectionHeader";
 import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
 
 export default async function CarsSection() {
-  const CAROUSEL_HEIGHT = 38 * 16; // rem * 16 = px
   const cars = await fetchCars();
   const IN_MAINTENANCE = 3; // status id for car in maintenance
-  
-  return (
-    <section id="cars" className="min-h-screen relative bg-gradient-to-b from-main-color to-secondary-50 flex flex-col items-center pt-16">
-        <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl md:py-10 text-center">Cars Available</h1>
-        <Carousel height={CAROUSEL_HEIGHT}>
-          {cars.map(car => {
-              if (car.status?.id === IN_MAINTENANCE) return
+  const available = cars.filter(car => car.status?.id !== IN_MAINTENANCE);
 
-              return <CarCard key={car.id} car={car} />
-            })}
-        </Carousel>
+  return (
+    <section className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 pb-24 sm:px-8 lg:px-16 lg:pb-28">
+      <SectionHeader index="01" label="Fleet" title="Pick what fits the trip.">
+        <p className="num text-xs text-ink-2">{available.length} cars available</p>
+      </SectionHeader>
+      {available.length > 0 ? (
+        <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          {available.map(car => <CarCard key={car.id} car={car} />)}
+        </div>
+      ) : (
+        <p className="text-ink-2">No cars are available right now. Please check back soon.</p>
+      )}
     </section>
   );
 }

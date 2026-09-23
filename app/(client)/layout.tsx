@@ -3,6 +3,7 @@ import "@/app/globals.css";
 // Removed Head import as it's not standard in App Router for metadata
 import { fetchCMSContent } from '@/lib/supabase/queries/cms';
 import { CMSProvider } from './context/CMSContext';
+import { fontVariables } from '@/lib/fonts';
 
 export async function generateMetadata() {
   const cmsContent = await fetchCMSContent();
@@ -32,8 +33,8 @@ export default async function RootLayout({
   const cmsContent = await fetchCMSContent(); // Fetch all CMS content once
 
   return (
-    <html lang="en" className="h-full w-full scroll-smooth">
-      <body>
+    <html lang="en" className={`${fontVariables} h-full w-full scroll-smooth`}>
+      <body className="bg-paper text-ink font-sans antialiased">
         <CMSProvider initialContent={cmsContent}>
           <NavigationBar />
           {children}

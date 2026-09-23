@@ -1,34 +1,50 @@
-"use client"; // This component needs to be a Client Component to use useCMS
+"use client";
 
-import "@/app/globals.css";
-import { useCMS } from "@/app/(client)/context/CMSContext"; // Import useCMS
+import { useCMS } from "@/app/(client)/context/CMSContext";
+import { buttonClass } from "../ui/button";
+
+const STEPS = ["Pick a car", "Choose dates", "Pay via GCash"];
 
 export default function HeroSection() {
-  const { getText, getImage } = useCMS(); // Use the hook to get CMS functions
+  const { getText, getImage } = useCMS();
 
-  // Fetch content from CMS
   const subtitle = getText('hero', 'subtitle', 'Car Rental Services');
-  const mainImage = getImage('hero', 'main_image', '/images/kentb_car_gradient.webp'); // Default fallback
-  const textImage = getImage('hero', 'text_image', '/images/JRJC TEXT ONLY.png'); // Default fallback
+  const mainImage = getImage('hero', 'main_image', '/images/BG.webp');
 
   return (
-    <section id="hero" className="bg-main-color font-main-font min-h-screen relative z-0
-                    flex flex-col items-center -mt-12 overflow-hidden
-                    md:flex-row-reverse">
-       <div className="flex flex-col items-center w-full h-1/2
-                       md:min-h-screen md:w-3/5 pt-40 md:pt-50 md:pl-20 
-                       md:bg-gradient-to-l from-main-color from-85% to-transparent z-1">
-          <div className="flex flex-col justify-center items-center">
-            <img src={textImage} alt="JRJC Logo" className="-my-10 min-h-60 max-h-60 md:-my-12 md:min-h-80 md:max-h-80"/>
-            <h3 className="pt-2 pb-9 text-2xl">{subtitle}</h3>
-            <a href="book" className="bg-secondary-100 py-2 md:py-3 px-16 md:px-16 
-                                  text-2xl md:text-3xl text-white rounded-full transition-transform hover:scale-110
-                                  shadow-md">Book Now</a>
-          </div>
-       </div>
-       <div className="flex overflow-hidden object-cover absolute left-0 top-5/11 md:top-auto w-full max-h-screen">
-          <img src={mainImage} alt="Car background" className="opacity-30 min-w-3xl max-w-3xl sm:max-w-4xl md:max-w-full max-h-screen object-cover"/>
-       </div>
+    <section id="hero" className="mx-auto grid max-w-[1440px] grid-cols-1 gap-10 px-4 pt-10 pb-20 sm:px-8 md:grid-cols-12 md:gap-6 md:pt-16 lg:px-16 lg:pb-24">
+      <div className="flex flex-col gap-7 md:col-span-6 md:self-end lg:col-span-5">
+        <p className="eyebrow">{subtitle} — Bukidnon, PH</p>
+        <h1 className="text-[3.25rem] leading-[0.98] font-normal tracking-[-0.035em] sm:text-7xl lg:text-[5.25rem]">
+          Good cars for <em className="text-forest">long</em> roads.
+        </h1>
+        <p className="max-w-md text-lg leading-relaxed text-ink-2">
+          Pick a car, choose your dates, and pay through GCash. We confirm by text and email.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <a href="/book" className={buttonClass("primary", "lg")}>Book a car</a>
+          <a href="/tracker" className={buttonClass("secondary", "lg")}>Track a booking</a>
+        </div>
+        <ol className="mt-2 grid grid-cols-3 gap-4 border-t border-line pt-5">
+          {STEPS.map((step, i) => (
+            <li key={step} className="flex flex-col gap-1.5">
+              <span className="num text-xs text-clay">0{i + 1}</span>
+              <span className="text-[15px]">{step}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <figure className="flex flex-col gap-3 md:col-span-6 lg:col-span-6 lg:col-start-7">
+        <img
+          src={mainImage}
+          alt="JRJC rental cars"
+          className="aspect-[4/3] w-full rounded-sm object-cover md:aspect-auto md:h-[560px]"
+        />
+        <figcaption className="num flex justify-between text-xs text-ink-2">
+          <span>Fig. 01 — The fleet</span>
+          <span>Bukidnon, Philippines</span>
+        </figcaption>
+      </figure>
     </section>
   );
 }

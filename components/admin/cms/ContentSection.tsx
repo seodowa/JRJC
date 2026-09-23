@@ -142,7 +142,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
       <form onSubmit={handleSubmit} className="space-y-6">
         {fields.map(field => (
           <div key={field.key}>
-            <label htmlFor={`${sectionKey}-${field.key}`} className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor={`${sectionKey}-${field.key}`} className="field-label">
               {field.label}
             </label>
             
@@ -153,7 +153,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                 value={formData[field.key]?.toString() || ''}
                 onChange={handleChange}
                 rows={5}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 text-sm"
+                className="field mt-1"
                 placeholder={field.placeholder}
               ></textarea>
             ) : field.type === 'image_url' ? (
@@ -217,7 +217,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                 name={field.key}
                 value={formData[field.key]?.toString() || ''}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 text-sm"
+                className="field mt-1"
                 placeholder={field.placeholder}
               />
             )}

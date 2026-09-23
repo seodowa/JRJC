@@ -88,14 +88,14 @@ const BookingDetailsModal = ({
       case 'Pending':
         return (
           <>
-            <AsyncButton onClick={() => onApprove(booking.Booking_ID)} disabled={isProcessing} className="flex-1 md:flex-none px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50 text-center justify-center">Approve</AsyncButton>
+            <AsyncButton onClick={() => onApprove(booking.Booking_ID)} disabled={isProcessing} className="flex-1 md:flex-none px-4 py-2 bg-forest text-white rounded-md hover:bg-forest-hover disabled:opacity-50 text-center justify-center">Approve</AsyncButton>
             <AsyncButton onClick={() => onDecline(booking.Booking_ID)} disabled={isProcessing} className="flex-1 md:flex-none px-4 py-2 shadow-sm text-red-500 rounded-md hover:bg-red-400 hover:text-white disabled:opacity-50 text-center justify-center">Decline</AsyncButton>
           </>
         );
       case 'Confirmed':
         return (
           <>
-            <AsyncButton onClick={() => onStart(booking.Booking_ID)} disabled={isProcessing} className="flex-1 md:flex-none px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50 text-center justify-center">Start</AsyncButton>
+            <AsyncButton onClick={() => onStart(booking.Booking_ID)} disabled={isProcessing} className="flex-1 md:flex-none px-4 py-2 bg-forest text-white rounded-md hover:bg-forest-hover disabled:opacity-50 text-center justify-center">Start</AsyncButton>
             <AsyncButton onClick={() => onCancel(booking.Booking_ID)} disabled={isProcessing} className="flex-1 md:flex-none px-4 py-2 border border-gray-400 text-red-500 rounded-md hover:bg-red-400 hover:text-white disabled:opacity-50 text-center justify-center">Cancel</AsyncButton>
           </>
         );
@@ -106,13 +106,13 @@ const BookingDetailsModal = ({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 md:p-4">
+      <div className="fixed inset-0 bg-ink/40 flex justify-center items-center z-50 md:p-4">
         {/* Mobile: Full screen, Desktop: Centered card */}
         <div className="relative bg-white md:rounded-lg shadow-xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col">
           
           {/* Header - Fixed */}
           <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 truncate pr-4">
+            <h2 className="text-xl md:text-2xl font-medium truncate pr-4">
               Booking {booking.Booking_ID}
             </h2>
             <button type="button" onClick={handleManualClose} className="text-gray-500 p-2 hover:bg-gray-100 rounded-full">

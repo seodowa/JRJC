@@ -135,7 +135,7 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
                       {/* Top Row: Title and Prices */}
                       <div className="flex justify-between items-start gap-2">
                           {/* Car Title */}
-                          <h3 className="font-bold text-gray-900 text-lg leading-tight max-w-[55%]">
+                          <h3 className="font-display font-medium text-lg leading-tight max-w-[55%]">
                               {car.brand} {car.model} <span className="text-gray-700">{car.year}</span>
                               <span className="block text-sm font-normal text-gray-600 mt-0.5">({car.transmission})</span>
                           </h3>

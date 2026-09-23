@@ -1,15 +1,260 @@
 @import "tailwindcss";
 
+/*
+ * JRJC design tokens — warm editorial palette.
+ * Tailwind's default gray/blue/red/... scales are re-pointed at this palette
+ * so every existing utility (text-gray-700, bg-blue-600, ...) follows it.
+ */
 @theme {
-    --color-secondary-100: #6bb7d1;
-    --color-secondary-50: #EEFFFB;
-    --color-hover-color: oklch(60.9% 0.126 221.723); 
-    --color-darker-color: #3674B5;
-    --color-main-color: #D1F8EF;
-    --color-footer-color: #3D4358;
-    --font-main-font: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
-    --font-secondary-font: 'Inter', Tahoma, Geneva, Verdana, sans-serif;
-    --text-header-font-size: 0.9rem;
+  /* Core palette */
+  --color-paper: #F4EFE6;
+  --color-surface: #FBF8F2;
+  --color-ink: #1B1915;
+  --color-ink-2: #5E574C;
+  --color-ink-3: #7A7163;
+  --color-line: #DDD4C4;
+  --color-line-strong: #CFC5B3;
+  --color-forest: #1E4A36;
+  --color-forest-hover: #163829;
+  --color-forest-tint: #E6EDE7;
+  --color-clay: #B8532A;
+  --color-clay-tint: #F5E6DC;
+
+  --color-white: #FBF8F2;
+  --color-black: #1B1915;
+
+  /* Warm neutrals (replaces cool gray) */
+  --color-gray-50: #FBF8F2;
+  --color-gray-100: #F4EFE6;
+  --color-gray-200: #E9E2D5;
+  --color-gray-300: #DDD4C4;
+  --color-gray-400: #B3A996;
+  --color-gray-500: #7A7163;
+  --color-gray-600: #5E574C;
+  --color-gray-700: #443F37;
+  --color-gray-800: #2C2924;
+  --color-gray-900: #1B1915;
+  --color-gray-950: #11100D;
+
+  /* Forest (replaces blue / indigo / sky / cyan) */
+  --color-blue-50: #EEF3EF;
+  --color-blue-100: #DCE7DF;
+  --color-blue-200: #B9CFC0;
+  --color-blue-300: #8FB19A;
+  --color-blue-400: #5E8C6E;
+  --color-blue-500: #2F6A4B;
+  --color-blue-600: #1E4A36;
+  --color-blue-700: #163829;
+  --color-blue-800: #102A1F;
+  --color-blue-900: #0B1D15;
+  --color-indigo-50: #EEF3EF;
+  --color-indigo-100: #DCE7DF;
+  --color-indigo-200: #B9CFC0;
+  --color-indigo-300: #8FB19A;
+  --color-indigo-400: #5E8C6E;
+  --color-indigo-500: #2F6A4B;
+  --color-indigo-600: #1E4A36;
+  --color-indigo-700: #163829;
+  --color-indigo-800: #102A1F;
+  --color-sky-100: #DCE7DF;
+  --color-sky-500: #2F6A4B;
+  --color-sky-600: #1E4A36;
+  --color-cyan-100: #DCE7DF;
+  --color-cyan-500: #2F6A4B;
+  --color-cyan-600: #1E4A36;
+
+  /* Brick (replaces red) */
+  --color-red-50: #F8ECE9;
+  --color-red-100: #F4E1DD;
+  --color-red-200: #E8C2BB;
+  --color-red-300: #D8A9A3;
+  --color-red-400: #C0685E;
+  --color-red-500: #A8392F;
+  --color-red-600: #9E2B25;
+  --color-red-700: #83231E;
+  --color-red-800: #661B17;
+  --color-red-900: #4A1411;
+
+  /* Sage (replaces green) */
+  --color-green-50: #EEF3EC;
+  --color-green-100: #E0EAD9;
+  --color-green-200: #C2D5B6;
+  --color-green-300: #9DBB8C;
+  --color-green-400: #739C5F;
+  --color-green-500: #557F43;
+  --color-green-600: #436834;
+  --color-green-700: #36532A;
+  --color-green-800: #2A4121;
+  --color-green-900: #1F3018;
+
+  /* Ochre (replaces yellow / amber) */
+  --color-yellow-50: #FAF4E4;
+  --color-yellow-100: #F3EAD3;
+  --color-yellow-200: #E8D6A8;
+  --color-yellow-300: #D6C08A;
+  --color-yellow-400: #C4A04E;
+  --color-yellow-500: #A87A1E;
+  --color-yellow-600: #8C6517;
+  --color-yellow-700: #7A5A14;
+  --color-yellow-800: #5C430F;
+  --color-amber-100: #F3EAD3;
+  --color-amber-500: #A87A1E;
+  --color-amber-600: #8C6517;
+  --color-amber-700: #7A5A14;
+  --color-amber-800: #5C430F;
+  --color-orange-100: #F5E6DC;
+  --color-orange-500: #B8532A;
+  --color-orange-600: #9C4522;
+
+  /* Legacy tokens, re-pointed */
+  --color-main-color: #F4EFE6;
+  --color-secondary-50: #FBF8F2;
+  --color-secondary-100: #1E4A36;
+  --color-hover-color: #1E4A36;
+  --color-darker-color: #1E4A36;
+  --color-footer-color: #1B1915;
+
+  /* Type */
+  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-main-font: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-secondary-font: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --text-header-font-size: 0.9rem;
+
+  /* Shape: small radii everywhere, hairlines instead of drop shadows */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
+  --radius-4xl: 8px;
+
+  --shadow-xs: 0 0 0 1px #DDD4C4;
+  --shadow-sm: 0 0 0 1px #DDD4C4;
+  --shadow: 0 0 0 1px #DDD4C4;
+  --shadow-md: 0 0 0 1px #DDD4C4;
+  --shadow-lg: 0 0 0 1px #DDD4C4, 0 12px 24px -16px rgb(27 25 21 / 0.25);
+  --shadow-xl: 0 0 0 1px #DDD4C4, 0 24px 48px -20px rgb(27 25 21 / 0.3);
+  --shadow-2xl: 0 0 0 1px #DDD4C4, 0 32px 64px -24px rgb(27 25 21 / 0.35);
+  --shadow-soft: 0 0 0 1px #DDD4C4;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    background: var(--color-forest);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-forest);
+    outline-offset: 2px;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-forest);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-ink-3);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* Small uppercase mono label used above section headings */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  /* Form controls */
+  .field {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+  .field:hover:not(:disabled) {
+    border-color: var(--color-ink-3);
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-forest);
+    box-shadow: 0 0 0 1px var(--color-forest);
+  }
+  .field:disabled,
+  .field[readonly] {
+    background: var(--color-gray-200);
+    color: var(--color-ink-2);
+    cursor: not-allowed;
+  }
+  .field-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 /* Hide spinner buttons for number input */

@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react'; // Added useEffect
 import dayjs from 'dayjs';
 import SelectCar from '@/components/SelectCar';
 import BookingCalendar from '@/components/BookingCalendar';
-import { LocalizationProvider, MobileTimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { MobileTimePicker } from '@mui/x-date-pickers';
+import PickerProvider from '@/components/ui/PickerProvider';
 import { Dayjs } from 'dayjs';
 import { useWalkInBooking } from '@/app/(admin)/context/WalkInBookingContext';
 import AsyncButton from "@/components/AsyncButton";
@@ -65,8 +65,8 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-4xl shadow-md mt-8">
-      <h2 className="text-xl font-bold mb-6">Rental Details</h2>
+    <div className="mt-8 rounded-md border border-line bg-surface p-6 md:p-8">
+      <h2 className="text-xl font-medium mb-6">Rental Details</h2>
       <form onSubmit={(e) => { e.preventDefault(); onNext(); }}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -80,26 +80,26 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="field-label">
                 Transmission
               </label>
               <input
                 type="text"
                 disabled
                 value={selectedCarData?.transmission || "—"}
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+                className="field"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="field-label">
                 Area <span className="text-red-500">*</span>
               </label>
               <select
                 name="area"
                 value={rentalInfo.area}
                 onChange={handleRentalInputChange}
-                className="w-full border border-gray-300 rounded-md p-2.5 text-sm"
+                className="field"
                 required
                 disabled={loading}
               >
@@ -123,12 +123,12 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="field-label">
                 Pick-up Time <span className="text-red-500">*</span>
               </label>
               {/* --- FIX START: Conditional Rendering --- */}
               {isMounted ? (
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <PickerProvider>
                   <MobileTimePicker
                     label="Select time"
                     value={selectedTime}
@@ -147,7 +147,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                       },
                     }}
                   />
-                </LocalizationProvider>
+                </PickerProvider>
               ) : (
                 // Optional: Loading placeholder to prevent layout shift
                 <div className="w-full h-[40px] border border-gray-300 rounded-md bg-gray-50 animate-pulse" />
@@ -178,26 +178,26 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
           </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="field-label">
                 Fuel Type
               </label>
               <input
                 type="text"
                 disabled
                 value="Gasoline(Unleaded)"
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+                className="field"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="field-label">
                 Self-drive? <span className="text-red-500">*</span>
               </label>
               <select
                 name="selfDrive"
                 value={rentalInfo.selfDrive}
                 onChange={handleRentalInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="field"
                 required
               >
                 <option value="">Select</option>
@@ -207,7 +207,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="field-label">
                 Duration <span className="text-red-500">*</span>
               </label>
               
@@ -216,7 +216,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                   name="duration"
                   value={rentalInfo.duration}
                   onChange={handleRentalInputChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  className="field"
                   required
                 >
                   <option value="">Select duration</option>
@@ -244,7 +244,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
                   type="text"
                   value="Select dates and time first"
                   disabled
-                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500"
+                  className="field"
                 />
               )}
               
@@ -294,14 +294,14 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
             <AsyncButton
               type="button"
               onClick={onBack}
-              className="bg-gray-200 hover:bg-gray-300 shadow-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              className="border border-ink bg-transparent hover:bg-gray-200 shadow-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Back
             </AsyncButton>
             <AsyncButton
               type="submit"
               disabled={!rentalInfo.duration || dateRangeError !== null}
-              className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
+              className="bg-forest hover:bg-forest-hover text-paper font-medium py-2 px-4 rounded-lg"
             >
               Next
             </AsyncButton>

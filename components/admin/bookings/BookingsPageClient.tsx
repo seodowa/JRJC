@@ -322,7 +322,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
   const handleModalExtend = (bookingId: string, newEndDate: string) => handleExtendAction(bookingId, newEndDate);
 
   return (
-    <div className="flex flex-col h-full p-4 sm:p-6 lg:p-8 bg-white rounded-3xl shadow-md relative">
+    <div className="relative flex h-full flex-col">
       <BookingsHeader
         view={view}
         onSearch={handleSearch}
@@ -342,10 +342,10 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
       
       {/* Loading Overlay */}
       {isProcessing && !isModalOpen && !isHeaderExtendOpen && !isOngoingModalOpen && !confirmationState.isOpen && (
-        <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center rounded-3xl backdrop-blur-sm">
-           <div className="bg-white p-6 rounded-xl shadow-2xl border border-gray-100 flex flex-col items-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-t-blue-500 mb-4"></div>
-              <p className="text-gray-700 font-semibold text-lg">Processing...</p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-paper/70">
+           <div className="flex flex-col items-center rounded-md bg-surface p-6 shadow-xl">
+              <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-line border-t-forest"></div>
+              <p className="text-ink-2">Processing…</p>
            </div>
         </div>
       )}
@@ -416,7 +416,7 @@ const BookingsPageClient = ({ bookings, view, bookingStatuses: initialStatuses }
 
       {/* Loading Spinner for Modal Content Fetching */}
       {(isModalOpen || isOngoingModalOpen) && isModalLoading && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/30">
           <LoadingSpinner />
         </div>
       )}

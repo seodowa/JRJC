@@ -16,7 +16,7 @@ const StarRating = ({ rating }: { rating: number }) => (
     {[...Array(5)].map((_, i) => (
       <svg
         key={i}
-        className={`w-5 h-5 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+        className={`w-5 h-5 ${i < rating ? 'text-clay' : 'text-gray-300'}`}
         fill="currentColor"
         viewBox="0 0 20 20"
         xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@ const ReviewsTableView = ({ reviews }: { reviews: Review[] }) => {
           {/* Review Content */}
           <div className="col-span-12 md:col-span-6 space-y-2 md:space-y-1">
             <div className="flex justify-between items-start md:block">
-                <h3 className="text-sm font-bold text-gray-900">{review.title}</h3>
+                <h3 className="font-display text-sm font-medium">{review.title}</h3>
                 <div className="md:hidden">
                     <StarRating rating={review.rating} />
                 </div>

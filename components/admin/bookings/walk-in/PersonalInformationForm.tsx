@@ -87,12 +87,12 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-4xl shadow-md">
-      <h2 className="text-xl font-bold mb-6">Personal Information</h2>
+    <div className="rounded-md border border-line bg-surface p-6 md:p-8">
+      <h2 className="text-xl font-medium mb-6">Personal Information</h2>
       <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="firstName" className="field-label">
               First Name: <span className="text-red-500">*</span>
             </label>
             <input
@@ -102,12 +102,12 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               required // REQUIRED
               value={personalInfo.firstName}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your first name"
             />
           </div>
           <div className="md:col-span-1">
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="lastName" className="field-label">
               Last Name: <span className="text-red-500">*</span>
             </label>
             <input
@@ -117,12 +117,12 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               required // REQUIRED
               value={personalInfo.lastName}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your last name"
             />
           </div>
           <div className="md:col-span-1">
-            <label htmlFor="suffix" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="suffix" className="field-label">
               Suffix:
             </label>
             <input
@@ -131,14 +131,14 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="suffix"
               value={personalInfo.suffix}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-20 border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1 w-20"
               placeholder="(e.g., Jr.)"
             />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="field-label">
               Email Address: {/* Removed * (Optional) */}
             </label>
             <input
@@ -150,12 +150,12 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               title="Please enter a valid email address (e.g., user@domain.com)"
               value={personalInfo.email}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your email address"
             />
           </div>
           <div>
-            <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="mobileNumber" className="field-label">
               Mobile Number: <span className="text-red-500">*</span>
             </label>
             <input
@@ -165,7 +165,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               required // REQUIRED
               value={personalInfo.mobileNumber}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your mobile number"
             />
           </div>
@@ -173,7 +173,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         
       {/* Valid Government ID Upload */}
       <div className="pt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="field-label">
           Valid Government ID (Image): <span className="text-red-500">*</span>
         </label>
         
@@ -207,7 +207,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         <div className="flex justify-end mt-6">
           <AsyncButton
             type="submit" // Trigger form submit to run validation
-            className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
+            className="bg-forest hover:bg-forest-hover text-paper font-medium py-2 px-4 rounded-lg"
           >
             Next
           </AsyncButton>

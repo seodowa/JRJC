@@ -95,18 +95,18 @@ const OTPModal: React.FC<OtpModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
-            <div className="relative bg-[#E6F5F3] p-4 sm:p-8 rounded-2xl shadow-xl w-full max-w-md">
-                <h1 className="absolute top-4 left-4 font-bold text-lg sm:text-xl">{title}</h1>
-                <button type="button" onClick={onClose} className="absolute top-4 right-4 hover:bg-[#8BFFF1]/50 hover:rounded-lg">
+        <div className="fixed inset-0 bg-ink/40 flex justify-center items-center z-50 p-4">
+            <div className="relative w-full max-w-md rounded-md bg-surface p-6 shadow-xl sm:p-8">
+                <p className="eyebrow absolute top-5 left-6">{title}</p>
+                <button type="button" onClick={onClose} aria-label="Close" className="absolute top-3 right-3 rounded-md p-1.5 text-ink-2 hover:bg-gray-200 hover:text-ink">
                     <CloseIcon />
                 </button>
                 <div className="text-center pt-10">
-                    <h2 className="text-xl sm:text-2xl font-bold mb-2">Two-Step Verification</h2>
+                    <h2 className="mb-2 text-3xl">Check your inbox.</h2>
                     <div className="flex justify-center my-6">
                         <OTPVerificationIcon size={64} />
                     </div>
-                    <p className="mb-6">{descriptionText}</p>
+                    <p className="mb-6 text-ink-2">{descriptionText}</p>
                     <form onSubmit={handleSubmit}>
                         <div className="flex justify-center gap-1 sm:gap-2 mb-4">
                             {otp.map((data, index) => {
@@ -115,7 +115,7 @@ const OTPModal: React.FC<OtpModalProps> = ({
                                         key={index}
                                         type="text"
                                         name="otp"
-                                        className="w-10 h-10 sm:w-12 sm:h-12 text-center text-xl sm:text-2xl border border-gray-300 rounded-md focus:outline-2 focus:outline-[#8BFFF1] focus:border-transparent"
+                                        className="field num h-12 w-10 px-0 text-center text-xl sm:h-14 sm:w-12 sm:text-2xl"
                                         maxLength={1}
                                         value={data}
                                         onChange={e => handleOtpChange(e.target, index)}
@@ -137,7 +137,7 @@ const OTPModal: React.FC<OtpModalProps> = ({
                                         checked={trustDevice}
                                         onChange={(e) => setTrustDevice(e.target.checked)}
                                     />
-                                    <span className="w-5 h-5 border-2 border-gray-300 rounded-sm grid place-items-center peer-checked:bg-[#8BFFF1] peer-checked:border-[#8BFFF1]">
+                                    <span className="w-5 h-5 border-2 border-gray-300 rounded-sm grid place-items-center peer-checked:bg-forest peer-checked:border-forest peer-checked:text-paper">
                                         {trustDevice && <CheckmarkButtonIcon className="w-3 h-3" />}
                                     </span>
                                     <span className="ml-2 block text-sm text-gray-900">
@@ -154,7 +154,7 @@ const OTPModal: React.FC<OtpModalProps> = ({
                         <AsyncButton
                             type="submit"
                             isLoading={isSubmitting}
-                            className="w-28 sm:w-32 h-10 rounded-lg bg-white border border-gray-300 text-black hover:bg-[#8BFFF1] transition-colors"
+                            className="h-11 w-full rounded-md bg-forest font-medium text-paper transition-colors hover:bg-forest-hover"
                             loadingText="Verifying..."
                         >
                             Verify

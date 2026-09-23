@@ -73,8 +73,8 @@ export default function EmployeeFormModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full">
-        <h3 className="text-lg font-bold mb-4">{employee ? 'Edit Employee' : 'Add Employee'}</h3>
+      <div className="w-full rounded-md bg-surface p-6 shadow-xl">
+        <h3 className="font-display text-lg font-medium mb-4">{employee ? 'Edit Employee' : 'Add Employee'}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Image Upload */}
           <div className="flex items-center gap-4">
@@ -103,7 +103,7 @@ export default function EmployeeFormModal({
             placeholder="Username"
             value={formData.username}
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="field"
             required
           />
           <input
@@ -111,13 +111,13 @@ export default function EmployeeFormModal({
             placeholder="Email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="field"
             required
           />
           <select
             value={formData.account_type_id}
             onChange={(e) => setFormData({ ...formData, account_type_id: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="field"
             required
           >
             <option value="">Select Account Type</option>
@@ -130,7 +130,7 @@ export default function EmployeeFormModal({
             placeholder={employee ? "New Password (leave blank to keep)" : "Password"}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="field"
             required={!employee}
           />
 

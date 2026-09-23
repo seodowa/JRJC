@@ -13,7 +13,7 @@ const CarsSidebar = ({ cars, onAddNewCar }: CarsSidebarProps) => {
     <div>
       <AsyncButton
         onClick={onAddNewCar}
-        className="bg-white text-black px-4 py-4 rounded-xl hover:bg-[#A1E3F9] w-full block text-center mb-4 border border-gray-400"
+        className="bg-white text-black px-4 py-4 rounded-xl hover:bg-gray-200 w-full block text-center mb-4 border border-gray-400"
       >
         + Add a new car
       </AsyncButton>

@@ -112,21 +112,21 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 relative">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Finish Booking - {booking.Booking_ID}</h2>
+      <div className="relative rounded-md bg-surface p-6 shadow-xl md:p-8">
+        <h2 className="text-2xl font-medium mb-6">Finish Booking - {booking.Booking_ID}</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         
         <div className="space-y-4 mb-6">
           <p className="text-sm text-gray-600"><strong>Booking End:</strong> {new Date(booking.Booking_End_Date_Time).toLocaleString()}</p>
           
           <div>
-            <label htmlFor="dateReturned" className="block text-sm font-medium text-gray-700">Actual Return Date & Time:</label>
+            <label htmlFor="dateReturned" className="field-label">Actual Return Date & Time:</label>
             <input
               type="datetime-local"
               id="dateReturned"
               value={dateReturned}
               onChange={(e) => setDateReturned(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="field mt-1"
             />
           </div>
 
@@ -148,7 +148,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
         </div>
 
         <div className="flex justify-end space-x-3 mt-6">
-          <AsyncButton onClick={handleSubmit} disabled={isSubmitting || isLoading} className="px-4 py-2 bg-[#A1E3F9] text-white rounded-md hover:bg-blue-400 disabled:opacity-50">
+          <AsyncButton onClick={handleSubmit} disabled={isSubmitting || isLoading} className="px-4 py-2 bg-forest text-white rounded-md hover:bg-forest-hover disabled:opacity-50">
             {isSubmitting ? 'Finishing...' : 'Confirm Finish'}
           </AsyncButton>
           <AsyncButton onClick={onClose} disabled={isSubmitting} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">

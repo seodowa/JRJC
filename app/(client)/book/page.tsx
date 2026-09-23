@@ -5,8 +5,7 @@ import InputField from "@/components/InputField";
 import SelectCar from "@/components/SelectCar";
 import { useCarPricing } from "@/hooks/useCarPricing";
 import { useRentalCalculation } from "@/hooks/useRentalCalculation";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import PickerProvider from '@/components/ui/PickerProvider';
 import dayjs, { Dayjs } from 'dayjs';
 import { MobileTimePicker } from "@mui/x-date-pickers";
 import { Car } from "@/types";
@@ -385,7 +384,7 @@ const BookingPage: React.FC = () => {
                   
           {/* Valid Government ID Upload */}
           <div className="col-span-3 md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="field-label">
               Valid Government ID (Image) <span className="text-red-500">*</span>
             </label>
             
@@ -430,7 +429,7 @@ const BookingPage: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Car <span className="text-red-500">*</span></label>
+                    <label className="field-label">Select Car <span className="text-red-500">*</span></label>
                     <SelectCar 
                         selectedCar={selectedCar} 
                         setSelectedCar={setSelectedCar} 
@@ -438,10 +437,10 @@ const BookingPage: React.FC = () => {
                         cars={cars} 
                     />
                   </div>
-                  <div><label className="block text-sm font-medium text-gray-700 mb-1">Transmission</label><input type="text" disabled value={selectedCarData?.transmission || "—"} className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" /></div>
+                  <div><label className="field-label">Transmission</label><input type="text" disabled value={selectedCarData?.transmission || "—"} className="field" /></div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Area <span className="text-red-500">*</span></label>
-                    <select name="area" value={rentalInfo.area} onChange={handleRentalInputChange} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" required disabled={loading}>
+                    <label className="field-label">Area <span className="text-red-500">*</span></label>
+                    <select name="area" value={rentalInfo.area} onChange={handleRentalInputChange} className="field" required disabled={loading}>
                       <option value="">Select area</option>
                       {pricingData.map((area) => <option key={area.Location} value={area.Location}>{area.Location}</option>)}
                     </select>
@@ -450,10 +449,10 @@ const BookingPage: React.FC = () => {
                     {error && <div className="text-sm text-red-500 mt-1">{error}</div>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Pick-up Time <span className="text-red-500">*</span></label>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <label className="field-label">Pick-up Time <span className="text-red-500">*</span></label>
+                    <PickerProvider>
                       <MobileTimePicker label="Select time" value={selectedTime} onChange={(newTime: Dayjs | null) => { setSelectedTime(newTime); const timeString = newTime ? newTime.format('HH:mm') : ''; setRentalInfo(prev => ({ ...prev, time: timeString })); }} ampm={true} minutesStep={30} slotProps={{ textField: { required: true, fullWidth: true, size: "small" } }} />
-                    </LocalizationProvider>
+                    </PickerProvider>
                   </div>
                   <div className="md:col-span-2">
                     <BookingCalendar 
@@ -468,25 +467,25 @@ const BookingPage: React.FC = () => {
                     />
                     {dateRangeError && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md"><p className="text-sm text-red-700">{dateRangeError}</p></div>}
                   </div>
-                  <div><label className="block text-sm font-medium text-gray-700 mb-1">Fuel Type</label><input type="text" disabled value="Gasoline(Unleaded)" className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" /></div>
+                  <div><label className="field-label">Fuel Type</label><input type="text" disabled value="Gasoline(Unleaded)" className="field" /></div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Self-drive? <span className="text-red-500">*</span></label>
-                    <select name="selfDrive" value={rentalInfo.selfDrive} onChange={handleRentalInputChange} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" required>
+                    <label className="field-label">Self-drive? <span className="text-red-500">*</span></label>
+                    <select name="selfDrive" value={rentalInfo.selfDrive} onChange={handleRentalInputChange} className="field" required>
                       <option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option>
                     </select>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration <span className="text-red-500">*</span></label>
+                    <label className="field-label">Duration <span className="text-red-500">*</span></label>
                     {(hours > 0 || isSameDay) ? (
-                      <select name="duration" value={rentalInfo.duration} onChange={handleRentalInputChange} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" required>
+                      <select name="duration" value={rentalInfo.duration} onChange={handleRentalInputChange} className="field" required>
                         <option value="">Select duration</option>
                         {show12HourOption && <option value="12 hours">₱{twelveHourPrice}/12 hours</option>}
                         {show24HourOption && <option value="24 hours">₱{twentyFourHourPrice}/24 hours</option>}
                         {hours > 24 && <option value={`${days} days`}>₱{multiDayPrice} for {days} {days === 1 ? 'day' : 'days'} ({hours} hours total)</option>}
                       </select>
                     ) : (
-                      <input type="text" value="Select dates and time first" disabled className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-gray-50 text-gray-500" />
+                      <input type="text" value="Select dates and time first" disabled className="field" />
                     )}
                     <div className="text-sm text-gray-500 mt-1">
                         {hours > 0 ? (
@@ -503,7 +502,7 @@ const BookingPage: React.FC = () => {
               </div>
               <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-800">{rentalInfo.duration ? `Initial Price: ₱${totalPrice}` : "Initial Price: ₱0"}</span>
+                  <span className="text-sm text-ink-2">Initial price <span className="num ml-2 text-lg font-medium text-clay">₱{rentalInfo.duration ? totalPrice : 0}</span></span>
                   {rentalInfo.startDate && rentalInfo.time && rentalInfo.duration && (
                     <div className="text-xs text-gray-600 mt-1 space-y-1">
                       <div><span className="font-medium">Pickup:</span> {formatDate(rentalInfo.startDate)} at {formatTime(rentalInfo.time)}</div>
@@ -514,7 +513,7 @@ const BookingPage: React.FC = () => {
                   )}
                 </div>
                 <div className="flex gap-3">
-                  <button type="button" onClick={handleBack} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Back</button>
+                  <button type="button" onClick={handleBack} className="border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Back</button>
                   <button type="submit" disabled={!rentalInfo.duration || dateRangeError !== null} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">Next</button>
                 </div>
               </div>
@@ -539,29 +538,29 @@ const BookingPage: React.FC = () => {
                       <p className="text-sm text-gray-700"><strong>Booking Fee:</strong> ₱{bookingFee}</p>
                       <p className="text-sm text-gray-700"><strong>Cost Breakdown:</strong> ₱{initialPayment} (Rental) + ₱{carWashFee} (Car Wash)</p>
                     </div>
-                    <p className="mt-6 text-sm font-semibold text-gray-800">Total Payment: ₱{totalPayment}</p>
+                    <p className="mt-6 flex items-baseline justify-between border-t border-ink pt-3 text-sm font-medium">Total payment <span className="num text-xl text-clay">₱{totalPayment}</span></p>
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Upload the reference number below: <span className="text-red-500 ml-1">*</span></label>
-                      <input type="text" name="referenceNumber" value={paymentInfo.referenceNumber} onChange={handlePaymentInputChange} placeholder="Enter GCash reference number" required className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                      <label className="field-label">Upload the reference number below: <span className="text-red-500 ml-1">*</span></label>
+                      <input type="text" name="referenceNumber" value={paymentInfo.referenceNumber} onChange={handlePaymentInputChange} placeholder="Enter GCash reference number" required className="field" />
                     </div>
                   </div>
                   <div className="flex justify-center">
-                    <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48 border rounded-md shadow-sm" />
+                    <img src={qrCodeUrl} alt="QR Code" className="h-56 w-56 rounded-md border border-ink bg-white p-3" />
                   </div>
                 </div>
               </div>
               <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-                <button type="button" onClick={handleBack} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Back</button>
+                <button type="button" onClick={handleBack} className="border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Back</button>
                 <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Book</button>
               </div>
             </form>
 
             {showConfirm && (
-              <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+              <div className="fixed inset-0 bg-ink/40 flex items-center justify-center z-50">
+                <div className="w-96 max-w-[calc(100%-2rem)] rounded-md bg-surface p-6 shadow-xl">
                   {bookingSuccess ? (
                     <div className="text-center">
-                      <div className="text-green-500 text-4xl mb-4">✓</div>
+                      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-forest-tint text-xl text-forest">✓</div>
                       {/* UPDATED: Success Title */}
                       <h2 className="text-lg font-semibold text-gray-900 mb-2">Booking Sent for Confirmation</h2>
                       <p className="text-sm text-gray-600 mb-4">Your booking has been successfully submitted. Redirecting...</p>
@@ -632,7 +631,7 @@ const BookingPage: React.FC = () => {
                       )}
 
                       <div className="flex justify-between gap-3">
-                        <button onClick={handleCancelConfirm} disabled={submitting} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50">Cancel</button>
+                        <button onClick={handleCancelConfirm} disabled={submitting} className="flex-1 border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50">Cancel</button>
                         <button 
                           onClick={handleFinalSubmit} 
                           disabled={submitting || notificationPreferences.length === 0} 
@@ -654,34 +653,36 @@ const BookingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-main-color md:bg-transparent md:bg-gradient-to-b from-main-color from-80% md:from-60% lg:from-40% to-transparent -mt-12 pt-9 md:pt-12 relative overflow-hidden">
-      <img src="/images/BG.webp" className="opacity-20 min-w-full absolute bottom-0 -z-2" />
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="lg:hidden mb-6 text-center">
-            <span className="text-lg font-semibold text-gray-900">{["Personal Information", "Rental Details", "Payment Details"][currentStep - 1]}</span>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-3"><div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${(currentStep / 3) * 100}%` }}></div></div>
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-[1440px] px-4 pt-10 pb-24 sm:px-8 lg:px-16 lg:pt-14">
+        <div className="flex flex-col gap-3">
+          <p className="eyebrow">Book a car</p>
+          <h1 className="text-5xl leading-none font-normal tracking-[-0.03em] sm:text-6xl">
+            {["Tell us about you.", "When and where?", "Pay the booking fee."][currentStep - 1]}
+          </h1>
+        </div>
+        <ol className="mt-8 grid grid-cols-3 gap-3">
+          {["Your details", "Rental", "Payment"].map((step, index) => {
+            const n = index + 1;
+            const state = n < currentStep ? "done" : n === currentStep ? "current" : "todo";
+            return (
+              <li key={step} className="flex flex-col gap-2.5" aria-current={state === "current" ? "step" : undefined}>
+                <span className={`h-0.5 ${state === "done" ? "bg-ink" : state === "current" ? "bg-forest" : "bg-line"}`} />
+                <span className={`text-sm ${state === "current" ? "font-medium text-ink" : "text-ink-2"}`}>
+                  <span className={`num mr-2 ${state === "current" ? "text-forest" : ""}`}>0{n}</span>
+                  {step}{state === "done" && " ✓"}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+        <div className="mt-10 rounded-md border border-line bg-surface">
+          <div className="border-b border-line px-6 py-4">
+            <h2 className="font-sans text-sm font-medium tracking-normal text-ink-2">
+              {["Personal information", "Rental details", "Payment details"][currentStep - 1]}
+            </h2>
           </div>
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="hidden lg:block lg:w-1/5">
-              <div className="space-y-4">
-                {["Personal Information", "Rental Details", "Payment Details"].map((step, index) => (
-                  <div key={step} className={`p-4 rounded-lg border-2 ${index + 1 === currentStep ? "border-blue-600 bg-[rgba(161,227,249,1)]" : "border-gray-300 bg-white"}`}>
-                    <div className={`font-medium text-sm ${index + 1 === currentStep ? "text-gray-900" : "text-gray-600"}`}>
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${index + 1 === currentStep ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"} font-bold text-sm mb-2`}>{index + 1}</div>
-                      {step}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="lg:w-4/5 bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="border-b border-gray-200 px-6 py-4">
-                <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{["Personal Information", "Rental Details", "Payment Details"][currentStep - 1]}</h1>
-              </div>
-              {renderStepContent()}
-            </div>
-          </div>
+          {renderStepContent()}
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { TAdminBooking } from '@/types/adminBooking';
+import Badge, { toneForStatus } from '@/components/ui/Badge';
 
 interface BookingsTableViewProps {
   bookings: TAdminBooking[];
@@ -21,81 +22,81 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full min-w-[1300px] text-gray-800 table table-fixed">
-      <thead className="rounded-lg border-y border-gray-200 text-sm font-normal">
+      <table className="table w-full min-w-[1300px] table-fixed border border-line bg-surface text-ink">
+      <thead className="num border-b border-ink text-[11px] tracking-[0.1em] text-ink-2 uppercase">
           <tr>
             {showCheckboxes && (
               <th scope="col" className="p-5 font-medium text-center w-[5%]">
                 {/* This is an empty header for the checkboxes in the content rows */}
               </th>
             )}
-            <th scope="col" className="p-3 font-medium text-left w-[15%]">
+            <th scope="col" className="p-3 font-medium text-left py-3.5 w-[15%]">
               Name
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[20%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[20%]">
               Booking ID
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">
               Date Booked
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">
               Booking Start
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">
               Booking End
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[5%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[5%]">
               Duration
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[15%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[15%]">
               Car
             </th>
-            <th scope="col" className="px-3 font-medium text-left w-[10%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">
               Status
             </th>
           </tr>
         </thead>
-      <tbody className="bg-white">
+      <tbody>
         {bookings.map((booking) => (
           <tr
             key={booking.bookingId}
-            className="w-full border-b border-gray-200 py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg cursor-pointer hover:bg-gray-50" // Added cursor-pointer and hover effect
+            className="w-full cursor-pointer border-b border-gray-200 text-sm transition-colors last-of-type:border-none hover:bg-gray-100"
             onClick={() => onRowClick(booking.bookingId)} // Attach onClick handler
           >
             {showCheckboxes && (
               <td className="whitespace-nowrap p-3 text-center">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-blue-600 focus:ring-2"
+                  className="h-4 w-4 cursor-pointer"
                   checked={selectedBookings.includes(booking.bookingId)}
                   onChange={(e) => handleCheckboxClick(e, booking.bookingId)}
                   onClick={(e) => e.stopPropagation()} // Prevent row click from triggering when checkbox is clicked
                 />
               </td>
             )}
-            <td className="whitespace-nowrap p-3 text-left">
+            <td className="whitespace-nowrap p-3 text-left font-medium">
               {booking.customerName}
             </td>
-            <td className="whitespace-nowrap p-3 text-left">
+            <td className="num truncate whitespace-nowrap p-3 text-left text-[13px] text-ink-2">
               {booking.bookingId}
             </td>
-            <td className="whitespace-nowrap p-3 text-left">
+            <td className="num truncate whitespace-nowrap p-3 text-left text-[13px] text-ink-2">
               {new Date(booking.dateCreated).toLocaleDateString()}
             </td>
-            <td className="whitespace-nowrap p-3 text-left">
+            <td className="num truncate whitespace-nowrap p-3 text-left text-[13px] text-ink-2">
               {new Date(booking.startDate).toLocaleDateString()}
             </td>
-            <td className="whitespace-nowrap p-3 text-left">
+            <td className="num truncate whitespace-nowrap p-3 text-left text-[13px] text-ink-2">
               {new Date(booking.endDate).toLocaleDateString()}
             </td>
-            <td className="whitespace-nowrap p-3 text-left">
+            <td className="num truncate whitespace-nowrap p-3 text-left text-[13px] text-ink-2">
               {booking.duration}
             </td>
             <td className="whitespace-nowrap p-3 text-left">
               {booking.carManufacturer} {booking.carModel} ({booking.carYear})
             </td>
             <td className="whitespace-nowrap p-3 text-left">
-              {booking.status}
+              <Badge tone={toneForStatus(booking.status)}>{booking.status}</Badge>
             </td>
           </tr>
         ))}

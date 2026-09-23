@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import {usePathname} from 'next/navigation';
-import {BookingsIcon, CarsIcon, DashboardIcon, ReviewsIcon} from "@/components/icons/AdminSidebarIcons";
-import {LogoutIcon, SettingsIcon} from "@/components/icons/AdminHeaderIcons";
+import { usePathname } from 'next/navigation';
+import { CalendarRange, CarFront, LayoutGrid, LogOut, Settings, Star } from 'lucide-react';
 import AsyncButton from "@/components/AsyncButton";
 
 import LoadingSpinner from "./LoadingSpinner";
@@ -15,68 +14,72 @@ interface AdminSidebarProps {
   handleLogout: () => Promise<void>;
 }
 
+const ICON = { size: 18, strokeWidth: 1.6 };
+
 const AdminSidebar = ({ isCollapsed, user, handleLogout }: AdminSidebarProps) => {
   const pathname = usePathname();
 
   const navLinks = [
-      { href: '/adminSU/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-      { href: '/adminSU/manageBookings', label: 'Manage Bookings', icon: <BookingsIcon /> },
-      { href: '/adminSU/manageCars', label: 'Manage Cars', icon: <CarsIcon /> },
-      { href: '/adminSU/adminReviews', label: 'See Reviews', icon: <ReviewsIcon /> },
-      {href: '/adminSU/settings', label: 'Settings', icon: <SettingsIcon />},
+      { href: '/adminSU/dashboard', label: 'Dashboard', icon: <LayoutGrid {...ICON} /> },
+      { href: '/adminSU/manageBookings', label: 'Bookings', icon: <CalendarRange {...ICON} /> },
+      { href: '/adminSU/manageCars', label: 'Cars', icon: <CarFront {...ICON} /> },
+      { href: '/adminSU/adminReviews', label: 'Reviews', icon: <Star {...ICON} /> },
+      { href: '/adminSU/settings', label: 'Settings', icon: <Settings {...ICON} /> },
   ];
 
   return (
     <aside
-      className={`bg-white border-r border-gray-300 text-[#333333] h-screen p-2 fixed inset-y-0 left-0 z-30 transition-transform duration-300 ease-in-out md:sticky md:top-0 md:translate-x-0 md:w-60 ${isCollapsed ? '-translate-x-full' : 'translate-x-0'}`}
+      className={`fixed inset-y-0 left-0 z-30 flex h-screen w-64 shrink-0 flex-col bg-ink text-paper transition-transform duration-200 ease-out md:sticky md:top-0 md:translate-x-0 md:w-60 ${isCollapsed ? '-translate-x-full' : 'translate-x-0'}`}
     >
-    <div className="flex flex-col h-full ">
-        <div className="flex flex-col items-center my-8">
-            {user?.profileImage ? (
-                <img 
-                    src={user.profileImage} 
-                    alt={user.username} 
-                    className="w-36 h-36 rounded-full object-cover mb-4 border border-gray-200"
-                />
-            ) : (
-                <div className="w-36 h-36 rounded-full bg-gray-300 mb-4"></div>
-            )}
-            <div>
-                {user ? (
-                    <span className="font-bold text-2xl justify-self-center">{user.username}</span>
-                ) : (
-                    <LoadingSpinner />
-                )}
-            </div>
-        </div>
-      <nav className="flex-grow">
-          <ul>
-            {navLinks.map((link) => (
-              <li key={link.href} className="mb-2">
+      <div className="flex flex-col gap-0.5 px-7 pt-7 pb-8">
+        <span className="font-display text-[1.65rem] leading-none font-semibold tracking-tight">JRJC</span>
+        <span className="num text-[11px] tracking-[0.12em] text-gray-400 uppercase">Admin</span>
+      </div>
+
+      <nav className="flex-grow" aria-label="Admin">
+        <ul>
+          {navLinks.map((link) => {
+            const active = pathname === link.href || pathname.startsWith(link.href + '/');
+            return (
+              <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`flex items-center p-4 rounded-xl hover:bg-[#A1E3F9]/60 ${
-                    pathname === link.href ? 'bg-[#A1E3F9] text-white [&_path]:fill-white' : ''
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex items-center gap-3 border-l-[3px] py-3 pr-6 pl-[25px] text-[15px] transition-colors ${
+                    active
+                      ? 'border-forest bg-white/[0.07] font-medium text-paper'
+                      : 'border-transparent text-gray-300 hover:bg-white/[0.04] hover:text-paper'
                   }`}
                 >
-                  <span className="flex-shrink-0">{link.icon}</span>
-                  <span className="ml-3 whitespace-nowrap">{link.label}</span>
+                  <span className={active ? 'text-paper' : 'text-gray-400'}>{link.icon}</span>
+                  {link.label}
                 </Link>
               </li>
-            ))}
-          </ul>
-        </nav>
-        {/* Desktop Expanded User Menu */}
-        <div className="hidden md:block border-t border-gray-200">
-            <AsyncButton
-                onClick={handleLogout}
-                className="w-full text-left flex items-center p-4 text-sm rounded-xl hover:bg-black/30"
-            >
-                <LogoutIcon />
-                <span className="ml-3 text-[#FF6565] font-semibold">Logout</span>
-            </AsyncButton>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div className="flex flex-col gap-3 border-t border-white/10 px-7 pt-5 pb-6">
+        <div className="flex items-center gap-3">
+          {user?.profileImage ? (
+            <img src={user.profileImage} alt="" className="h-9 w-9 rounded-full object-cover" />
+          ) : (
+            <div className="h-9 w-9 rounded-full bg-white/10" />
+          )}
+          <div className="flex min-w-0 flex-col">
+            <span className="text-xs text-gray-400">Signed in as</span>
+            {user ? <span className="truncate text-sm">{user.username}</span> : <LoadingSpinner />}
+          </div>
         </div>
-    </div>
+        <AsyncButton
+          onClick={handleLogout}
+          className="flex items-center gap-2 self-start text-sm text-red-300 hover:text-red-200"
+        >
+          <LogOut size={16} strokeWidth={1.6} />
+          Log out
+        </AsyncButton>
+      </div>
     </aside>
   );
 };

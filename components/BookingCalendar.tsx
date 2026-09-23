@@ -5,8 +5,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { MobileDatePicker } from '@mui/x-date-pickers';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import PickerProvider from '@/components/ui/PickerProvider';
 import { useBookedDates } from '@/hooks/useBookedDates';
 
 interface BookingCalendarProps {
@@ -102,10 +101,10 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
   if (loading) return <div className="text-sm text-gray-500">Checking availability...</div>;
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <PickerProvider>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Start Date <span className="text-red-500">*</span></label>
+          <label className="field-label">Start Date <span className="text-red-500">*</span></label>
           <MobileDatePicker
             value={startDate ? dayjs(startDate) : null}
             onChange={handleStartDateChange}
@@ -125,7 +124,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">End Date <span className="text-red-500">*</span></label>
+          <label className="field-label">End Date <span className="text-red-500">*</span></label>
           <MobileDatePicker
             value={endDate ? dayjs(endDate) : null}
             onChange={handleEndDateChange}
@@ -141,7 +140,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
           />
         </div>
       </div>
-    </LocalizationProvider>
+    </PickerProvider>
   );
 };
 

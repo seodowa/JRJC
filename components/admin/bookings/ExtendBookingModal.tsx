@@ -58,7 +58,7 @@ const ExtendBookingModal = ({ isOpen, onClose, booking, onConfirm }: ExtendBooki
     <Modal isOpen={isOpen} onClose={onClose} hideCloseButton={true}>
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg relative">
         <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Extend Booking</h2>
+            <h2 className="text-xl font-medium">Extend Booking</h2>
             <AsyncButton onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
                 <CloseIcon />
             </AsyncButton>

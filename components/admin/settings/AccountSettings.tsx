@@ -143,13 +143,13 @@ export default function AccountSettings() {
 
   return (
     <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm">
-      <h2 className="text-xl font-bold text-gray-900 mb-8">Account</h2>
+      <h2 className="text-xl font-medium mb-8">Account</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-12">
         {/* Form Fields Column */}
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="field-label">
               Username: <span className="text-red-500">*</span>
             </label>
             <input
@@ -157,14 +157,14 @@ export default function AccountSettings() {
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="field"
               placeholder="Enter username"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="field-label">
               Password: <span className="text-red-500">*</span>
             </label>
             <input
@@ -172,13 +172,13 @@ export default function AccountSettings() {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="field"
               placeholder="Enter new password (leave empty to keep current)"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="field-label">
               Email: <span className="text-red-500">*</span>
             </label>
             <input
@@ -186,7 +186,7 @@ export default function AccountSettings() {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="field"
               placeholder="Enter email address"
               required
             />
