@@ -1,5 +1,6 @@
 'use client';
 
+import { buttonClass } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@/components/icons/CloseIcon';
 import { SketchPicker, ColorResult } from 'react-color';
@@ -53,7 +54,7 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isOpen, onClose, on
             <AsyncButton type="button" onClick={onClose} className="px-4 py-2 rounded-md text-sm font-medium text-gray-700 border border-ink bg-transparent hover:bg-gray-200">
               Cancel
             </AsyncButton>
-            <AsyncButton type="button" onClick={handleConfirm} className="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+            <AsyncButton type="button" onClick={handleConfirm} className={buttonClass("primary", "sm")}>
               Select
             </AsyncButton>
         </div>

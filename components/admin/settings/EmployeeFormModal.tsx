@@ -1,5 +1,6 @@
 'use client';
 
+import { buttonClass } from "@/components/ui/button";
 import React, { useRef, useState, useEffect } from 'react';
 import { ManageEmployee } from '@/types/manageEmployee';
 import { AccountType } from '@/app/(admin)/services/manageEmployeeService';
@@ -145,7 +146,7 @@ export default function EmployeeFormModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+              className={buttonClass("primary")}
             >
               {isSubmitting ? 'Saving...' : 'Save'}
             </button>

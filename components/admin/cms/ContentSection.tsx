@@ -1,3 +1,4 @@
+import { buttonClass } from "@/components/ui/button";
 import React, { useEffect, useState } from 'react';
 import { CMSContent } from '@/types/cms';
 import AsyncButton from '@/components/AsyncButton';
@@ -227,7 +228,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
           type="submit"
           isLoading={loading}
           loadingText="Saving..."
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-md transition-colors shadow-sm"
+          className={buttonClass("primary", "md", "w-full sm:w-auto px-6")}
         >
           Save {title}
         </AsyncButton>
