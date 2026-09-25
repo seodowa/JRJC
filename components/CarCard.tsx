@@ -1,6 +1,6 @@
 import { Car } from "@/types";
 
-export default function CarCard({ car }: { car: Car }) {
+export default function CarCard({ car, carWashFee = 300 }: { car: Car; carWashFee?: number }) {
     // Helper function to get price properties safely
     const getPriceProperty = (priceObj: any, property: string) => {
         if (!priceObj) return 0;
@@ -49,7 +49,7 @@ export default function CarCard({ car }: { car: Car }) {
                 ))}
             </dl>
             <div className="flex items-center justify-between border-t border-line pt-3">
-                <span className="text-xs text-ink-2">+₱300 car wash fee</span>
+                <span className="text-xs text-ink-2">+₱{carWashFee} car wash fee</span>
                 <a href="/book" className="text-[15px] font-medium text-forest hover:text-forest-hover">
                     Book this car <span aria-hidden="true">→</span>
                 </a>
