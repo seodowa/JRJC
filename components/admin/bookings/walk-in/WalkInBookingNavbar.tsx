@@ -18,9 +18,9 @@ const WalkInBookingNavbar = ({
 }: WalkInBookingNavbarProps) => {
   const router = useRouter();
   const navItems = [
-    { id: 'personal', label: 'Personal Information', ref: personalRef },
-    { id: 'rental', label: 'Rental Details', ref: rentalRef },
-    { id: 'payment', label: 'Payment Details', ref: paymentRef },
+    { id: 'personal', label: 'Personal information', ref: personalRef },
+    { id: 'rental', label: 'Rental details', ref: rentalRef },
+    { id: 'payment', label: 'Payment details', ref: paymentRef },
   ];
 
   return (

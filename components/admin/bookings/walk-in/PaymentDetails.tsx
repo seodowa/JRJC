@@ -59,7 +59,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
 
   return (
     <div className="mt-8 rounded-md border border-line bg-surface p-6 md:p-8">
-      <h2 className="text-xl font-medium mb-6">Payment Details</h2>
+      <h2 className="text-xl font-medium mb-6">Payment details</h2>
       {!paymentMethod ? (
         <div>
           <div className="flex flex-col items-center">

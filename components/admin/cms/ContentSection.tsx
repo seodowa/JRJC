@@ -138,7 +138,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
 
   return (
     <div id={sectionKey} className="bg-white p-6 rounded-lg shadow mb-6 border border-gray-100">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">{title}</h2>
+      <h2 className="mb-4 text-2xl">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {fields.map(field => (
           <div key={field.key}>

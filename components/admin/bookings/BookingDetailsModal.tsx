@@ -128,7 +128,7 @@ const BookingDetailsModal = ({
               <div className="space-y-4">
                 {/* Booking Info */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Booking Information</h3>
+                  <h3 className="eyebrow mb-3">Booking Information</h3>
                   <p className="text-sm text-gray-600"><strong>Status:</strong> <span className={`font-medium ${
                     booking.Booking_Status?.Name === 'Pending' ? 'text-yellow-600' :
                     booking.Booking_Status?.Name === 'Confirmed' ? 'text-blue-600' :
@@ -146,7 +146,7 @@ const BookingDetailsModal = ({
                   
                   {booking.Payment_Details && (
                     <div className="mt-4 p-3 bg-gray-50 rounded-md">
-                      <h4 className="font-semibold text-md text-gray-700 mb-1">Payment Summary</h4>
+                      <h4 className="eyebrow mb-3">Payment Summary</h4>
                       {(booking.Booking_Status.Name === 'Pending' || booking.Booking_Status.Name === 'Confirmed') ? (
                         <div className="space-y-1 text-sm">
                           <p className="text-gray-600"><strong>Booking Fee:</strong> P{booking.Payment_Details.booking_fee?.toFixed(2)}</p>
@@ -168,7 +168,7 @@ const BookingDetailsModal = ({
 
                 {/* Customer Info */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Customer Information</h3>
+                  <h3 className="eyebrow mb-3">Customer Information</h3>
                   <p className="text-sm text-gray-600"><strong>Name:</strong> {booking.Customer.First_Name} {booking.Customer.Last_Name} {booking.Customer.Suffix || ''}</p>
                   <p className="text-sm text-gray-600"><strong>Email:</strong> {booking.Customer.Email || 'N/A'}</p>
                   <p className="text-sm text-gray-600"><strong>Contact:</strong> {booking.Customer.Contact_Number || 'N/A'}</p>
@@ -176,7 +176,7 @@ const BookingDetailsModal = ({
 
                 {/* Valid Government ID */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Valid Government ID</h3>
+                  <h3 className="eyebrow mb-3">Valid Government ID</h3>
                   {validIdUrl ? (
                     <div className="relative w-full h-48 border border-gray-300 rounded-md overflow-hidden cursor-pointer group" onClick={() => window.open(validIdUrl, '_blank')}>
                       <Image
@@ -206,7 +206,7 @@ const BookingDetailsModal = ({
               <div className="space-y-4">
                 {/* Car Info */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Car Information</h3>
+                  <h3 className="eyebrow mb-3">Car Information</h3>
                   <p className="text-sm text-gray-600"><strong>Make:</strong> {booking.Car_Models.Manufacturer.Manufacturer_Name}</p>
                   <p className="text-sm text-gray-600"><strong>Model:</strong> {booking.Car_Models.Model_Name}</p>
                   <p className="text-sm text-gray-600"><strong>Year:</strong> {booking.Car_Models.Year_Model}</p>
@@ -214,7 +214,7 @@ const BookingDetailsModal = ({
 
                 {/* Car Image */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Car Image</h3>
+                  <h3 className="eyebrow mb-3">Car Image</h3>
                   {booking.Car_Models.image ? (
                     <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden">
                       <Image

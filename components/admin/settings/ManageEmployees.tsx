@@ -160,7 +160,7 @@ export default function ManageEmployees() {
   if (error) {
     return (
       <div className="flex-1 rounded-md border border-line bg-surface p-8 text-red-600">
-        <h2 className="text-xl font-medium mb-4">Manage Employees</h2>
+        <h2 className="text-xl font-medium mb-4">Manage employees</h2>
         <p>Error: {error}</p>
       </div>
     );
@@ -169,7 +169,7 @@ export default function ManageEmployees() {
   return (
     <div className="flex-1 rounded-md border border-line bg-surface p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className="text-xl font-medium">Manage Employees</h2>
+        <h2 className="text-xl font-medium">Manage employees</h2>
         <button
           onClick={handleOpenCreate}
           className={buttonClass("primary", "md", "w-full md:w-auto")}

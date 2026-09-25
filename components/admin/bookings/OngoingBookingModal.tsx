@@ -223,7 +223,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
           
           {/* Header */}
           <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
-            <h2 className="text-xl md:text-2xl font-medium truncate pr-4">Ongoing - {localBooking.Booking_ID}</h2>
+            <h2 className="text-xl md:text-2xl font-medium truncate pr-4">Ongoing · {localBooking.Booking_ID}</h2>
             <button type="button" onClick={handleManualClose} className="text-gray-500 p-2 hover:bg-gray-100 rounded-full">
                <span className="text-2xl leading-none">&times;</span>
             </button>
@@ -237,7 +237,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
               <div className="space-y-4">
                 {/* Booking Info */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Booking Information</h3>
+                  <h3 className="eyebrow mb-3">Booking Information</h3>
                   <p className="text-sm text-gray-600"><strong>Status:</strong> <span className="font-medium text-green-600">Ongoing</span></p>
                   <p className="text-sm text-gray-600"><strong>Booked On:</strong> {formatDateTime(localBooking.date_created)}</p>
                   <p className="text-sm text-gray-600"><strong>Start:</strong> {formatDateTime(localBooking.Booking_Start_Date_Time)}</p>
@@ -247,7 +247,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
                   
                   {/* Return Status Area */}
                   <div className="mt-4 pt-2 border-t border-gray-100">
-                      <h4 className="font-semibold text-sm text-gray-700 mb-2">Return Status</h4>
+                      <h4 className="eyebrow mb-3">Return Status</h4>
                       {!localBooking.date_returned ? (
                           <AsyncButton 
                               onClick={() => setIsReturnConfirmOpen(true)} 
@@ -271,7 +271,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
 
                 {/* Customer Info */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Customer Information</h3>
+                  <h3 className="eyebrow mb-3">Customer Information</h3>
                   <p className="text-sm text-gray-600"><strong>Name:</strong> {localBooking.Customer.First_Name} {localBooking.Customer.Last_Name} {localBooking.Customer.Suffix || ''}</p>
                   <p className="text-sm text-gray-600"><strong>Email:</strong> {localBooking.Customer.Email || 'N/A'}</p>
                   <p className="text-sm text-gray-600"><strong>Contact:</strong> {localBooking.Customer.Contact_Number || 'N/A'}</p>
@@ -279,7 +279,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
 
                 {/* Valid Government ID */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Valid Government ID</h3>
+                  <h3 className="eyebrow mb-3">Valid Government ID</h3>
                   {validIdUrl ? (
                     <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden cursor-pointer group" onClick={() => window.open(validIdUrl, '_blank')}>
                       <Image
@@ -309,7 +309,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
               <div className="space-y-4">
                 {/* Car Info */}
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-700 mb-2">Car Information</h3>
+                  <h3 className="eyebrow mb-3">Car Information</h3>
                   <p className="text-sm text-gray-600"><strong>Make:</strong> {localBooking.Car_Models.Manufacturer.Manufacturer_Name}</p>
                   <p className="text-sm text-gray-600"><strong>Model:</strong> {localBooking.Car_Models.Model_Name}</p>
                   <p className="text-sm text-gray-600"><strong>Year:</strong> {localBooking.Car_Models.Year_Model}</p>
@@ -336,7 +336,7 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
 
                 {/* Payment Summary (Breakdown) */}
                 <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
-                  <h4 className="font-semibold text-md text-gray-700 mb-2">Payment Summary</h4>
+                  <h4 className="eyebrow mb-3">Payment Summary</h4>
                   <div className="space-y-1 text-sm">
                       <div className="flex justify-between text-gray-600">
                           <span>Initial Total:</span>

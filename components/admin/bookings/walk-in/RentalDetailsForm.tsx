@@ -66,7 +66,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
 
   return (
     <div className="mt-8 rounded-md border border-line bg-surface p-6 md:p-8">
-      <h2 className="text-xl font-medium mb-6">Rental Details</h2>
+      <h2 className="text-xl font-medium mb-6">Rental details</h2>
       <form onSubmit={(e) => { e.preventDefault(); onNext(); }}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

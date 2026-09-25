@@ -113,7 +113,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="relative rounded-md bg-surface p-6 shadow-xl md:p-8">
-        <h2 className="text-2xl font-medium mb-6">Finish Booking - {booking.Booking_ID}</h2>
+        <h2 className="text-2xl font-medium mb-6">Finish booking · {booking.Booking_ID}</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         
         <div className="space-y-4 mb-6">
@@ -131,7 +131,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
           </div>
 
           <div className="border-t border-gray-200 pt-4 mt-4">
-            <h3 className="font-semibold text-lg text-gray-700 mb-2">Payment Breakdown</h3>
+            <h3 className="eyebrow mb-3">Payment Breakdown</h3>
             {isLoading ? (
               <p>Loading late fee rates...</p>
             ) : (

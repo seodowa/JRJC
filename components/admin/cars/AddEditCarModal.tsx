@@ -187,7 +187,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
           
           {/* Header - Fixed at top */}
           <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
-             <h2 className="text-xl font-medium">{isEditMode ? 'Edit Car' : 'Add Car'}</h2>
+             <h2 className="text-xl font-medium">{isEditMode ? 'Edit car' : 'Add car'}</h2>
              {/* Close button for mobile accessibility/clarity */}
              <button type="button" onClick={handleManualClose} className="md:hidden text-gray-500 p-2">
                <span className="text-2xl">&times;</span>

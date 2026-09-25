@@ -88,7 +88,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
 
   return (
     <div className="rounded-md border border-line bg-surface p-6 md:p-8">
-      <h2 className="text-xl font-medium mb-6">Personal Information</h2>
+      <h2 className="text-xl font-medium mb-6">Personal information</h2>
       <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
