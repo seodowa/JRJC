@@ -11,9 +11,11 @@
     the user agrees.
 - **Vercel previews** build green for both branches.
 - **Attribution rule (user, global AGENTS.md):** no `Co-Authored-By`, no AI/tool mentions in
-  commits, merge commits, PRs, comments, or pushed files. Older commits on these branches still
-  carry `Co-Authored-By` trailers and PR #2's body has a tool footer — removing them from
-  history would need a force-push; only do it if the user asks.
+  commits, merge commits, PRs, comments, or pushed files. History and PR bodies are already
+  clean (see pass 6) — keep them that way.
+- **History was rewritten and force-pushed on 2026-09-25** (both branches). Anyone with an older
+  checkout must `git fetch && git reset --hard origin/<branch>` before pushing, or the old
+  commits come back. Commit hashes from before that date no longer exist on these branches.
 
 ## Design reference
 - Source of truth: the "JRJC redesign" design canvas (the user has the link) — boards: Landing,
@@ -57,6 +59,19 @@ F1 About HTML in `<div>`; F2 dashboard date in Asia/Manila; F3 `ReviewStars` rol
 hidden icons; F4 car-wash fee read from CMS `fees.car_wash_fee` in `CarsSection` (server);
 F5 OTP modal heading "Enter your code." (modal is used for SMS too).
 
+### Pass 6 — attribution cleanup (user request)
+- Added the no-attribution rule to the global `projs/AGENTS.md` (Git Workflow section).
+- Removed tool mentions from the PR #1 and PR #2 descriptions.
+- Rewrote `ui-redesign` and `staging` history (commits not on `main` only; `main` untouched):
+  one commit re-authored to the user, attribution trailers dropped from messages, and every
+  past version of this file replaced with a clean one. The user ran the rewrite script; both
+  branches were force-pushed with `--force-with-lease`. Only this file's content differed
+  afterwards (commit hashes replaced by titles).
+- Local-only backups of the pre-rewrite branches: `backup/ui-redesign-pre-rewrite`,
+  `backup/staging-pre-rewrite`. Delete them once the user confirms; never push them.
+- Old commits may stay reachable on GitHub by hash (and in PR #1's timeline) until GitHub
+  garbage-collects them; only GitHub support can purge them sooner.
+
 ## Verification done
 - `npx tsc --noEmit` clean; `npm run build` passes (latest: after pass 5).
 - Headless Chromium screenshots of all public pages and logged-in admin pages at desktop and
@@ -71,6 +86,8 @@ F5 OTP modal heading "Enter your code." (modal is used for SMS too).
   act on real bookings in production. Needs a test booking or a non-production database.
 - Send a test booking email and check rendering in a mail client.
 - Decide PR path (#1 vs #2) and get the user's go-ahead before merging to `main`.
+- Delete the local `backup/*-pre-rewrite` branches after the user confirms the rewrite.
+- Tell collaborators (e.g. the CodeRabbit reviewer) to reset their checkouts of these branches.
 - Page copy that comes from the CMS (e.g. the "About Us" title) is edited in Site content,
   not in code.
 - `.env` points at the production Supabase project — avoid writes; prefer a branch/dev project.
