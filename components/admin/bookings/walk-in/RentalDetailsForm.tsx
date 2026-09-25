@@ -124,7 +124,7 @@ const RentalDetailsForm = ({ onBack, onNext }: RentalDetailsFormProps) => {
 
             <div>
               <label className="field-label">
-                Pick-up Time <span className="text-red-500">*</span>
+                Pick-up time <span className="text-red-500">*</span>
               </label>
               {/* --- FIX START: Conditional Rendering --- */}
               {isMounted ? (

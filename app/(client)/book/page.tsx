@@ -363,8 +363,8 @@ const BookingPage: React.FC = () => {
             <form onSubmit={handleSubmit} noValidate>
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
-                  <InputField label="First Name" name="firstName" type="text" value={personalInfo.firstName} onChange={handleInputChange} placeholder="Enter your first name" required className="col-span-3 md:col-span-1" />
-                  <InputField label="Last Name" name="lastName" type="text" value={personalInfo.lastName} onChange={handleInputChange} placeholder="Enter your last name" required className="col-span-2 md:col-span-1" />
+                  <InputField label="First name" name="firstName" type="text" value={personalInfo.firstName} onChange={handleInputChange} placeholder="Enter your first name" required className="col-span-3 md:col-span-1" />
+                  <InputField label="Last name" name="lastName" type="text" value={personalInfo.lastName} onChange={handleInputChange} placeholder="Enter your last name" required className="col-span-2 md:col-span-1" />
                   <InputField label="Suffix" name="suffix" type="text" value={personalInfo.suffix} onChange={handleInputChange} placeholder="(e.g., Jr.)" optional={true} />
                   
                   <InputField 
@@ -380,12 +380,12 @@ const BookingPage: React.FC = () => {
                     className="col-span-3 md:col-span-1" 
                   />
                   
-                  <InputField label="Mobile Number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-3 md:col-span-1" />
+                  <InputField label="Mobile number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-3 md:col-span-1" />
                   
           {/* Valid Government ID Upload */}
           <div className="col-span-3 md:col-span-1">
             <label className="field-label">
-              Valid Government ID (Image) <span className="text-red-500">*</span>
+              Valid government ID (image) <span className="text-red-500">*</span>
             </label>
             
             <div className={`relative flex items-center w-full border rounded-md overflow-hidden bg-surface transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-line-strong focus-within:ring-1 focus-within:ring-forest focus-within:border-forest'}`}>
@@ -429,7 +429,7 @@ const BookingPage: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="field-label">Select Car <span className="text-red-500">*</span></label>
+                    <label className="field-label">Select car <span className="text-red-500">*</span></label>
                     <SelectCar 
                         selectedCar={selectedCar} 
                         setSelectedCar={setSelectedCar} 
@@ -449,7 +449,7 @@ const BookingPage: React.FC = () => {
                     {error && <div className="text-sm text-red-500 mt-1">{error}</div>}
                   </div>
                   <div>
-                    <label className="field-label">Pick-up Time <span className="text-red-500">*</span></label>
+                    <label className="field-label">Pick-up time <span className="text-red-500">*</span></label>
                     <PickerProvider>
                       <MobileTimePicker label="Select time" value={selectedTime} onChange={(newTime: Dayjs | null) => { setSelectedTime(newTime); const timeString = newTime ? newTime.format('HH:mm') : ''; setRentalInfo(prev => ({ ...prev, time: timeString })); }} ampm={true} minutesStep={30} slotProps={{ textField: { required: true, fullWidth: true, size: "small" } }} />
                     </PickerProvider>
@@ -467,7 +467,7 @@ const BookingPage: React.FC = () => {
                     />
                     {dateRangeError && <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md"><p className="text-sm text-red-700">{dateRangeError}</p></div>}
                   </div>
-                  <div><label className="field-label">Fuel Type</label><input type="text" disabled value="Gasoline(Unleaded)" className="field" /></div>
+                  <div><label className="field-label">Fuel type</label><input type="text" disabled value="Gasoline(Unleaded)" className="field" /></div>
                   <div>
                     <label className="field-label">Self-drive? <span className="text-red-500">*</span></label>
                     <select name="selfDrive" value={rentalInfo.selfDrive} onChange={handleRentalInputChange} className="field" required>

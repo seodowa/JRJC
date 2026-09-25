@@ -120,7 +120,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
           <p className="text-sm text-gray-600"><strong>Booking End:</strong> {new Date(booking.Booking_End_Date_Time).toLocaleString()}</p>
           
           <div>
-            <label htmlFor="dateReturned" className="field-label">Actual Return Date & Time:</label>
+            <label htmlFor="dateReturned" className="field-label">Actual return date &amp; time</label>
             <input
               type="datetime-local"
               id="dateReturned"

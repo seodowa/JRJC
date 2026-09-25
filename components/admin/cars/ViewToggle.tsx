@@ -13,7 +13,7 @@ const ViewToggle = ({ view, setView }: ViewToggleProps) => {
         <div className="flex items-center gap-x-1 rounded-md bg-gray-100 p-1 border border-gray-200 shadow-sm">
             <button
                 className={`relative py-1.5 px-3 rounded-md flex items-center gap-2 transition-colors ${view === 'list' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-                aria-label="List View"
+                aria-label="List view"
                 onClick={() => setView('list')}
             >
                 {view === 'list' && (
@@ -28,7 +28,7 @@ const ViewToggle = ({ view, setView }: ViewToggleProps) => {
             </button>
             <button
                 className={`relative py-1.5 px-3 rounded-md flex items-center gap-2 transition-colors ${view === 'grid' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
-                aria-label="Grid View"
+                aria-label="Grid view"
                 onClick={() => setView('grid')}
             >
                 {view === 'grid' && (

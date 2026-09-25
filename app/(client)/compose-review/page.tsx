@@ -133,7 +133,7 @@ export default function ComposeReviewPage({
                     {allowCarSelection && !carId && (
                         <div>
                             <label htmlFor="carId" className="field-label">
-                                Select Car <span className="text-gray-500">(Optional)</span>
+                                Select car <span className="text-gray-500">(Optional)</span>
                             </label>
                             <select
                                 id="carId"
@@ -142,7 +142,7 @@ export default function ComposeReviewPage({
                                 className="field"
                                 disabled={isSubmitting}
                             >
-                                <option value="">General Review (No specific car)</option>
+                                <option value="">General review (no specific car)</option>
                                 {CARS.map((car) => (
                                     <option key={car.id} value={car.id}>
                                         {car.year} {car.brand} {car.model}
@@ -158,7 +158,7 @@ export default function ComposeReviewPage({
                     {/* Name Field */}
                     <div>
                         <label htmlFor="name" className="field-label">
-                            Your Name <span className='text-red-500'>*</span>
+                            Your name <span className='text-red-500'>*</span>
                         </label>
                         <input
                             id="name"
@@ -216,7 +216,7 @@ export default function ComposeReviewPage({
                     {/* Title Field */}
                     <div>
                         <label htmlFor="title" className="field-label">
-                            Review Title <span className='text-red-500'>*</span>
+                            Review title <span className='text-red-500'>*</span>
                         </label>
                         <input
                             id="title"
@@ -247,7 +247,7 @@ export default function ComposeReviewPage({
                     {/* Body Field */}
                     <div>
                         <label htmlFor="body" className="field-label">
-                            Your Review <span className='text-red-500'>*</span>
+                            Your review <span className='text-red-500'>*</span>
                         </label>
                         <textarea
                             id="body"
@@ -329,7 +329,7 @@ export default function ComposeReviewPage({
 
                 {/* Guidelines */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Review Guidelines:</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Review guidelines</h3>
                     <ul className="text-sm text-gray-600 space-y-1">
                         <li>• Be honest and detailed about your experience</li>
                         <li>• Focus on the service, vehicle condition, and overall experience</li>

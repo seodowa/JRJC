@@ -174,7 +174,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
       {/* Valid Government ID Upload */}
       <div className="pt-4">
         <label className="field-label">
-          Valid Government ID (Image): <span className="text-red-500">*</span>
+          Valid government ID (image) <span className="text-red-500">*</span>
         </label>
         
         <div className={`relative flex items-center w-full border rounded-md overflow-hidden bg-surface transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-line-strong focus-within:ring-1 focus-within:ring-forest focus-within:border-forest'}`}>
