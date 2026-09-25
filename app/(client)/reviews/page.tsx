@@ -1,5 +1,6 @@
 "use client"
 
+import { buttonClass } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { ALL_REVIEWS } from "@/lib/data/reviews";
 import { ChevronDown, Filter, Star } from "lucide-react";
@@ -170,11 +171,11 @@ const ReviewsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Filters */}
           <div className="lg:col-span-1">
-            <div className="sticky top-20 rounded-md border border-line bg-surface p-6">
+            <div className="sticky top-20 rounded-md border border-line bg-surface p-1 lg:p-6">
               {/* Mobile Filter Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden w-full flex items-center justify-between mb-4 px-4 py-2 bg-gray-100 rounded-lg"
+                className="lg:hidden w-full flex items-center justify-between px-4 py-2.5 rounded-md hover:bg-gray-200"
               >
                 <span className="flex items-center gap-2 font-medium">
                   <Filter size={20} />
@@ -183,7 +184,7 @@ const ReviewsPage = () => {
                 <ChevronDown size={20} className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
 
-              <div className={`${showFilters ? 'block' : 'hidden'} lg:block`}>
+              <div className={`${showFilters ? 'block' : 'hidden'} p-4 lg:block lg:p-0`}>
                 {/* Overall Rating */}
                 <div className="mb-6">
                   <h3 className="eyebrow mb-3">Overall Rating</h3>
@@ -271,7 +272,7 @@ const ReviewsPage = () => {
                 {filterRating !== null && (
                   <button
                     onClick={() => setFilterRating(null)}
-                    className="w-full px-4 py-2 border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+                    className="w-full px-4 py-2 border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium rounded-md transition-colors"
                   >
                     Clear Filters
                   </button>
@@ -302,7 +303,7 @@ const ReviewsPage = () => {
                 <p className="text-gray-600 text-lg">No reviews found with the selected filters.</p>
                 <button
                   onClick={() => setFilterRating(null)}
-                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className={buttonClass("primary", "md", "mt-4")}
                 >
                   Clear Filters
                 </button>
