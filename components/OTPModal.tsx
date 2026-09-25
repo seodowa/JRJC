@@ -102,7 +102,7 @@ const OTPModal: React.FC<OtpModalProps> = ({
                     <CloseIcon />
                 </button>
                 <div className="text-center pt-10">
-                    <h2 className="mb-2 text-3xl">Check your inbox.</h2>
+                    <h2 className="mb-2 text-3xl">Enter your code.</h2>
                     <div className="flex justify-center my-6">
                         <OTPVerificationIcon size={64} />
                     </div>

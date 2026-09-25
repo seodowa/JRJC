@@ -19,7 +19,7 @@ export default function AboutSection() {
       <div className="grid grid-cols-1 gap-6 border-t border-ink pt-6 md:grid-cols-12">
         <div className="eyebrow md:col-span-2">03 — About</div>
         <h2 className="text-4xl leading-none sm:text-5xl md:col-span-4 md:text-[3.5rem]">{title}</h2>
-        <p
+        <div
           className="max-w-2xl text-lg leading-relaxed text-ink-2 md:col-span-6 [&_strong]:font-medium [&_strong]:text-ink"
           dangerouslySetInnerHTML={{ __html: content }}
         />

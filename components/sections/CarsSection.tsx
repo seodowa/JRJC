@@ -1,9 +1,12 @@
 import CarCard from "../CarCard";
 import SectionHeader from "../ui/SectionHeader";
 import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
+import { fetchCMSContentMap } from "@/lib/supabase/queries/cms";
 
 export default async function CarsSection() {
-  const cars = await fetchCars();
+  const [cars, fees] = await Promise.all([fetchCars(), fetchCMSContentMap("fees")]);
+  // Same parsing and default as getNumber("fees", "car_wash_fee", 300) on the booking page
+  const carWashFee = fees.car_wash_fee?.value ? parseFloat(fees.car_wash_fee.value) : 300;
   const IN_MAINTENANCE = 3; // status id for car in maintenance
   const available = cars.filter(car => car.status?.id !== IN_MAINTENANCE);
 
@@ -14,7 +17,7 @@ export default async function CarsSection() {
       </SectionHeader>
       {available.length > 0 ? (
         <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {available.map(car => <CarCard key={car.id} car={car} />)}
+          {available.map(car => <CarCard key={car.id} car={car} carWashFee={carWashFee} />)}
         </div>
       ) : (
         <p className="text-ink-2">No cars are available right now. Please check back soon.</p>

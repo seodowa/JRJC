@@ -7,7 +7,7 @@ interface WelcomeMessageProps {
 }
 
 const WelcomeMessage = ({ user }: WelcomeMessageProps) => {
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Manila' });
 
   return (
     <div className="flex flex-col gap-2">
