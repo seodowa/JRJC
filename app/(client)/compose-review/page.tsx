@@ -105,7 +105,7 @@ export default function ComposeReviewPage({
     const displayRating = hoveredRating || formData.rating
 
     return (
-        <div className='w-full min-h-screen pt-10 pb-24 lg:pt-14'>
+        <div className='w-full pt-10 pb-24 lg:pt-14'>
             <div className="mx-auto w-full max-w-2xl px-4 sm:px-8">
                 {/* Header */}
                 <div className="mb-6 main-w-2xl">
@@ -310,7 +310,7 @@ export default function ComposeReviewPage({
                                     Submitting...
                                 </span>
                             ) : (
-                                'Submit Review'
+                                'Submit review'
                             )}
                         </button>
                         {onClose && (

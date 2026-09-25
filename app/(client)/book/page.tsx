@@ -380,7 +380,7 @@ const BookingPage: React.FC = () => {
                     className="col-span-3 md:col-span-1" 
                   />
                   
-                  <InputField label="Mobile Number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-2 md:col-span-1" />
+                  <InputField label="Mobile Number" name="mobileNumber" type="tel" value={personalInfo.mobileNumber} onChange={handleInputChange} placeholder="Enter your mobile number" required className="col-span-3 md:col-span-1" />
                   
           {/* Valid Government ID Upload */}
           <div className="col-span-3 md:col-span-1">
@@ -388,14 +388,14 @@ const BookingPage: React.FC = () => {
               Valid Government ID (Image) <span className="text-red-500">*</span>
             </label>
             
-            <div className={`relative flex items-center w-full border rounded-lg overflow-hidden transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'}`}>
+            <div className={`relative flex items-center w-full border rounded-md overflow-hidden bg-surface transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-line-strong focus-within:ring-1 focus-within:ring-forest focus-within:border-forest'}`}>
                 <label 
                     htmlFor="id-upload" 
-                    className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-3 text-base border-r border-gray-300 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                    className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-2.5 text-[15px] border-r border-line-strong hover:bg-gray-200 transition-colors whitespace-nowrap"
                 >
                     Browse
                 </label>
-                <div className="flex-1 px-4 py-3 text-gray-500 truncate bg-white">
+                <div className="flex-1 px-4 py-2.5 text-[15px] text-ink-3 truncate bg-surface">
                     {isUploadingId ? (
                         <span className="text-blue-500">Uploading...</span>
                     ) : validIdPath ? (
@@ -653,7 +653,7 @@ const BookingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div>
       <div className="mx-auto max-w-[1440px] px-4 pt-10 pb-24 sm:px-8 lg:px-16 lg:pt-14">
         <div className="flex flex-col gap-3">
           <p className="eyebrow">Book a car</p>

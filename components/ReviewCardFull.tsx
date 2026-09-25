@@ -24,7 +24,7 @@ export default function ReviewCardFull({ review, onToggleHelpful }: ReviewCardFu
   }, [review.createdAt])
 
   return (
-    <article className="relative flex flex-col gap-5 rounded-md border border-line bg-surface p-6 shadow-xl sm:p-8">
+    <article className="relative flex flex-col gap-5 rounded-md border border-line bg-surface p-6 sm:p-8">
       <div className="flex items-center gap-3 pr-10">
         <ReviewStars rating={review.rating} size={17} />
         <span className="num text-xs text-ink-2">{timeAgo}</span>

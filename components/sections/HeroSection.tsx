@@ -16,7 +16,7 @@ export default function HeroSection() {
       <div className="flex flex-col gap-7 md:col-span-6 md:self-end lg:col-span-5">
         <p className="eyebrow">{subtitle} — Bukidnon, PH</p>
         <h1 className="text-[3.25rem] leading-[0.98] font-normal tracking-[-0.035em] sm:text-7xl lg:text-[5.25rem]">
-          Good cars for <em className="text-forest">long</em> roads.
+          Good cars for <em className="pr-[0.1em] text-forest">long</em> roads.
         </h1>
         <p className="max-w-md text-lg leading-relaxed text-ink-2">
           Pick a car, choose your dates, and pay through GCash. We confirm by text and email.

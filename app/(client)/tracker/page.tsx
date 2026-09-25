@@ -167,7 +167,7 @@ export default function BookingTrackerPage() {
     }, [uuid]); 
 
     return (
-        <div className="mx-auto min-h-[calc(100dvh-4rem)] max-w-[1440px] px-4 pt-10 pb-24 sm:px-8 lg:px-16 lg:pt-14">
+        <div className="mx-auto max-w-[1440px] px-4 pt-10 pb-24 sm:px-8 lg:px-16 lg:pt-14">
             <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-6">
                 <div className="flex flex-col gap-6 md:col-span-5">
                     <p className="eyebrow">Booking tracker</p>

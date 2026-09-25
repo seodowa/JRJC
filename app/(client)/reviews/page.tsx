@@ -136,7 +136,7 @@ const ReviewsPage = () => {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen">
+      <div>
         <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-8 lg:px-16">
           <div className="animate-pulse">
             <div className="h-12 bg-gray-200 rounded w-1/3 mb-4"></div>
@@ -156,7 +156,7 @@ const ReviewsPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Header */}
       <div className="border-b border-line">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 pt-10 pb-10 sm:px-8 lg:px-16 lg:pt-14">
