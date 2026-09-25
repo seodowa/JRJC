@@ -104,7 +104,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
     <PickerProvider>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1">
-          <label className="field-label">Start Date <span className="text-red-500">*</span></label>
+          <label className="field-label">Start date <span className="text-red-500">*</span></label>
           <MobileDatePicker
             value={startDate ? dayjs(startDate) : null}
             onChange={handleStartDateChange}
@@ -124,7 +124,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
         </div>
 
         <div className="space-y-1">
-          <label className="field-label">End Date <span className="text-red-500">*</span></label>
+          <label className="field-label">End date <span className="text-red-500">*</span></label>
           <MobileDatePicker
             value={endDate ? dayjs(endDate) : null}
             onChange={handleEndDateChange}

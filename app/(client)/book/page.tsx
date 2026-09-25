@@ -12,6 +12,8 @@ import { Car } from "@/types";
 import { fetchCars } from "@/lib/supabase/queries/client/fetchCars";
 import { createBooking } from "@/lib/supabase/mutations/createBooking";
 import BookingCalendar from "@/components/BookingCalendar";
+import BookingSummary from "@/components/BookingSummary";
+import { buttonClass } from "@/components/ui/button";
 import { sendBookingConfirmationService } from "@/app/services/bookingService";
 import { createClient } from "@/utils/supabase/client"; 
 import { useCMS } from "@/app/(client)/context/CMSContext";
@@ -417,7 +419,7 @@ const BookingPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-end mt-8 pt-6 border-t border-gray-100">
-                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full lg:w-auto">Next</button>
+                <button type="submit" className={buttonClass("primary", "md", "px-8 w-full lg:w-auto")}>Next</button>
               </div>
             </form>
           </div>
@@ -513,8 +515,8 @@ const BookingPage: React.FC = () => {
                   )}
                 </div>
                 <div className="flex gap-3">
-                  <button type="button" onClick={handleBack} className="border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Back</button>
-                  <button type="submit" disabled={!rentalInfo.duration || dateRangeError !== null} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">Next</button>
+                  <button type="button" onClick={handleBack} className={buttonClass("secondary", "md", "px-8")}>Back</button>
+                  <button type="submit" disabled={!rentalInfo.duration || dateRangeError !== null} className={buttonClass("primary", "md", "px-8")}>Next</button>
                 </div>
               </div>
             </form>
@@ -550,8 +552,8 @@ const BookingPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-                <button type="button" onClick={handleBack} className="border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Back</button>
-                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-md transition-colors duration-200">Book</button>
+                <button type="button" onClick={handleBack} className={buttonClass("secondary", "md", "px-8")}>Back</button>
+                <button type="submit" className={buttonClass("primary", "md", "px-8")}>Book</button>
               </div>
             </form>
 
@@ -631,11 +633,11 @@ const BookingPage: React.FC = () => {
                       )}
 
                       <div className="flex justify-between gap-3">
-                        <button onClick={handleCancelConfirm} disabled={submitting} className="flex-1 border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50">Cancel</button>
+                        <button onClick={handleCancelConfirm} disabled={submitting} className={buttonClass("secondary", "md", "flex-1")}>Cancel</button>
                         <button 
                           onClick={handleFinalSubmit} 
                           disabled={submitting || notificationPreferences.length === 0} 
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
+                          className={buttonClass("primary", "md", "flex-1")}
                         >
                           {submitting ? 'Processing...' : 'Confirm'}
                         </button>
@@ -676,13 +678,29 @@ const BookingPage: React.FC = () => {
             );
           })}
         </ol>
-        <div className="mt-10 rounded-md border border-line bg-surface">
-          <div className="border-b border-line px-6 py-4">
-            <h2 className="font-sans text-sm font-medium tracking-normal text-ink-2">
-              {["Personal information", "Rental details", "Payment details"][currentStep - 1]}
-            </h2>
+        <div className="mt-10 grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+          <div className={`rounded-md border border-line bg-surface ${currentStep > 1 ? "lg:col-span-8" : "lg:col-span-12"}`}>
+            <div className="border-b border-line px-6 py-4">
+              <h2 className="font-sans text-sm font-medium tracking-normal text-ink-2">
+                {["Personal information", "Rental details", "Payment details"][currentStep - 1]}
+              </h2>
+            </div>
+            {renderStepContent()}
           </div>
-          {renderStepContent()}
+          {currentStep > 1 && (
+            <div className="lg:col-span-4">
+              <BookingSummary
+                car={selectedCarData}
+                area={rentalInfo.area}
+                pickup={rentalInfo.startDate && rentalInfo.time ? `${formatDate(rentalInfo.startDate)} · ${formatTime(rentalInfo.time)}` : null}
+                dropoff={rentalInfo.endDate && rentalInfo.duration ? `${formatDate(rentalInfo.endDate)} · ${returnTime}` : null}
+                duration={rentalInfo.duration}
+                rentalPrice={rentalInfo.duration ? totalPrice || 0 : 0}
+                bookingFee={getNumber('fees', 'booking_fee', 500)}
+                carWashFee={getNumber('fees', 'car_wash_fee', 300)}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
