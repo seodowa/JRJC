@@ -245,14 +245,14 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
                     </div>
 
                     <div>
-                    <Label>Transmission:</Label>
+                    <Label>Transmission</Label>
                     <select name="transmission" value={formData.transmission || ''} onChange={handleInputChange} className={inputClassName}>
                         {transmissionTypes.map(type => <option key={type} value={type}>{type}</option>)}
                     </select>
                     </div>
 
                     <div>
-                    <Label>Fuel Type:</Label>
+                    <Label>Fuel type</Label>
                     <select name="fuelType" value={formData.fuelType || ''} onChange={handleInputChange} className={inputClassName}>
                         {fuelTypes.map(type => <option key={type} value={type}>{type}</option>)}
                     </select>
@@ -264,7 +264,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
                     
                     {/* Color Picker */}
                     <div>
-                    <Label>Color:</Label>
+                    <Label>Color</Label>
                     <button 
                         type="button" 
                         onClick={() => setIsColorPickerOpen(true)} 

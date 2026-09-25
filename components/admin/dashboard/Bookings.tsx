@@ -9,11 +9,11 @@ interface BookingsProps {
 
 const Bookings = ({ bookings }: BookingsProps) => {
   
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string, withYear = true) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric',
+      ...(withYear && { year: 'numeric' }),
     });
   };
 
@@ -40,10 +40,10 @@ const Bookings = ({ bookings }: BookingsProps) => {
                   {getFullName(booking)}
                 </p>
                 <p className="num text-xs text-ink-2">
-                  {formatDate(booking.Booking_Start_Date_Time)} - {formatDate(booking.Booking_End_Date_Time)}
+                  {formatDate(booking.Booking_Start_Date_Time, false)} – {formatDate(booking.Booking_End_Date_Time)}
                 </p>
-                <p className="text-sm text-gray-500">
-                  {booking.Duration} hours - {booking.Location}
+                <p className="text-sm text-ink-2">
+                  {booking.Duration} hours · {booking.Location}
                 </p>
               </li>
             ))}

@@ -19,7 +19,7 @@ export default function SettingsPage() {
     <div className="flex h-full flex-col gap-7">
       <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">Settings</h1>
 
-      <nav className="w-full overflow-x-auto border-b border-line custom-scrollbar" role="tablist">
+      <nav className="w-full shrink-0 overflow-x-auto border-b border-line custom-scrollbar" role="tablist">
         <div className="flex min-w-max gap-7">
           <button role="tab" aria-selected={activeTab === 'account'} onClick={() => setActiveTab('account')} className={tabClass(activeTab === 'account')}>
             Account

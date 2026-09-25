@@ -151,7 +151,7 @@ export default function AccountSettings() {
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
             <label className="field-label">
-              Username: <span className="text-red-500">*</span>
+              Username <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -166,7 +166,7 @@ export default function AccountSettings() {
 
           <div className="space-y-2">
             <label className="field-label">
-              Password: <span className="text-red-500">*</span>
+              Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -180,7 +180,7 @@ export default function AccountSettings() {
 
           <div className="space-y-2">
             <label className="field-label">
-              Email: <span className="text-red-500">*</span>
+              Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -197,7 +197,7 @@ export default function AccountSettings() {
         {/* Profile Picture Column */}
         <div className="flex flex-col items-center lg:items-start space-y-4">
           <span className="text-sm font-medium text-gray-700 self-center lg:self-start">
-            Profile Picture:
+            Profile picture
           </span>
           
           <div 
@@ -213,7 +213,7 @@ export default function AccountSettings() {
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center bg-gray-300 text-white">
                 <Pencil size={48} strokeWidth={2.5} />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
+                <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/10 transition-colors" />
               </div>
             )}
             

@@ -63,7 +63,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
       {!paymentMethod ? (
         <div>
           <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">Select a Payment Method:</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Select a payment method</h3>
             <div className="flex space-x-4">
               <AsyncButton
                 onClick={() => handlePaymentMethodSelect("cash")}
@@ -95,7 +95,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               <div>
                 <p className="text-sm text-gray-700">
-                  <strong>Booking Fee:</strong> ₱{bookingFee}
+                  <strong>Booking fee:</strong> ₱{bookingFee}
                 </p>
                 <p className="text-sm text-gray-700">
                   <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)
@@ -138,7 +138,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                 
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-gray-700">
-                    <strong>Booking Fee:</strong> ₱{bookingFee}
+                    <strong>Booking fee:</strong> ₱{bookingFee}
                   </p>
                   <p className="text-sm text-gray-700">
                     <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)

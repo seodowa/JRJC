@@ -1,5 +1,6 @@
 'use client';
 
+import { buttonClass } from "@/components/ui/button";
 import { useState, useEffect } from 'react';
 import { Review, Car } from '@/types';
 import ReviewsTableView from './ReviewsTableView';
@@ -55,48 +56,41 @@ const ReviewsPageClient = ({ reviews, cars }: { reviews: Review[]; cars: Car[] }
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <header className="flex-shrink-0 p-4 sm:p-6 lg:p-8 border-b border-gray-200">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">Reviews</h1>
-          <div className="relative"> {/* Added relative for dropdown positioning */}
-            <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V19l-4 2v-5.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filter
-            </button>
-            {isDropdownOpen && (
-              <FilterDropdown
-                cars={cars}
-                onApply={applyFilters}
-                onReset={resetFilters}
-                initialFilters={filters}
-              />
-            )}
-          </div>
-        </div>
-        <div className="hidden md:grid grid-cols-12 gap-x-6 px-6 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div className="col-span-6">Review Content</div>
-            <div className="col-span-2">Rating</div>
-            <div className="col-span-4">Review Details</div>
+    <div className="flex h-full flex-col gap-7">
+      <header className="flex items-end justify-between">
+        <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">Reviews</h1>
+        <div className="relative">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className={buttonClass("secondary", "sm")}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V19l-4 2v-5.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filter
+          </button>
+          {isDropdownOpen && (
+            <FilterDropdown
+              cars={cars}
+              onApply={applyFilters}
+              onReset={resetFilters}
+              initialFilters={filters}
+            />
+          )}
         </div>
       </header>
-      <main className="flex-grow overflow-y-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex-grow overflow-y-auto rounded-md border border-line bg-surface custom-scrollbar">
+        <div className="num hidden grid-cols-12 gap-x-6 border-b border-ink px-6 py-3.5 text-[11px] font-medium tracking-[0.1em] text-ink-2 uppercase md:grid">
+          <div className="col-span-6">Review</div>
+          <div className="col-span-2">Rating</div>
+          <div className="col-span-4">Details</div>
+        </div>
         {filteredReviews.length > 0 ? (
           <ReviewsTableView reviews={filteredReviews} />
         ) : (
-          <div className="flex justify-center items-center h-64 bg-white rounded-lg shadow">
-            <p className="text-gray-500">No reviews found.</p>
-          </div>
+          <p className="p-12 text-center text-ink-2">No reviews found.</p>
         )}
-      </main>
-      <footer className="flex-shrink-0 p-6 border-t border-gray-200">
-        {/* Footer content can go here */}
-      </footer>
+      </div>
     </div>
   );
 };

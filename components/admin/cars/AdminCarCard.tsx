@@ -135,15 +135,15 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
             {/* Column B: Specs */}
             <div className="md:col-span-4 text-xs text-gray-600 space-y-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Transmission:</span>
+                    <span className="text-gray-500">Transmission</span>
                     <span className="font-medium text-gray-800">{car.transmission}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Fuel Type:</span>
+                    <span className="text-gray-500">Fuel type</span>
                     <span className="font-medium text-gray-800">{car.fuelType}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Color:</span>
+                    <span className="text-gray-500">Color</span>
                     <div className="flex items-center gap-2">
                         {car.color && (
                             <span 
@@ -154,7 +154,7 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Number of Seats:</span>
+                    <span className="text-gray-500">Seats</span>
                     <span className="font-medium text-gray-800">{car.seats}</span>
                 </div>
             </div>

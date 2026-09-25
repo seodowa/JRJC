@@ -22,7 +22,7 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="table w-full min-w-[1300px] table-fixed border border-line bg-surface text-ink">
+      <table className="table w-full min-w-[1080px] table-fixed border border-line bg-surface text-ink">
       <thead className="num border-b border-ink text-[11px] tracking-[0.1em] text-ink-2 uppercase">
           <tr>
             {showCheckboxes && (
@@ -30,10 +30,10 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
                 {/* This is an empty header for the checkboxes in the content rows */}
               </th>
             )}
-            <th scope="col" className="p-3 font-medium text-left py-3.5 w-[15%]">
+            <th scope="col" className="p-3 font-medium text-left py-3.5 w-[17%]">
               Name
             </th>
-            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[20%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[11%]">
               Booking ID
             </th>
             <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">
@@ -45,10 +45,10 @@ const BookingsTableView = ({ bookings, selectedBookings, setSelectedBookings, sh
             <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">
               Booking End
             </th>
-            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[5%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[8%]">
               Duration
             </th>
-            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[15%]">
+            <th scope="col" className="px-3 font-medium text-left py-3.5 w-[19%]">
               Car
             </th>
             <th scope="col" className="px-3 font-medium text-left py-3.5 w-[10%]">

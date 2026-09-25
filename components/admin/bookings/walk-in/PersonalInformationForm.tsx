@@ -93,7 +93,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
             <label htmlFor="firstName" className="field-label">
-              First Name: <span className="text-red-500">*</span>
+              First name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -108,7 +108,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
           </div>
           <div className="md:col-span-1">
             <label htmlFor="lastName" className="field-label">
-              Last Name: <span className="text-red-500">*</span>
+              Last name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -123,7 +123,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
           </div>
           <div className="md:col-span-1">
             <label htmlFor="suffix" className="field-label">
-              Suffix:
+              Suffix <span className="text-ink-3 text-xs font-normal">(optional)</span>
             </label>
             <input
               type="text"
@@ -131,7 +131,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="suffix"
               value={personalInfo.suffix}
               onChange={handleInputChange}
-              className="field mt-1 w-20"
+              className="field mt-1"
               placeholder="(e.g., Jr.)"
             />
           </div>
@@ -139,7 +139,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
             <label htmlFor="email" className="field-label">
-              Email Address: {/* Removed * (Optional) */}
+              Email address {/* Removed * (Optional) */}
             </label>
             <input
               type="email"
@@ -156,7 +156,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
           </div>
           <div>
             <label htmlFor="mobileNumber" className="field-label">
-              Mobile Number: <span className="text-red-500">*</span>
+              Mobile number <span className="text-red-500">*</span>
             </label>
             <input
               type="text"

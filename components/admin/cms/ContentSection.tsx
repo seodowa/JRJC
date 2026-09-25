@@ -170,7 +170,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, [field.key]: '' }))}
                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600 transition-colors"
-                      title="Remove Image"
+                      title="Remove image"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -205,7 +205,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                     ) : (
                       <>
                         <PhotoIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" aria-hidden="true" />
-                        {formData[field.key] ? 'Change Image' : 'Upload Image'}
+                        {formData[field.key] ? 'Change image' : 'Upload image'}
                       </>
                     )}
                   </label>
@@ -230,7 +230,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
           loadingText="Saving..."
           className={buttonClass("primary", "md", "w-full sm:w-auto px-6")}
         >
-          Save {title}
+          Save {title.toLowerCase()}
         </AsyncButton>
       </form>
     </div>

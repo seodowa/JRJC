@@ -24,7 +24,8 @@ const CarsSidebar = ({ cars, onAddNewCar }: CarsSidebarProps) => {
             <li key={car.id} className="border-b border-line">
               <a 
                 href={`#car-id-${car.id}`} 
-                className="block p-4 hover:bg-gray-200 whitespace-nowrap overflow-hidden text-ink text-sm"
+                title={`${car.brand} ${car.model} ${car.year}`}
+                className="block truncate p-4 text-sm text-ink hover:bg-gray-200"
               >
                 {`${car.brand} ${car.model} ${car.year}`}
               </a>

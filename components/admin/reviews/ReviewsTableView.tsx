@@ -1,5 +1,6 @@
 'use client';
 
+import Badge from "@/components/ui/Badge";
 import { Review } from '@/types';
 
 // Helper function to format the date
@@ -29,13 +30,13 @@ const StarRating = ({ rating }: { rating: number }) => (
 
 const ReviewsTableView = ({ reviews }: { reviews: Review[] }) => {
   return (
-    <div className="divide-y divide-gray-200">
+    <div className="divide-y divide-line">
       {reviews.map((review) => (
-        <div key={review.id} className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-x-6 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+        <div key={review.id} className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-x-6 px-6 py-4 hover:bg-gray-100 transition-colors">
           {/* Review Content */}
           <div className="col-span-12 md:col-span-6 space-y-2 md:space-y-1">
             <div className="flex justify-between items-start md:block">
-                <h3 className="font-display text-sm font-medium">{review.title}</h3>
+                <h3 className="font-display text-base font-medium">{review.title}</h3>
                 <div className="md:hidden">
                     <StarRating rating={review.rating} />
                 </div>
@@ -53,9 +54,9 @@ const ReviewsTableView = ({ reviews }: { reviews: Review[] }) => {
           {/* Booking Details */}
           <div className="col-span-12 md:col-span-4 flex flex-col space-y-2 mt-2 md:mt-0">
             <div className="flex items-center justify-between md:justify-start">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${review.car ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
-                    {review.car ? `${review.car.brand} ${review.car.model} ${review.car.year}` : 'No Car Linked'}
-                </span>
+                <Badge tone={review.car ? "forest" : "neutral"}>
+                    {review.car ? `${review.car.brand} ${review.car.model} ${review.car.year}` : 'No car linked'}
+                </Badge>
                 <span className="md:hidden text-xs text-gray-500">
                     {formatDate(review.createdAt)}
                 </span>

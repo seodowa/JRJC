@@ -154,7 +154,7 @@ const WalkInBookingLayout = () => {
 
                     <div className="text-sm text-gray-700 p-3 bg-gray-50 rounded-md">
                       <div className="flex justify-between">
-                        <span>Booking Fee:</span>
+                        <span>Booking fee</span>
                         <span>₱{bookingFee}</span>
                       </div>
                       <div className="flex justify-between">
@@ -162,7 +162,7 @@ const WalkInBookingLayout = () => {
                         <span>₱{initialPayment}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Car Wash Fee:</span>
+                        <span>Car wash fee</span>
                         <span>₱{carWashFee}</span>
                       </div>
                       <div className="flex justify-between font-medium border-t border-ink mt-2 pt-2">

@@ -159,7 +159,7 @@ const CarsPageClient: React.FC<CarsPageClientProps> = ({ cars, carStatuses, view
                 <div className="flex items-center gap-3 w-full max-w-md justify-end">
                     <div className="w-full">
                         <SearchBar
-                            placeholder="Find Car"
+                            placeholder="Find a car"
                             onChange={(e) => handleSearch(e.target.value)}
                             className="w-full"
                         />
