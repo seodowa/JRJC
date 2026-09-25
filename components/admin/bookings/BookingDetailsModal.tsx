@@ -108,7 +108,7 @@ const BookingDetailsModal = ({
     <>
       <div className="fixed inset-0 bg-ink/40 flex justify-center items-center z-50 md:p-4">
         {/* Mobile: Full screen, Desktop: Centered card */}
-        <div className="relative bg-white md:rounded-lg shadow-xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col">
+        <div className="relative bg-surface md:rounded-md shadow-xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl overflow-hidden flex flex-col">
           
           {/* Header - Fixed */}
           <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">

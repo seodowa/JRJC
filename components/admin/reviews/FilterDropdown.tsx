@@ -17,7 +17,7 @@ const FilterDropdown = ({ cars, onApply, onReset, initialFilters }: FilterDropdo
   const [selectedCar, setSelectedCar] = useState(initialFilters.car || '');
 
   return (
-    <div className="absolute top-10 right-0 mt-2 w-64 bg-white rounded-xl shadow-xl z-10 border border-gray-200">
+    <div className="absolute top-10 right-0 mt-2 w-64 bg-white rounded-md shadow-xl z-10 border border-gray-200">
       <div className="p-4">
         <h3 className="text-lg font-semibold">Filter Reviews</h3>
       </div>

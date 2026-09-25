@@ -36,7 +36,7 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({ isOpen, onClose, on
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-[60] p-4">
-      <div className="relative bg-white p-6 rounded-lg shadow-xl">
+      <div className="relative rounded-md bg-surface p-6 shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-medium">Select a Color</h2>
           <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">

@@ -1,5 +1,6 @@
 'use client';
 
+import { buttonClass } from "@/components/ui/button";
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Pencil } from 'lucide-react';
 import { UserContext } from '@/app/(admin)/context/UserContext';
@@ -142,7 +143,7 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm">
+    <div className="flex-1 rounded-md border border-line bg-surface p-8">
       <h2 className="text-xl font-medium mb-8">Account</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-12">
@@ -236,7 +237,7 @@ export default function AccountSettings() {
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className="px-8 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors shadow-sm disabled:opacity-50"
+          className={buttonClass("primary", "md", "px-8")}
         >
           {isLoading ? 'Updating...' : 'Update'}
         </button>

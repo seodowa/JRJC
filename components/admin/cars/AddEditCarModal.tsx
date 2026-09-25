@@ -203,7 +203,7 @@ const AddEditCarModal: React.FC<AddEditCarModalProps> = ({
                 <div className="w-full lg:w-64 flex-shrink-0">
                 <div 
                     onClick={handleImageClick}
-                    className="w-full aspect-square bg-[#e0e0e0] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden relative hover:opacity-90 transition-opacity"
+                    className="w-full aspect-square bg-gray-200 rounded-md flex items-center justify-center cursor-pointer overflow-hidden relative hover:opacity-90 transition-opacity"
                 >
                     {imagePreview ? (
                     <Image src={imagePreview} alt="Car preview" fill className="object-cover" />

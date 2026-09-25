@@ -267,3 +267,21 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
 }
+
+/* Sonner toasts (admin): rich colors re-pointed at the palette */
+[data-sonner-toaster] {
+  --normal-bg: var(--color-surface);
+  --normal-border: var(--color-line);
+  --normal-text: var(--color-ink);
+  --success-bg: var(--color-forest-tint);
+  --success-border: var(--color-green-300);
+  --success-text: var(--color-forest);
+  --error-bg: var(--color-red-100);
+  --error-border: var(--color-red-300);
+  --error-text: var(--color-red-700);
+  --warning-bg: var(--color-yellow-100);
+  --warning-border: var(--color-yellow-300);
+  --warning-text: var(--color-yellow-700);
+  --border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+}
