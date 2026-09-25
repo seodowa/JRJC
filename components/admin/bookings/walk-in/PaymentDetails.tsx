@@ -100,10 +100,10 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                 <p className="text-sm text-gray-700">
                   <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)
                 </p>
-                <p className="mt-6 text-sm font-semibold text-gray-800">
+                <p className="mt-6 text-sm font-medium">
                   Total Payment: ₱{initialTotalPayment}
                 </p>
-                <p className="mt-4 text-lg font-bold text-green-600">
+                <p className="mt-4 text-lg font-medium text-forest">
                   Booking Fee Paid through Cash
                 </p>
               </div>
@@ -145,7 +145,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                   </p>
                 </div>
 
-                <p className="mt-6 text-sm font-semibold text-gray-800">
+                <p className="mt-6 text-sm font-medium">
                   Total Payment: ₱{initialTotalPayment}
                 </p>
 

@@ -157,7 +157,7 @@ const BookingDetailsModal = ({
                         <div className="space-y-1 text-sm">
                           <p className="text-gray-600"><strong>Initial Total:</strong> P{booking.Payment_Details.initial_total_payment?.toFixed(2)}</p>
                           {booking.Payment_Details.additional_fees > 0 && <p className="text-red-600"><strong>Late Fees:</strong> P{booking.Payment_Details.additional_fees.toFixed(2)}</p>}
-                          {booking.Payment_Details.total_payment && <p className="text-gray-800 font-bold"><strong>Final Total:</strong> P{booking.Payment_Details.total_payment.toFixed(2)}</p>}
+                          {booking.Payment_Details.total_payment && <p className="font-medium">Final total: <span className="num text-clay">₱{booking.Payment_Details.total_payment.toFixed(2)}</span></p>}
                           <p className="text-gray-600"><strong>Status:</strong> {booking.Payment_Details.payment_status}</p>
                           {booking.Payment_Details.bf_reference_number && <p className="text-gray-600"><strong>Ref No:</strong> {booking.Payment_Details.bf_reference_number}</p>}
                         </div>

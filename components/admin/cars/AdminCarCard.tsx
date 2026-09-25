@@ -88,7 +88,7 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
         
         {/* Header Title */}
         <h3 className="font-display text-xl font-medium mb-3 truncate">
-            {car.brand} {car.model} <span className="text-gray-600 font-semibold">{car.year}</span>
+            {car.brand} {car.model} <span className="num text-base text-ink-2">{car.year}</span>
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4"> {/* Reduced gap-6 to gap-4 */}

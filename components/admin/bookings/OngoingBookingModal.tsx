@@ -348,9 +348,9 @@ const OngoingBookingModal = ({ isOpen, onClose, booking, onSuccess, onExtend }: 
                               <span>+ P{calculatedLateFees.toFixed(2)}</span>
                           </div>
                       )}
-                      <div className="flex justify-between text-gray-800 font-bold border-t border-gray-300 pt-1 mt-1">
-                          <span>Final Total:</span>
-                          <span>P{finalTotal.toFixed(2)}</span>
+                      <div className="flex justify-between font-medium border-t border-ink pt-2 mt-2">
+                          <span>Final total</span>
+                          <span className="num text-clay">₱{finalTotal.toFixed(2)}</span>
                       </div>
                       
                       <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">

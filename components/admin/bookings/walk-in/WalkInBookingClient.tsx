@@ -165,9 +165,9 @@ const WalkInBookingLayout = () => {
                         <span>Car Wash Fee:</span>
                         <span>₱{carWashFee}</span>
                       </div>
-                      <div className="flex justify-between font-semibold border-t mt-2 pt-2">
-                        <span>Total Payment:</span>
-                        <span>₱{initialTotalPayment}</span>
+                      <div className="flex justify-between font-medium border-t border-ink mt-2 pt-2">
+                        <span>Total payment</span>
+                        <span className="num text-clay">₱{initialTotalPayment}</span>
                       </div>
                     </div>
                   </div>

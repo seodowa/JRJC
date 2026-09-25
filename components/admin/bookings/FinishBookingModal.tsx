@@ -141,7 +141,7 @@ const FinishBookingModal = ({ isOpen, onClose, booking, onSuccess }: FinishBooki
                 <p className="text-sm text-gray-600"><strong>Late Fee Rate ({booking.Car_Models?.Number_Of_Seats || 'N/A'} seats - {carClassName}):</strong> P{applicableLateFeeRate.toFixed(2)} / hour</p>
                 <p className="text-sm text-gray-600"><strong>Additional Hours:</strong> {additionalHours}</p>
                 <p className="text-sm text-red-600 font-semibold"><strong>Calculated Additional Fees:</strong> P{calculatedAdditionalFees.toFixed(2)}</p>
-                <p className="text-lg text-gray-800 font-bold mt-2"><strong>Final Total Payment:</strong> P{finalTotalPayment.toFixed(2)}</p>
+                <p className="mt-2 flex items-baseline justify-between border-t border-ink pt-3 font-medium">Final total <span className="num text-xl text-clay">₱{finalTotalPayment.toFixed(2)}</span></p>
               </>
             )}
           </div>
