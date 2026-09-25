@@ -3,6 +3,7 @@ import Toaster from "@/components/toast/toaster";
 import AdminLayoutClient from "./AdminLayoutClient";
 import { fetchCMSContent } from '@/lib/supabase/queries/cms';
 import { CMSProvider } from '@/app/(client)/context/CMSContext';
+import { fontVariables } from '@/lib/fonts';
 
 export async function generateMetadata() {
   const cmsContent = await fetchCMSContent();
@@ -26,8 +27,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     const cmsContent = await fetchCMSContent();
 
     return (
-        <html lang="en">
-            <body>
+        <html lang="en" className={fontVariables}>
+            <body className="bg-paper text-ink font-sans antialiased">
                 <CMSProvider initialContent={cmsContent}>
                     <AdminLayoutClient>{children}</AdminLayoutClient>
                     {/* Toasts for admin route group */}

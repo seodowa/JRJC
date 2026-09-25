@@ -18,23 +18,25 @@ const WalkInBookingNavbar = ({
 }: WalkInBookingNavbarProps) => {
   const router = useRouter();
   const navItems = [
-    { id: 'personal', label: 'Personal Information', ref: personalRef },
-    { id: 'rental', label: 'Rental Details', ref: rentalRef },
-    { id: 'payment', label: 'Payment Details', ref: paymentRef },
+    { id: 'personal', label: 'Personal information', ref: personalRef },
+    { id: 'rental', label: 'Rental details', ref: rentalRef },
+    { id: 'payment', label: 'Payment details', ref: paymentRef },
   ];
 
   return (
-    <div className="hidden md:flex w-64 bg-white p-4 shadow-md flex-col justify-between rounded-2xl">
+    <div className="hidden w-60 flex-col justify-between gap-8 md:flex">
       <div>
-        <h2 className="text-lg font-bold mb-4">Walk-in Book</h2>
+        <p className="eyebrow mb-2">New booking</p>
+        <h1 className="mb-6 text-4xl leading-none font-normal tracking-[-0.03em]">Walk-in.</h1>
         <nav>
           <ul>
-            {navItems.map((item) => (
-              <li key={item.id} className="mb-4">
+            {navItems.map((item, index) => (
+              <li key={item.id} className="border-t border-line">
                 <AsyncButton
                   onClick={() => scrollToRef(item.ref)}
-                  className={`w-full text-left p-4 rounded-lg hover:bg-gray-200`}
+                  className="flex w-full items-center gap-3 py-3.5 text-left text-[15px] hover:text-forest"
                 >
+                  <span className="num text-xs text-clay">0{index + 1}</span>
                   {item.label}
                 </AsyncButton>
               </li>
@@ -44,7 +46,7 @@ const WalkInBookingNavbar = ({
       </div>
       <AsyncButton
         onClick={() => router.back()}
-        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg"
+        className="border border-ink bg-transparent hover:bg-gray-200 text-ink font-medium py-2 px-4 rounded-md"
       >
         Back
       </AsyncButton>

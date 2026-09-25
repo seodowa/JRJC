@@ -7,11 +7,15 @@ interface WelcomeMessageProps {
 }
 
 const WelcomeMessage = ({ user }: WelcomeMessageProps) => {
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Manila' });
+
   return (
-    <>
-      <h2 className="text-2xl font-bold">Welcome back, {user?.username || 'Admin'}!</h2>
-      <p className="text-gray-500">Here's a quick overview of your business.</p>
-    </>
+    <div className="flex flex-col gap-2">
+      <p className="eyebrow" suppressHydrationWarning>{today}</p>
+      <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">
+        Welcome back, {user?.username || 'Admin'}.
+      </h1>
+    </div>
   );
 };
 

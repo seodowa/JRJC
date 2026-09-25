@@ -12,8 +12,7 @@ export default function PasswordInputField({ className = '', ...inputProps }: Pa
     <div className="relative w-full flex items-center">
       <input
         {...inputProps}
-        className={`w-[250px] rounded-3xl border
-        border-white/30 bg-white p-2 text-black placeholder:font-normal placeholder-black/70 backdrop-blur-sm shadow-lg ${className}`}
+        className={`field pr-11 ${className}`}
         // Enforce type switching between password and text based on toggle
         type={showPassword ? 'text' : 'password'}
         autoComplete={inputProps.autoComplete ?? 'current-password'}
@@ -21,7 +20,7 @@ export default function PasswordInputField({ className = '', ...inputProps }: Pa
       <button
         type="button"
         aria-label={showPassword ? 'Hide password' : 'Show password'}
-        className="absolute right-3 top-1/2 -translate-y-1/2"
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-ink-2 hover:bg-gray-200 hover:text-ink"
         onClick={() => setShowPassword((s) => !s)}
      >
         {showPassword ? (

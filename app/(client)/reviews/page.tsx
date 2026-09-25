@@ -1,5 +1,6 @@
 "use client"
 
+import { buttonClass } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { ALL_REVIEWS } from "@/lib/data/reviews";
 import { ChevronDown, Filter, Star } from "lucide-react";
@@ -136,8 +137,8 @@ const ReviewsPage = () => {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-main-color -mt-12 pt-12">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+      <div>
+        <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-8 lg:px-16">
           <div className="animate-pulse">
             <div className="h-12 bg-gray-200 rounded w-1/3 mb-4"></div>
             <div className="h-6 bg-gray-200 rounded w-1/2 mb-8"></div>
@@ -156,24 +157,25 @@ const ReviewsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-main-color -mt-12 pt-12">
+    <div>
       {/* Header */}
-      <div className="bg-main-color border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Customer Reviews</h1>
-          <p className="text-gray-600">See what our customers are saying about their rental experience</p>
+      <div className="border-b border-line">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 pt-10 pb-10 sm:px-8 lg:px-16 lg:pt-14">
+          <p className="eyebrow">Reviews</p>
+          <h1 className="text-5xl leading-none font-normal tracking-[-0.03em] sm:text-6xl">What renters say.</h1>
+          <p className="max-w-lg text-lg text-ink-2">Honest notes from people who rented with us.</p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-8 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Filters */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-16">
+            <div className="sticky top-20 rounded-md border border-line bg-surface p-1 lg:p-6">
               {/* Mobile Filter Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden w-full flex items-center justify-between mb-4 px-4 py-2 bg-gray-100 rounded-lg"
+                className="lg:hidden w-full flex items-center justify-between px-4 py-2.5 rounded-md hover:bg-gray-200"
               >
                 <span className="flex items-center gap-2 font-medium">
                   <Filter size={20} />
@@ -182,12 +184,12 @@ const ReviewsPage = () => {
                 <ChevronDown size={20} className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
 
-              <div className={`${showFilters ? 'block' : 'hidden'} lg:block`}>
+              <div className={`${showFilters ? 'block' : 'hidden'} p-4 lg:block lg:p-0`}>
                 {/* Overall Rating */}
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Overall Rating</h3>
+                  <h3 className="eyebrow mb-3">Overall Rating</h3>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="font-display text-5xl text-ink">
                       {ratingStats.average.toFixed(1)}
                     </span>
                     <div>
@@ -196,7 +198,7 @@ const ReviewsPage = () => {
                           <Star 
                             key={i} 
                             size={20} 
-                            className={i < Math.round(ratingStats.average) ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+                            className={i < Math.round(ratingStats.average) ? 'text-clay fill-current' : 'text-line-strong'}
                           />
                         ))}
                       </div>
@@ -207,14 +209,14 @@ const ReviewsPage = () => {
 
                 {/* Sort By */}
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Sort By</h3>
+                  <h3 className="eyebrow mb-3">Sort By</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => setSortBy('recent')}
                       className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                         sortBy === 'recent' 
-                          ? 'bg-blue-100 text-blue-700 font-medium' 
-                          : 'hover:bg-gray-100 text-gray-700'
+                          ? 'bg-ink text-paper font-medium' 
+                          : 'hover:bg-gray-200 text-gray-700'
                       }`}
                     >
                       Most Recent
@@ -223,8 +225,8 @@ const ReviewsPage = () => {
                       onClick={() => setSortBy('helpful')}
                       className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                         sortBy === 'helpful' 
-                          ? 'bg-blue-100 text-blue-700 font-medium' 
-                          : 'hover:bg-gray-100 text-gray-700'
+                          ? 'bg-ink text-paper font-medium' 
+                          : 'hover:bg-gray-200 text-gray-700'
                       }`}
                     >
                       Most Helpful
@@ -234,14 +236,14 @@ const ReviewsPage = () => {
 
                 {/* Filter by Rating */}
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Filter by Rating</h3>
+                  <h3 className="eyebrow mb-3">Filter by Rating</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => setFilterRating(null)}
                       className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                         filterRating === null 
-                          ? 'bg-blue-100 text-blue-700 font-medium' 
-                          : 'hover:bg-gray-100 text-gray-700'
+                          ? 'bg-ink text-paper font-medium' 
+                          : 'hover:bg-gray-200 text-gray-700'
                       }`}
                     >
                       All Ratings ({ratingStats.total})
@@ -252,12 +254,12 @@ const ReviewsPage = () => {
                         onClick={() => setFilterRating(rating)}
                         className={`w-full flex items-center justify-between px-4 py-2 rounded-lg transition-colors ${
                           filterRating === rating 
-                            ? 'bg-blue-100 text-blue-700 font-medium' 
-                            : 'hover:bg-gray-100 text-gray-700'
+                            ? 'bg-ink text-paper font-medium' 
+                            : 'hover:bg-gray-200 text-gray-700'
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <Star size={16} className="text-yellow-400 fill-current" />
+                          <Star size={16} className="text-clay fill-current" />
                           <span>{rating}</span>
                         </div>
                         <span className="text-sm">({ratingStats.stats[rating as keyof typeof ratingStats.stats]})</span>
@@ -270,7 +272,7 @@ const ReviewsPage = () => {
                 {filterRating !== null && (
                   <button
                     onClick={() => setFilterRating(null)}
-                    className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors"
+                    className="w-full px-4 py-2 border border-ink bg-transparent hover:bg-gray-200 text-gray-700 font-medium rounded-md transition-colors"
                   >
                     Clear Filters
                   </button>
@@ -297,11 +299,11 @@ const ReviewsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <div className="rounded-md border border-dashed border-line-strong p-12 text-center">
                 <p className="text-gray-600 text-lg">No reviews found with the selected filters.</p>
                 <button
                   onClick={() => setFilterRating(null)}
-                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className={buttonClass("primary", "md", "mt-4")}
                 >
                   Clear Filters
                 </button>

@@ -1,5 +1,6 @@
 'use client';
 
+import { buttonClass } from "@/components/ui/button";
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '@/app/(admin)/context/UserContext';
 import { ManageEmployee } from '@/types/manageEmployee';
@@ -149,8 +150,8 @@ export default function ManageEmployees() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      <div className="flex-1 rounded-md border border-line bg-surface p-8 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-forest" />
         <span className="ml-2 text-gray-600">Loading employees...</span>
       </div>
     );
@@ -158,23 +159,23 @@ export default function ManageEmployees() {
 
   if (error) {
     return (
-      <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm text-red-600">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Manage Employees</h2>
+      <div className="flex-1 rounded-md border border-line bg-surface p-8 text-red-600">
+        <h2 className="text-xl font-medium mb-4">Manage employees</h2>
         <p>Error: {error}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 bg-white rounded-3xl p-4 md:p-8 shadow-sm">
+    <div className="flex-1 rounded-md border border-line bg-surface p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className="text-xl font-bold text-gray-900">Manage Employees</h2>
+        <h2 className="text-xl font-medium">Manage employees</h2>
         <button
           onClick={handleOpenCreate}
-          className="w-full md:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className={buttonClass("primary", "md", "w-full md:w-auto")}
         >
           <Plus size={18} />
-          Add Employee
+          Add employee
         </button>
       </div>
       
@@ -185,17 +186,17 @@ export default function ManageEmployees() {
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="border-b border-ink">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">ID</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Profile</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Username</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Email</th>
+                  <th className="num px-6 py-3.5 text-left text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Type</th>
+                  <th className="num px-6 py-3.5 text-right text-[11px] font-medium text-ink-2 uppercase tracking-[0.1em]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-surface divide-y divide-gray-200">
                 {employees.map((emp) => (
                   <tr key={emp.ID}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.ID}</td>
@@ -226,7 +227,7 @@ export default function ManageEmployees() {
           {/* Mobile Card View */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {employees.map((emp) => (
-              <div key={emp.ID} className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
+              <div key={emp.ID} className="rounded-md border border-line bg-surface p-4 flex flex-col gap-3">
                 <div className="flex items-center gap-3">
                   {emp.profile_image ? (
                     <img src={emp.profile_image} alt="Profile" className="h-10 w-10 rounded-full object-cover" />
@@ -248,13 +249,13 @@ export default function ManageEmployees() {
                 <div className="flex justify-end gap-3 mt-2 border-t border-gray-200 pt-3">
                   <button 
                     onClick={() => handleOpenEdit(emp)} 
-                    className="flex items-center gap-1 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
+                    className="flex items-center gap-1 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md transition-colors text-sm font-medium"
                   >
                     <Pencil size={16} /> Edit
                   </button>
                   <button 
                     onClick={() => handleOpenDelete(emp)} 
-                    className="flex items-center gap-1 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
+                    className="flex items-center gap-1 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-md transition-colors text-sm font-medium"
                   >
                     <Trash2 size={16} /> Delete
                   </button>

@@ -98,10 +98,10 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
       >
         {/* Add a new car tile */}
         <div>
-          <div className="relative border-2 border-dashed border-gray-300 rounded-2xl text-center flex flex-col items-center justify-center group bg-white hover:bg-gray-50 transition-colors h-[220px]">
+          <div className="relative border-2 border-dashed border-gray-300 rounded-md text-center flex flex-col items-center justify-center group bg-white hover:bg-gray-50 transition-colors h-[220px]">
               <AsyncButton
                 onClick={onAddNewCar}
-                className="w-full h-full flex flex-col items-center justify-center rounded-xl text-gray-600 hover:text-gray-800"
+                className="w-full h-full flex flex-col items-center justify-center rounded-md text-gray-600 hover:text-gray-800"
               >
                   <PlusIcon className="w-12 h-12 mb-2 opacity-60" />
                   <span className="font-medium text-base">Add a new car</span>
@@ -111,7 +111,7 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
 
         {cars.map((car) => (
             <motion.div key={car.id} variants={itemVariants}>
-              <div className="relative border border-gray-200 rounded-2xl p-4 shadow-sm bg-white overflow-hidden h-[220px] group hover:shadow-md transition-shadow">
+              <div className="relative border border-gray-200 rounded-md p-4 shadow-sm bg-white overflow-hidden h-[220px] group hover:shadow-md transition-shadow">
                   
                   {/* Faded Background Image */}
                   <div className="absolute inset-0 z-0">
@@ -135,7 +135,7 @@ const CarGridView = ({ cars, onAddNewCar, onEditCar, carStatuses }: CarGridViewP
                       {/* Top Row: Title and Prices */}
                       <div className="flex justify-between items-start gap-2">
                           {/* Car Title */}
-                          <h3 className="font-bold text-gray-900 text-lg leading-tight max-w-[55%]">
+                          <h3 className="font-display font-medium text-lg leading-tight max-w-[55%]">
                               {car.brand} {car.model} <span className="text-gray-700">{car.year}</span>
                               <span className="block text-sm font-normal text-gray-600 mt-0.5">({car.transmission})</span>
                           </h3>

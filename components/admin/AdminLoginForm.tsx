@@ -6,6 +6,7 @@ import { login } from "@/app/(admin)/services/auth/auth";
 import { useToast } from "@/components/toast/use-toast";
 import PasswordInputField from "./PasswordInputField"; // Import the custom PasswordInputField component
 import AsyncButton from "@/components/AsyncButton";
+import { buttonClass } from "@/components/ui/button";
 import OTPModal from "@/components/OTPModal"; // Corrected import path
 
 const AdminLoginForm: React.FC = () => {
@@ -104,49 +105,44 @@ const AdminLoginForm: React.FC = () => {
                     e.preventDefault();
                     void handleLogin();
                 }}
-                className="grid h-full lg:w-150 md:w-100 sm:w-80 flex-col place-items-center gap-4 rounded-2xl
-                    outline-[0.50px] outline-offset-[-0.50px] outline-white/20
-                    bg-black/5 backdrop-blur-sm shadow-lg shadow-black/25 p-10"
+                className="my-16 flex w-full max-w-sm flex-col gap-5"
             >
-                <h2 className="text-4xl font-bold mb-4 text-center">LOGIN</h2>
+                <div className="mb-2 flex flex-col gap-3">
+                    <p className="eyebrow">Admin</p>
+                    <h1 className="text-5xl leading-none font-normal tracking-[-0.03em]">Sign in.</h1>
+                </div>
                 <div>
+                    <label htmlFor="username" className="field-label">Username</label>
                     <input
                         type="text"
                         id="username"
                         name="username"
-                        placeholder="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
                         autoComplete="username"
-                        className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
-                        focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
-                        placeholder:font-normal placeholder-black/70  backdrop-blur-sm shadow-lg transition duration-200"
+                        className="field"
                     />
                 </div>
-                <div className="mt-4">
+                <div>
+                    <div className="flex items-baseline justify-between">
+                        <label htmlFor="password" className="field-label">Password</label>
+                        <a className="text-sm text-forest hover:underline" href="#">Forgot password?</a>
+                    </div>
                     <PasswordInputField
                         id="password"
                         name="password"
-                        placeholder="Password"
-                        className="w-[250px] rounded-3xl border border-white/30 focus:border-[#8BFFF1]
-                        focus:ring-2 focus:ring-[#8BFFF1]/50 focus:outline-none bg-white p-2 text-black
-                        placeholder:font-normal placeholder-black/70 backdrop-blur-sm shadow-lg transition duration-200"
                         required
                     />
                 </div>
-                <a className="underline pl-30 text-sm -mt-3.5" href="#">Forgot Password?</a>
-                <div className="mt-6">
-                    <AsyncButton
-                        type="submit"
-                        isLoading={isLoading}
-                        className="mb-4 w-40 rounded-4xl border border-white/30 bg-[#8BFFF1]/40 px-4 py-2
-                                  text-black hover:bg-[#8BFFF1] transition-colors duration-200"
-                        loadingText="Logging in..."
-                    >
-                        Log in
-                    </AsyncButton>
-                </div>
+                <AsyncButton
+                    type="submit"
+                    isLoading={isLoading}
+                    className={buttonClass("primary", "md", "mt-2 w-full")}
+                    loadingText="Signing in…"
+                >
+                    Sign in
+                </AsyncButton>
             </form>
             <OTPModal
                 isOpen={isOtpModalOpen}

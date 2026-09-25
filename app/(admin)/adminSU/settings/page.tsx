@@ -6,48 +6,37 @@ import Link from 'next/link';
 import AccountSettings from '@/components/admin/settings/AccountSettings';
 import ManageEmployees from '@/components/admin/settings/ManageEmployees';
 
+const tabClass = (active: boolean) =>
+  `-mb-px border-b-2 pb-3 text-[15px] whitespace-nowrap transition-colors duration-150 ${
+    active ? 'border-ink font-medium text-ink' : 'border-transparent text-ink-2 hover:text-ink'
+  }`;
+
 export default function SettingsPage() {
   const user = useContext(UserContext);
   const [activeTab, setActiveTab] = useState('account'); // 'account' or 'employees'
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 h-full">
-      {/* Left Settings Navigation Panel */}
-      <div className="w-full md:w-64 bg-white rounded-3xl p-6 shadow-sm h-fit">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Settings</h2>
-        
-        <nav className="space-y-2">
-          <button 
-            onClick={() => setActiveTab('account')}
-            className={`w-full text-left px-6 py-3 rounded-xl font-medium transition-colors ${
-              activeTab === 'account' ? 'bg-sky-200 text-gray-800' : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
+    <div className="flex h-full flex-col gap-7">
+      <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">Settings</h1>
+
+      <nav className="w-full shrink-0 overflow-x-auto border-b border-line custom-scrollbar" role="tablist">
+        <div className="flex min-w-max gap-7">
+          <button role="tab" aria-selected={activeTab === 'account'} onClick={() => setActiveTab('account')} className={tabClass(activeTab === 'account')}>
             Account
           </button>
-          
           {user?.account_type === 'owner' && (
             <>
-              <Link 
-                href="/adminSU/cms" 
-                className="block w-full text-left px-6 py-3 rounded-xl text-gray-600 hover:bg-gray-100 font-medium transition-colors"
-              >
-                Content Management
-              </Link>
-              <button 
-                onClick={() => setActiveTab('employees')}
-                className={`w-full text-left px-6 py-3 rounded-xl font-medium transition-colors ${
-                  activeTab === 'employees' ? 'bg-sky-200 text-gray-800' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Manage Employees
+              <button role="tab" aria-selected={activeTab === 'employees'} onClick={() => setActiveTab('employees')} className={tabClass(activeTab === 'employees')}>
+                Manage employees
               </button>
+              <Link href="/adminSU/cms" className={tabClass(false)}>
+                Content management →
+              </Link>
             </>
           )}
-        </nav>
-      </div>
+        </div>
+      </nav>
 
-      {/* Right Content Panel */}
       {activeTab === 'account' && <AccountSettings />}
       {activeTab === 'employees' && <ManageEmployees />}
     </div>

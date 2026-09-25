@@ -1,5 +1,6 @@
 'use client';
 
+import { buttonClass } from "@/components/ui/button";
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Pencil } from 'lucide-react';
 import { UserContext } from '@/app/(admin)/context/UserContext';
@@ -142,51 +143,51 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="flex-1 bg-white rounded-3xl p-8 shadow-sm">
-      <h2 className="text-xl font-bold text-gray-900 mb-8">Account</h2>
+    <div className="flex-1 rounded-md border border-line bg-surface p-8">
+      <h2 className="text-xl font-medium mb-8">Account</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-12">
         {/* Form Fields Column */}
         <div className="flex-1 space-y-6">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Username: <span className="text-red-500">*</span>
+            <label className="field-label">
+              Username <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="field"
               placeholder="Enter username"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Password: <span className="text-red-500">*</span>
+            <label className="field-label">
+              Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="field"
               placeholder="Enter new password (leave empty to keep current)"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Email: <span className="text-red-500">*</span>
+            <label className="field-label">
+              Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="field"
               placeholder="Enter email address"
               required
             />
@@ -196,7 +197,7 @@ export default function AccountSettings() {
         {/* Profile Picture Column */}
         <div className="flex flex-col items-center lg:items-start space-y-4">
           <span className="text-sm font-medium text-gray-700 self-center lg:self-start">
-            Profile Picture:
+            Profile picture
           </span>
           
           <div 
@@ -212,7 +213,7 @@ export default function AccountSettings() {
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center bg-gray-300 text-white">
                 <Pencil size={48} strokeWidth={2.5} />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
+                <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/10 transition-colors" />
               </div>
             )}
             
@@ -236,7 +237,7 @@ export default function AccountSettings() {
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className="px-8 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors shadow-sm disabled:opacity-50"
+          className={buttonClass("primary", "md", "px-8")}
         >
           {isLoading ? 'Updating...' : 'Update'}
         </button>
