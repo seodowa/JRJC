@@ -39,7 +39,7 @@ const InputField: React.FC<InputFieldProps> = ({
           value={value}
           onChange={onChange}
           required={required} // Ensure select also respects required
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          className="field"
         >
           <option value="">Select {label.toLowerCase()}</option>
           {selectOptions?.map(option => (
@@ -64,14 +64,14 @@ const InputField: React.FC<InputFieldProps> = ({
         required={required} // Passes the boolean to the DOM
         pattern={pattern}   // Passes the regex for validation
         title={title}       // Passes the error message bubble
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+        className="field"
       />
     );
   };
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+      <label htmlFor={name} className="field-label">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
         {optional && <span className="text-gray-400 text-xs ml-2">(Optional)</span>}

@@ -1,64 +1,60 @@
 "use client"
 
-import "@/app/globals.css";
 import React from "react";
-import HamburgerIcon from "./icons/HamburgerIcon";
-import CloseIcon from "./icons/CloseIcon";
-import { useCMS } from "@/app/(client)/context/CMSContext"; // Import useCMS
+import { Menu, X } from "lucide-react";
+import { useCMS } from "@/app/(client)/context/CMSContext";
+import { buttonClass } from "./ui/button";
 
 export default function NavigationBar() {
-    const { getImage } = useCMS(); // Use the hook to get CMS functions
+    const { getImage } = useCMS();
 
-    // Fetch logo URL from CMS
     const navLogoUrl = getImage('navigation', 'logo', '/images/jrjc_logo.png');
 
-    // Mapping of navigation item names to their corresponding anchor IDs
     const navigationLinks = {
-        "Booking Tracker": "/tracker", // Assuming this doesn't scroll to a section
-        "Cars": "/#cars",
+        "Fleet": "/#cars",
         "Reviews": "/#reviews",
-        "About Us": "/#about-us",
+        "Track a booking": "/tracker",
+        "About": "/#about-us",
     };
 
     return (
-        <header className="w-full shadow-[-1px_3px_5px_rgba(0,0,0,0.2)] sticky top-0
-                           bg-[rgba(255,255,255,0.15)] md:backdrop-blur-lg z-50 overflow-hidden">
-            <nav className="flex justify-end items-center h-12 px-3 md:pr-0 z-50 text-lg font-main-font">
-                <a className="mr-auto" href="/"><img src={navLogoUrl} alt="JRJC Logo" className="max-h-10"/></a>
-                <input type="checkbox" id="sidebar-active" className="peer sr-only"/>
-                <label htmlFor="sidebar-active" className="md:hidden">
-                    <HamburgerIcon />
+        <header className="sticky top-0 z-50 w-full border-b border-line bg-paper/95 backdrop-blur-sm">
+            <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-8 lg:px-16">
+                <a href="/" className="flex items-center gap-3 text-ink">
+                    <img src={navLogoUrl} alt="" className="h-9 w-9 rounded-full object-cover" />
+                    <span className="font-display text-2xl font-semibold tracking-tight">JRJC</span>
+                    <span className="hidden text-[13px] tracking-wide text-ink-2 sm:inline">Rent-a-Car · Bukidnon</span>
+                </a>
+
+                <input type="checkbox" id="sidebar-active" className="peer sr-only" />
+                <label htmlFor="sidebar-active" className="-mr-2 p-2 md:hidden" aria-label="Open menu">
+                    <Menu size={24} strokeWidth={1.75} />
                 </label>
-                {/* For translucent background when opening hamburger menu */}
-                <label htmlFor="sidebar-active" id="overlay" 
-                    className="peer-checked:bg-black
-                                peer-checked:opacity-10 
-                                peer-checked:w-full
-                                peer-checked:h-full 
-                                peer-checked:fixed 
-                                peer-checked:top-0 
-                                peer-checked:right-0 
-                                peer-checked:z-[100]"></label>
-                {/* Hamburger menu for smaller screen width */}
-                <div className="pt-2 fixed peer-checked:right-0 z-100
-                                top-0 -right-full bg-[rgba(255,255,255,0.15)] backdrop-blur-lg flex flex-col 
-                                items-start w-38 h-full 
-                                shadow-[-1px_3px_5px_rgba(0,0,0,0.2)]
-                                transition-[.3s_ease-in-out]
-                                md:flex-row md:static md:w-full md:pt-0
-                                md:h-full md:justify-end md:items-center 
-                                md:shadow-none md:bg-transparent md:backdrop-blur-none">
-                    <label htmlFor="sidebar-active" className="md:hidden">
-                        <CloseIcon />
+                {/* Backdrop behind the mobile sheet */}
+                <label
+                    htmlFor="sidebar-active"
+                    aria-hidden="true"
+                    className="hidden peer-checked:fixed peer-checked:inset-0 peer-checked:z-[90] peer-checked:block peer-checked:bg-ink/30 md:peer-checked:hidden"
+                />
+
+                <div className="fixed top-0 -right-full z-[100] flex h-dvh w-[82%] max-w-sm flex-col bg-paper px-6 pt-4 pb-8 transition-[right] duration-200 peer-checked:right-0
+                                md:static md:h-auto md:w-auto md:max-w-none md:flex-row md:items-center md:gap-9 md:bg-transparent md:p-0">
+                    <label htmlFor="sidebar-active" className="-mr-2 mb-6 self-end p-2 md:hidden" aria-label="Close menu">
+                        <X size={24} strokeWidth={1.75} />
                     </label>
-                    {Object.entries(navigationLinks).map(
-                        ([name, href]) => (
-                            <a key={name} href={href} className="px-5 2xl:px-12 py-5 h-auto w-full flex hover:text-hover-color
-                                                              md:w-auto md:h-full md:py-0 md:items-center">{name}</a>
-                        )
-                    )}
-                    <a href="book" className="font-bold text-[#3674B5] px-5 py-5 h-auto w-full flex hover:text-hover-color
-                                           md:w-auto md:h-full md:py-0 md:items-center">Book Now</a>
+                    {Object.entries(navigationLinks).map(([name, href]) => (
+                        <a
+                            key={name}
+                            href={href}
+                            className="border-b border-line py-4 font-display text-3xl text-ink hover:text-forest
+                                       md:border-0 md:py-0 md:font-sans md:text-[15px]"
+                        >
+                            {name}
+                        </a>
+                    ))}
+                    <a href="/book" className={buttonClass("primary", "md", "mt-8 md:mt-0")}>
+                        Book a car <span aria-hidden="true">→</span>
+                    </a>
                 </div>
             </nav>
         </header>

@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/globals.css";
 import { TOP_FIVE_REVIEWS } from "@/lib/data/reviews";
 import Carousel from "../Carousel";
 import Modal from "../Modal";
@@ -8,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Review } from "@/types";
 import ReviewCardPreview from "../ReviewCardPreview";
 import ReviewCardFull from "../ReviewCardFull";
+import SectionHeader from "../ui/SectionHeader";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { updateHelpfulCount } from "@/lib/supabase/mutations/updateReview";
 
@@ -115,17 +115,25 @@ export default function ReviewsSection() {
 
   if (!hasMounted) {
     return (
-        <section id="reviews" className="min-h-screen relative bg-secondary-50 flex flex-col items-center pt-40">
-          <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl py-4 text-center">Customer Reviews</h1>
-          <LoadingSpinner/>
+        <section id="reviews" className="bg-gray-200/60">
+          <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 py-24 sm:px-8 lg:px-16">
+            <SectionHeader index="02" label="Reviews" title="What renters say." />
+            <LoadingSpinner/>
+          </div>
         </section>
         )
   }
 
   return (
-    <section id="reviews" className="min-h-screen relative bg-secondary-50 flex flex-col items-center pt-40">
-        <h1 className="font-main-font text-4xl sm:text-5xl md:text-6xl py-4 text-center">Customer Reviews</h1>
-        <div className="flex justify-center items-start w-screen">
+    <section id="reviews" className="bg-gray-200/60">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 py-24 sm:px-8 lg:px-16">
+        <SectionHeader index="02" label="Reviews" title="What renters say.">
+          <div className="flex gap-6 text-[15px] font-medium">
+            <a href="/compose-review" className="text-forest hover:text-forest-hover">Write a review</a>
+            <a href="/reviews" className="text-forest hover:text-forest-hover">All reviews →</a>
+          </div>
+        </SectionHeader>
+        <div className="flex justify-center items-start w-full">
           {TOP_FIVE_REVIEWS.length > 0 && (
             <Carousel height={CAROUSEL_HEIGHT}>
               {reviewsForDisplay.map((review) => (
@@ -147,14 +155,11 @@ export default function ReviewsSection() {
           </Modal>
 
           {TOP_FIVE_REVIEWS.length <= 0 && (
-            <p className="font-main-font pt-16 text-xl md:text-2xl">No reviews yet. Be the first to leave a review.</p>
+            <p className="font-display text-2xl text-ink-2">No reviews yet. Be the first to leave one.</p>
           )}
 
         </div>
-        <a href={"/compose-review"} className="font-main-font mt-8 text-[#3674B5]
-                                                            hover:cursor-pointer hover:text-hover-color">Write a review</a>
-        <a href={"/reviews"} className="font-main-font mt-4 text-[#3674B5]
-                                                            hover:cursor-pointer hover:text-hover-color">See all reviews</a>
+      </div>
     </section>
   );
 }
