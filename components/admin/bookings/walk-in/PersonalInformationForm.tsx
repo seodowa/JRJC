@@ -87,13 +87,13 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-4xl shadow-md">
-      <h2 className="text-xl font-bold mb-6">Personal Information</h2>
+    <div className="rounded-md border border-line bg-surface p-6 md:p-8">
+      <h2 className="text-xl font-medium mb-6">Personal information</h2>
       <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-              First Name: <span className="text-red-500">*</span>
+            <label htmlFor="firstName" className="field-label">
+              First name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -102,13 +102,13 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               required // REQUIRED
               value={personalInfo.firstName}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your first name"
             />
           </div>
           <div className="md:col-span-1">
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-              Last Name: <span className="text-red-500">*</span>
+            <label htmlFor="lastName" className="field-label">
+              Last name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -117,13 +117,13 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               required // REQUIRED
               value={personalInfo.lastName}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your last name"
             />
           </div>
           <div className="md:col-span-1">
-            <label htmlFor="suffix" className="block text-sm font-medium text-gray-700">
-              Suffix:
+            <label htmlFor="suffix" className="field-label">
+              Suffix <span className="text-ink-3 text-xs font-normal">(optional)</span>
             </label>
             <input
               type="text"
@@ -131,15 +131,15 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               id="suffix"
               value={personalInfo.suffix}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-20 border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="(e.g., Jr.)"
             />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email Address: {/* Removed * (Optional) */}
+            <label htmlFor="email" className="field-label">
+              Email address {/* Removed * (Optional) */}
             </label>
             <input
               type="email"
@@ -150,13 +150,13 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               title="Please enter a valid email address (e.g., user@domain.com)"
               value={personalInfo.email}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your email address"
             />
           </div>
           <div>
-            <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
-              Mobile Number: <span className="text-red-500">*</span>
+            <label htmlFor="mobileNumber" className="field-label">
+              Mobile number <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -165,7 +165,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
               required // REQUIRED
               value={personalInfo.mobileNumber}
               onChange={handleInputChange}
-              className="mt-1 p-2 block w-full border-1 border-gray-300 rounded-lg shadow-sm sm:text-sm"
+              className="field mt-1"
               placeholder="Enter your mobile number"
             />
           </div>
@@ -173,18 +173,18 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         
       {/* Valid Government ID Upload */}
       <div className="pt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Valid Government ID (Image): <span className="text-red-500">*</span>
+        <label className="field-label">
+          Valid government ID (image) <span className="text-red-500">*</span>
         </label>
         
-        <div className={`relative flex items-center w-full border rounded-lg overflow-hidden transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'}`}>
+        <div className={`relative flex items-center w-full border rounded-md overflow-hidden bg-surface transition-all duration-200 ${idUploadError ? 'border-red-500 ring-1 ring-red-500' : 'border-line-strong focus-within:ring-1 focus-within:ring-forest focus-within:border-forest'}`}>
             <label 
                 htmlFor="admin-id-upload" 
-                className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-3 text-base border-r border-gray-300 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-2.5 text-[15px] border-r border-line-strong hover:bg-gray-200 transition-colors whitespace-nowrap"
             >
                 Browse
             </label>
-            <div className="flex-1 px-4 py-3 text-gray-500 truncate bg-white">
+            <div className="flex-1 px-4 py-2.5 text-[15px] text-ink-3 truncate bg-surface">
                 {isUploadingId ? (
                     <span className="text-blue-500">Uploading...</span>
                 ) : validIdPath ? (
@@ -207,7 +207,7 @@ const PersonalInformationForm = ({ onNext }: PersonalInformationFormProps) => {
         <div className="flex justify-end mt-6">
           <AsyncButton
             type="submit" // Trigger form submit to run validation
-            className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
+            className="bg-forest hover:bg-forest-hover text-paper font-medium py-2 px-4 rounded-lg"
           >
             Next
           </AsyncButton>

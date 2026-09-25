@@ -61,10 +61,13 @@ const RecentFeedback = ({ reviews }: RecentFeedbackProps) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Recent Feedback (Last 30 Days)</h2>
+      <div className="mb-4 flex items-baseline justify-between">
+        <h2 className="text-2xl">Recent feedback</h2>
+        <span className="num text-xs text-ink-2">Last 30 days</span>
+      </div>
       
       {reviews.length === 0 && (
-        <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg">
+        <div className="flex h-40 items-center justify-center rounded-md border border-dashed border-line-strong">
             <p>No feedback in the last 30 days.</p>
         </div>
       )}
@@ -75,12 +78,12 @@ const RecentFeedback = ({ reviews }: RecentFeedbackProps) => {
             className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-opacity duration-300 ${animationClass}`}
           >
             {currentReviews.map((review) => (
-              <div key={review.id} className="p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col justify-between h-40 bg-white min-h-0">
+              <div key={review.id} className="flex h-40 min-h-0 flex-col justify-between rounded-md border border-line bg-paper p-4">
                 {/* Top part of the card (title, user, car, rating) */}
                 <div className="flex-shrink-0">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-bold text-lg">{review.title}</h3>
+                      <h3 className="font-display text-lg leading-tight">{review.title}</h3>
                       <p className="text-sm text-gray-600">By {review.userName}</p>
                       <p className="text-sm text-gray-500">{review.car?.brand} {review.car?.model}</p>
                     </div>
@@ -89,7 +92,7 @@ const RecentFeedback = ({ reviews }: RecentFeedbackProps) => {
                         {[...Array(5)].map((_, i) => (
                           <svg
                             key={i}
-                            className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            className={`w-5 h-5 ${i < review.rating ? 'text-clay' : 'text-gray-300'}`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
@@ -123,15 +126,15 @@ const RecentFeedback = ({ reviews }: RecentFeedbackProps) => {
             <>
               <button 
                 onClick={() => handleNavigation('prev')} 
-                className="absolute top-1/2 -translate-y-1/2 -left-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+                aria-label="Previous" className="absolute top-1/2 -left-4 z-10 -translate-y-1/2 rounded-md border border-ink bg-paper p-1.5 transition-colors hover:bg-ink hover:text-paper"
               >
-                <ChevronLeft className="w-6 h-6 text-gray-700" />
+                <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
               </button>
               <button 
                 onClick={() => handleNavigation('next')} 
-                className="absolute top-1/2 -translate-y-1/2 -right-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+                aria-label="Next" className="absolute top-1/2 -right-4 z-10 -translate-y-1/2 rounded-md border border-ink bg-paper p-1.5 transition-colors hover:bg-ink hover:text-paper"
               >
-                <ChevronRight className="w-6 h-6 text-gray-700" />
+                <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
               </button>
             </>
           )}

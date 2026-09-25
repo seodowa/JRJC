@@ -16,21 +16,22 @@ export default function Modal({ isOpen, onClose, children, hideCloseButton = fal
   return (
     // Main container - fixed position, covers the whole screen
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40"
       onClick={onClose} // Close modal on background click
     >
       {/* Modal content - stop propagation to prevent closing when clicking inside */}
       <div 
-        className="relative bg-transparent rounded-xl max-w-2xl w-full m-4"
+        className="relative w-full max-w-2xl m-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         {!hideCloseButton && (
           <button 
             onClick={onClose}
-            className="absolute top-7 right-7 text-gray-400 hover:text-gray-800 hover:cursor-pointer transition-colors z-99"
+            aria-label="Close"
+            className="absolute top-8 right-8 z-99 rounded-md p-1 text-ink-2 transition-colors hover:bg-gray-200 hover:text-ink"
           >
-            <X size={24} />
+            <X size={20} strokeWidth={1.75} />
           </button>
         )}
         

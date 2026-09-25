@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import HamburgerIcon from "@/components/icons/HamburgerIcon";
-import {ChevronDownIcon, LogoutIcon, SettingsIcon} from "@/components/icons/AdminHeaderIcons";
+import { ChevronDown, LogOut, Menu, Settings } from 'lucide-react';
 
 interface AdminHeaderProps {
   isCollapsed: boolean;
@@ -16,34 +15,38 @@ interface AdminHeaderProps {
 const AdminHeader = ({ isCollapsed, setIsCollapsed, user, isUserMenuOpen, setIsUserMenuOpen, handleLogout }: AdminHeaderProps) => {
   return (
     <div className="md:hidden">
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-gray-700 focus:outline-none"
-        >
-          <HamburgerIcon />
-        </button>
+      <header className="flex h-14 items-center justify-between border-b border-line bg-paper px-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            aria-label="Open navigation"
+            className="-ml-2 rounded-md p-2 text-ink hover:bg-gray-200"
+          >
+            <Menu size={22} strokeWidth={1.75} />
+          </button>
+          <span className="font-display text-xl font-semibold tracking-tight">JRJC</span>
+        </div>
         <div className="relative">
             <button 
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} 
-              className="flex items-center text-gray-700 hover:text-blue-500 focus:outline-none"
+              className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-ink hover:bg-gray-200"
             >
               <span>{user?.username || 'Admin'}</span>
-              <ChevronDownIcon />
+              <ChevronDown size={16} strokeWidth={1.75} />
             </button>
     
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                <Link href="/adminSU/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <SettingsIcon />
+              <div className="absolute right-0 z-50 mt-2 w-48 rounded-md border border-line bg-surface py-1 shadow-lg">
+                <Link href="/adminSU/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-ink hover:bg-gray-200">
+                  <Settings size={16} strokeWidth={1.6} />
                   Settings
                 </Link>
                 <button 
                   onClick={handleLogout}
-                  className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-700 hover:bg-gray-200"
                 >
-                  <LogoutIcon />
-                  Logout
+                  <LogOut size={16} strokeWidth={1.6} />
+                  Log out
                 </button>
               </div>
             )}

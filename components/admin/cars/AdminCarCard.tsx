@@ -66,10 +66,10 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
 
   return (
     // Changed gap-6 to gap-4 and p-6 to p-5 for tighter layout
-    <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 p-5 bg-white rounded-[24px] border border-gray-200 shadow-sm items-start">
+    <div id={`car-id-${car.id}`} className="flex flex-col md:flex-row gap-4 p-5 bg-white rounded-md border border-gray-200 shadow-sm items-start">
       
       {/* 1. Image Section - Reduced width from w-48 to w-40 */}
-      <div className="w-full md:w-40 h-40 flex-shrink-0 bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100">
+      <div className="w-full md:w-40 h-40 flex-shrink-0 bg-gray-50 rounded-md flex items-center justify-center overflow-hidden border border-gray-100">
         {car.image ? (
           <Image
             src={car.image}
@@ -87,8 +87,8 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
       <div className="flex-1 w-full min-w-0"> {/* min-w-0 ensures flex child truncates properly */}
         
         {/* Header Title */}
-        <h3 className="text-xl font-bold text-gray-800 mb-3 truncate">
-            {car.brand} {car.model} <span className="text-gray-600 font-semibold">{car.year}</span>
+        <h3 className="font-display text-xl font-medium mb-3 truncate">
+            {car.brand} {car.model} <span className="num text-base text-ink-2">{car.year}</span>
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4"> {/* Reduced gap-6 to gap-4 */}
@@ -98,14 +98,14 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
                 <div className="flex flex-col gap-2"> {/* Changed from flex-row to flex-col */}
                     <AsyncButton
                         onClick={() => onEditCar(car)}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all text-xs"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all text-xs"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                         Edit
                     </AsyncButton>
                     <AsyncButton 
                         onClick={handleDeleteClick}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-500 font-medium hover:bg-red-50 hover:border-red-300 transition-all text-xs"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-red-200 text-red-500 font-medium hover:bg-red-50 hover:border-red-300 transition-all text-xs"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                         Delete
@@ -135,15 +135,15 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
             {/* Column B: Specs */}
             <div className="md:col-span-4 text-xs text-gray-600 space-y-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Transmission:</span>
+                    <span className="text-gray-500">Transmission</span>
                     <span className="font-medium text-gray-800">{car.transmission}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Fuel Type:</span>
+                    <span className="text-gray-500">Fuel type</span>
                     <span className="font-medium text-gray-800">{car.fuelType}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Color:</span>
+                    <span className="text-gray-500">Color</span>
                     <div className="flex items-center gap-2">
                         {car.color && (
                             <span 
@@ -154,7 +154,7 @@ const AdminCarCard = ({ car, onEditCar, carStatuses }: AdminCarCardProps) => {
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-gray-500">Number of Seats:</span>
+                    <span className="text-gray-500">Seats</span>
                     <span className="font-medium text-gray-800">{car.seats}</span>
                 </div>
             </div>

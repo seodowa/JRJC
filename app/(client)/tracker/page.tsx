@@ -1,6 +1,8 @@
 'use client';
 
 import { fetchBookingStatus } from "@/lib/supabase/queries/client/fetchBooking";
+import Badge, { toneForStatus } from "@/components/ui/Badge";
+import { buttonClass } from "@/components/ui/button";
 import { BookingStatus } from "@/types";
 import { useEffect, useRef, useState } from "react";
 import { cancelBookingService, requestCancelOTPService } from "@/app/services/bookingService";
@@ -22,7 +24,7 @@ export default function BookingTrackerPage() {
     const [isSendingOtp, setIsSendingOtp] = useState(false);
     const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
     
-    const handleUUIDSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleUUIDSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (inputRef.current) setUUID(inputRef.current.value);
     }
@@ -98,50 +100,41 @@ export default function BookingTrackerPage() {
 
     const BookingStatusDisplay = () => {
         if (isLoading) {
-            return <div>Loading booking details...</div>;
+            return <p className="text-ink-2">Looking up your booking…</p>;
         }
 
         if (error) {
-            return <div className="text-red-500">{error}</div>;
+            return <p className="text-red-600">{error}</p>;
         }
 
         if (booking) {
             const canCancel = booking.bookingStatus !== 'Cancelled' && booking.bookingStatus !== 'Completed' && booking.bookingStatus !== 'Declined';
 
             return (
-                <div className="flex flex-col gap-2">
-                    <p>
-                        <strong>Customer:</strong> {booking.customerFirstName} {booking.customerLastName}
-                    </p>
-                    <p>
-                        <strong>Vehicle:</strong> {booking.carManufacturer} {booking.carModelName}
-                    </p>
-                    <p>
-                        <strong>Status:</strong> 
-                        <span className={`ml-2 px-2 py-1 rounded-md text-sm font-medium ${
-                            booking.bookingStatus === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                            booking.bookingStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                            booking.bookingStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                        }`}>
-                            {booking.bookingStatus}
-                        </span>
-                    </p>
+                <div className="flex flex-col">
+                    <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 border-y border-line py-5 text-[15px]">
+                        <dt className="text-ink-2">Customer</dt>
+                        <dd className="text-right">{booking.customerFirstName} {booking.customerLastName}</dd>
+                        <dt className="text-ink-2">Vehicle</dt>
+                        <dd className="text-right">{booking.carManufacturer} {booking.carModelName}</dd>
+                        <dt className="text-ink-2">Status</dt>
+                        <dd className="text-right"><Badge tone={toneForStatus(booking.bookingStatus)}>{booking.bookingStatus}</Badge></dd>
+                    </dl>
 
                     {canCancel && (
                         <button 
                             onClick={handleCancelClick}
                             disabled={isSendingOtp}
-                            className="mt-6 bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600 disabled:bg-red-300 transition-colors"
+                            className={buttonClass("secondary", "md", "mt-6 self-start border-red-600 text-red-700 hover:bg-red-600 hover:text-paper")}
                         >
-                            {isSendingOtp ? 'Sending OTP...' : 'Cancel Booking'}
+                            {isSendingOtp ? 'Sending code…' : 'Cancel booking'}
                         </button>
                     )}
                 </div>
             );
         }
 
-        return <div className="text-gray-500">You can track your booking here.</div>;
+        return <p className="text-ink-2">Enter the booking ID from your confirmation text or email to see its status.</p>;
     }
 
     // --- Data Fetching ---
@@ -174,29 +167,26 @@ export default function BookingTrackerPage() {
     }, [uuid]); 
 
     return (
-        <div className="flex justify-center items-start min-h-screen bg-main-color md:bg-transparent md:bg-gradient-to-b from-main-color from-80% md:from-60% lg:from-40% to-transparent -mt-12 pt-9 md:pt-12 relative overflow-hidden font-main-font">
-            <img src="/images/BG.webp" className="opacity-20 min-w-full absolute bottom-0 -z-2" />
-
-            <div className="bg-white flex flex-col mt-12 h-144 p-4 rounded-2xl shadow-xl sm:w-md md:flex-row md:w-full md:max-w-6xl md:mx-12">
-                <div className="flex flex-col md:min-w-3xs md:max-w-3xs">
-                    <h1 className="font-bold text-2xl">Booking Tracker</h1>
-                    <label htmlFor="id-input" className="mt-3">Enter your booking ID:</label>
-                    <span className="flex md:flex-col md:items-center justify-between gap-3 mt-2">
-                        <input type="text" id="id-input" ref={inputRef}
-                        className="border-2 border-main-color rounded-xl grow px-1 self-stretch md:h-10"
-                        placeholder="Booking ID"/>
-                        <button className="bg-secondary-100 py-2 px-4 rounded-3xl
-                            hover:cursor-pointer hover:bg-cyan-200"
-                            onClick={handleUUIDSearch}>Search</button>
-                    </span>
+        <div className="mx-auto max-w-[1440px] px-4 pt-10 pb-24 sm:px-8 lg:px-16 lg:pt-14">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-6">
+                <div className="flex flex-col gap-6 md:col-span-5">
+                    <p className="eyebrow">Booking tracker</p>
+                    <h1 className="text-5xl leading-none font-normal tracking-[-0.03em] sm:text-6xl">Where’s my booking?</h1>
+                    <form
+                        className="flex flex-col gap-2"
+                        onSubmit={handleUUIDSearch}
+                    >
+                        <label htmlFor="id-input" className="field-label">Booking ID</label>
+                        <div className="flex gap-2">
+                            <input type="text" id="id-input" ref={inputRef} className="field num" placeholder="e.g. 3f2a…"/>
+                            <button type="submit" className={buttonClass("primary", "md", "shrink-0")}>Search</button>
+                        </div>
+                    </form>
                 </div>
-                <div className="mt-8 mb-4 bg-gray-400 w-full h-[1px] md:h-full md:w-[1px] md:mx-4 md:my-0"/>
-                <div className="flex flex-col items-center w-full text-md md:text-lg lg:text-xl">
-                    <h1 className="font-bold text-2xl">Booking Status</h1>
-                    <div className="flex flex-col gap-3 mt-8 text-wrap flex-wrap grow-0 min-w-xs max-w-xs text-center">
-                        <BookingStatusDisplay/>
-                    </div>
-                </div>
+                <section className="flex flex-col gap-5 rounded-md border border-line bg-surface p-6 sm:p-8 md:col-span-6 md:col-start-7" aria-live="polite">
+                    <h2 className="font-display text-2xl tracking-tight">Status</h2>
+                    <BookingStatusDisplay/>
+                </section>
             </div>
 
             <ConfirmationModal

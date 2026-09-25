@@ -11,20 +11,18 @@ type BookingTabsProps = {
 
 const BookingTabs = ({ tabs = [], activeTab, onTabChange }: BookingTabsProps) => {
   return (
-    <div className="w-full overflow-x-auto pb-1 custom-scrollbar">
-      <div className="flex -mb-0.25 min-w-max">
+    <div className="w-full overflow-x-auto border-b border-line custom-scrollbar" role="tablist">
+      <div className="flex min-w-max gap-7">
         {tabs.map((tab) => (
           <AsyncButton
             key={tab}
-            className={`
-              px-6 md:px-10 py-2 text-sm font-medium whitespace-nowrap
-              ${activeTab === tab
-                ? 'border-t border-x-1 rounded-t-xl border-gray-400 text-white bg-[#A1E3F9]'
-                : 'text-black border rounded-t-xl border-gray-200 hover:text-gray-700 mx-2 '
-              }
-              focus:outline-none
-              transition-colors duration-200 ease-in-out
-            `}
+            role="tab"
+            aria-selected={activeTab === tab}
+            className={`-mb-px border-b-2 pb-3 text-[15px] whitespace-nowrap transition-colors duration-150 ${
+              activeTab === tab
+                ? 'border-ink font-medium text-ink'
+                : 'border-transparent text-ink-2 hover:text-ink'
+            }`}
             onClick={() => onTabChange(tab)}
           >
             {tab}

@@ -58,22 +58,22 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-4xl shadow-md mt-8">
-      <h2 className="text-xl font-bold mb-6">Payment Details</h2>
+    <div className="mt-8 rounded-md border border-line bg-surface p-6 md:p-8">
+      <h2 className="text-xl font-medium mb-6">Payment details</h2>
       {!paymentMethod ? (
         <div>
           <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">Select a Payment Method:</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Select a payment method</h3>
             <div className="flex space-x-4">
               <AsyncButton
                 onClick={() => handlePaymentMethodSelect("cash")}
-                className="bg-green-500 hover:bg-green-600 shadow-sm text-white font-bold py-2 px-8 rounded-lg"
+                className="bg-green-500 hover:bg-green-600 text-paper font-medium py-2 px-8 rounded-lg"
               >
                 Cash
               </AsyncButton>
               <AsyncButton
                 onClick={() => handlePaymentMethodSelect("cashless")}
-                className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
+                className="bg-forest hover:bg-forest-hover text-paper font-medium py-2 px-4 rounded-lg"
               >
                 Cashless
               </AsyncButton>
@@ -83,7 +83,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <AsyncButton
               type="button"
               onClick={onBack}
-              className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              className="border border-ink bg-transparent hover:bg-gray-200 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Back
             </AsyncButton>
@@ -95,15 +95,15 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               <div>
                 <p className="text-sm text-gray-700">
-                  <strong>Booking Fee:</strong> ₱{bookingFee}
+                  <strong>Booking fee:</strong> ₱{bookingFee}
                 </p>
                 <p className="text-sm text-gray-700">
                   <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)
                 </p>
-                <p className="mt-6 text-sm font-semibold text-gray-800">
+                <p className="mt-6 text-sm font-medium">
                   Total Payment: ₱{initialTotalPayment}
                 </p>
-                <p className="mt-4 text-lg font-bold text-green-600">
+                <p className="mt-4 text-lg font-medium text-forest">
                   Booking Fee Paid through Cash
                 </p>
               </div>
@@ -113,13 +113,13 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <AsyncButton
               type="button"
               onClick={handleGoBack}
-              className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              className="border border-ink bg-transparent hover:bg-gray-200 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Go Back
             </AsyncButton>
             <AsyncButton
               type="submit"
-              className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
+              className="bg-forest hover:bg-forest-hover text-paper font-medium py-2 px-4 rounded-lg"
             >
               Book
             </AsyncButton>
@@ -138,19 +138,19 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                 
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-gray-700">
-                    <strong>Booking Fee:</strong> ₱{bookingFee}
+                    <strong>Booking fee:</strong> ₱{bookingFee}
                   </p>
                   <p className="text-sm text-gray-700">
                     <strong>Cost Breakdown:</strong> ₱{initialRentalCost} (Rental) + ₱{carWashFee} (Car Wash)
                   </p>
                 </div>
 
-                <p className="mt-6 text-sm font-semibold text-gray-800">
+                <p className="mt-6 text-sm font-medium">
                   Total Payment: ₱{initialTotalPayment}
                 </p>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="field-label">
                     Upload the reference number below:
                     <span className="text-red-500 ml-1">*</span>
                   </label>
@@ -161,7 +161,7 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
                     onChange={handlePaymentInputChange}
                     placeholder="Enter GCash reference number"
                     required
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    className="field"
                   />
                 </div>
               </div>
@@ -180,14 +180,14 @@ const PaymentDetails = ({ onBack }: PaymentDetailsProps) => {
             <AsyncButton
               type="button"
               onClick={handleGoBack}
-              className="bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+              className="border border-ink bg-transparent hover:bg-gray-200 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
             >
               Go Back
             </AsyncButton>
 
             <AsyncButton
               type="submit"
-              className="bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-bold py-2 px-4 rounded-lg"
+              className="bg-forest hover:bg-forest-hover text-paper font-medium py-2 px-4 rounded-lg"
             >
               Book
             </AsyncButton>

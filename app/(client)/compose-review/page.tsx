@@ -105,12 +105,13 @@ export default function ComposeReviewPage({
     const displayRating = hoveredRating || formData.rating
 
     return (
-        <div className='w-full min-h-screen -mt-12 bg-secondary-50 py-16 overflow-y-auto'>
-            <div className="w-full max-w-2xl mx-auto bg-transparent rounded-lg px-8">
+        <div className='w-full pt-10 pb-24 lg:pt-14'>
+            <div className="mx-auto w-full max-w-2xl px-4 sm:px-8">
                 {/* Header */}
                 <div className="mb-6 main-w-2xl">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Write a Review</h2>
+                        <p className="eyebrow mb-3">Reviews</p>
+                        <h1 className="text-5xl leading-none font-normal tracking-[-0.03em]">Write a review.</h1>
                         {getSelectedCarName() && (
                             <p className="text-gray-600 mt-1">Reviewing: <span className="font-medium">{getSelectedCarName()}</span></p>
                         )}
@@ -131,17 +132,17 @@ export default function ComposeReviewPage({
                     {/* Car Selection Field */}
                     {allowCarSelection && !carId && (
                         <div>
-                            <label htmlFor="carId" className="block text-sm font-medium text-gray-700 mb-1">
-                                Select Car <span className="text-gray-500">(Optional)</span>
+                            <label htmlFor="carId" className="field-label">
+                                Select car <span className="text-gray-500">(Optional)</span>
                             </label>
                             <select
                                 id="carId"
                                 value={formData.carId || ''}
                                 onChange={(e) => handleChange('carId', e.target.value ? Number(e.target.value) : undefined)}
-                                className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="field"
                                 disabled={isSubmitting}
                             >
-                                <option value="">General Review (No specific car)</option>
+                                <option value="">General review (no specific car)</option>
                                 {CARS.map((car) => (
                                     <option key={car.id} value={car.id}>
                                         {car.year} {car.brand} {car.model}
@@ -156,15 +157,15 @@ export default function ComposeReviewPage({
 
                     {/* Name Field */}
                     <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                            Your Name <span className='text-red-500'>*</span>
+                        <label htmlFor="name" className="field-label">
+                            Your name <span className='text-red-500'>*</span>
                         </label>
                         <input
                             id="name"
                             type="text"
                             value={formData.name}
                             onChange={(e) => handleChange('name', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className={`field ${
                                 errors.name ? 'border-red-500' : 'border-gray-400'
                             }`}
                             placeholder="Enter your name"
@@ -177,7 +178,7 @@ export default function ComposeReviewPage({
 
                     {/* Rating Field */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="field-label">
                             Rating <span className='text-red-500'>*</span>
                         </label>
                         <div className="flex items-center gap-1">
@@ -188,14 +189,14 @@ export default function ComposeReviewPage({
                                     onClick={() => handleStarClick(star)}
                                     onMouseEnter={() => setHoveredRating(star)}
                                     onMouseLeave={() => setHoveredRating(0)}
-                                    className="transition-transform hover:scale-110 focus:outline-none"
+                                    className="rounded-sm p-0.5 transition-colors"
                                     disabled={isSubmitting}
                                 >
                                     <Star
                                         size={32}
                                         className={`${
                                             star <= displayRating
-                                                ? 'text-yellow-400 fill-current'
+                                                ? 'text-clay fill-current'
                                                 : 'text-gray-400'
                                         } transition-colors`}
                                     />
@@ -214,15 +215,15 @@ export default function ComposeReviewPage({
 
                     {/* Title Field */}
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                            Review Title <span className='text-red-500'>*</span>
+                        <label htmlFor="title" className="field-label">
+                            Review title <span className='text-red-500'>*</span>
                         </label>
                         <input
                             id="title"
                             type="text"
                             value={formData.title}
                             onChange={(e) => handleChange('title', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className={`field ${
                                 errors.title ? 'border-red-500' : 'border-gray-400'
                             }`}
                             placeholder="Summarize your experience"
@@ -245,15 +246,15 @@ export default function ComposeReviewPage({
 
                     {/* Body Field */}
                     <div>
-                        <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-2">
-                            Your Review <span className='text-red-500'>*</span>
+                        <label htmlFor="body" className="field-label">
+                            Your review <span className='text-red-500'>*</span>
                         </label>
                         <textarea
                             id="body"
                             value={formData.body}
                             onChange={(e) => handleChange('body', e.target.value)}
                             rows={6}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+                            className={`field resize-none ${
                                 errors.body ? 'border-red-500' : 'border-gray-400'
                             }`}
                             placeholder="Share details of your experience..."
@@ -276,14 +277,14 @@ export default function ComposeReviewPage({
 
                     {/* Success Message */}
                     {submitSuccess && (
-                        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded">
+                        <div className="mb-6 rounded-md border border-green-300 bg-green-50 p-4">
                             <p className="text-green-800 font-medium">✓ Review submitted successfully!</p>
                         </div>
                     )}
 
                     {/* Error Message */}
                     {submissionError && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded">
+                        <div className="mb-6 rounded-md border border-red-300 bg-red-50 p-4">
                             <p className="text-red-800 font-medium">✗ {submissionError}</p>
                         </div>
                     )}
@@ -294,7 +295,7 @@ export default function ComposeReviewPage({
                             type="button"
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            className={`flex-1 py-3 px-6 hover:cursor-pointer rounded-lg font-semibold text-white transition-colors ${
+                            className={`flex-1 py-3 px-6 hover:cursor-pointer rounded-md font-medium text-paper transition-colors ${
                                 isSubmitting
                                     ? 'bg-blue-400 cursor-not-allowed'
                                     : 'bg-blue-600 hover:bg-blue-700'
@@ -309,7 +310,7 @@ export default function ComposeReviewPage({
                                     Submitting...
                                 </span>
                             ) : (
-                                'Submit Review'
+                                'Submit review'
                             )}
                         </button>
                         {onClose && (
@@ -317,7 +318,7 @@ export default function ComposeReviewPage({
                                 type="button"
                                 onClick={onClose}
                                 disabled={isSubmitting}
-                                className="px-6 py-3 border border-gray-400 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-6 py-3 border border-ink rounded-md font-medium text-ink hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Cancel
                             </button>
@@ -328,7 +329,7 @@ export default function ComposeReviewPage({
 
                 {/* Guidelines */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Review Guidelines:</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Review guidelines</h3>
                     <ul className="text-sm text-gray-600 space-y-1">
                         <li>• Be honest and detailed about your experience</li>
                         <li>• Focus on the service, vehicle condition, and overall experience</li>
