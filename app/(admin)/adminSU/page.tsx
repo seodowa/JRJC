@@ -16,22 +16,21 @@ export default async function AdminSU() {
   // Otherwise, the session is invalid, stale, or the user is not an admin.
   // In all these cases, we should show the login form.
   return (
-    <div
-      className="min-h-screen w-full flex flex-col items-center justify-center relative
-                 bg-[url('/images/BG.webp')] bg-cover bg-center bg-no-repeat
-                 overflow-hidden" /* Background image */
-    >
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-[#D1F8EF]/50 to-[#D1F8EF]/100" /*Gradient Filter*/ />
-      <div className="z-10 flex flex-col md:flex-row justify-center items-center 
-                      gap-6 sm:gap-8 md:gap-20 lg:gap-40 xl:gap-60 2xl:gap-80
-                      w-full max-w-7xl px-4 sm:px-6 md:px-8">
-        <img 
-          src="/images/jrjc_logo.png" // Placeholder for logo image
-          alt="Logo"
-          className="w-full max-w-[150px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-[400px] xl:max-w-[500px]
-                     h-auto object-contain"
-        /> 
+    <div className="grid min-h-screen w-full grid-cols-1 bg-paper lg:grid-cols-2">
+      <figure className="relative hidden lg:block">
+        <img src="/images/BG.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <figcaption className="num absolute bottom-6 left-8 bg-ink/70 px-3 py-1.5 text-xs text-paper">
+          JRJC Rent-a-Car — Bukidnon
+        </figcaption>
+      </figure>
+      <div className="flex flex-col justify-between px-6 py-8 sm:px-12 lg:px-20">
+        <div className="flex items-center gap-3">
+          <img src="/images/jrjc_logo.png" alt="" className="h-9 w-9 rounded-full object-cover" />
+          <span className="font-display text-2xl font-semibold tracking-tight">JRJC</span>
+          <span className="num text-[11px] tracking-[0.12em] text-ink-2 uppercase">Admin</span>
+        </div>
         <AdminLoginForm />
+        <p className="num text-xs text-ink-2">Staff access only.</p>
       </div>
     </div>
   );

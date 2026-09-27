@@ -65,22 +65,22 @@ const WalkInBookingLayout = () => {
     <div className="flex flex-col md:flex-row h-full relative">
       
       {/* Mobile Header - Only visible on small screens */}
-      <div className="md:hidden bg-white p-4 shadow-sm flex items-center justify-between z-10 sticky top-0">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-paper p-4 md:hidden">
         <div className="flex items-center gap-3">
             <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                 </svg>
             </button>
-            <h1 className="font-bold text-lg text-gray-800">Walk-in Book</h1>
+            <h1 className="text-2xl leading-none font-normal tracking-[-0.02em]">Walk-in booking</h1>
         </div>
-        <div className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+        <div className="num text-xs text-ink-2">
             Step {currentStep} of 3
         </div>
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:h-fit bg-white rounded-4xl mr-4">
+      <div className="mr-8 hidden md:flex md:h-fit">
         <WalkInBookingNavbar
           scrollToRef={scrollToRef}
           personalRef={personalRef}
@@ -106,8 +106,8 @@ const WalkInBookingLayout = () => {
       </div>
 
       {showConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+        <div className="fixed inset-0 bg-ink/40 flex items-center justify-center z-50">
+          <div className="bg-surface rounded-md shadow-lg w-96 p-6">
               <>
                 <h2 className="text-lg font-semibold text-gray-900 mb-2 text-center">
                   {submitting ? "Submitting Booking..." : "Confirm Walk-In Booking"}
@@ -154,7 +154,7 @@ const WalkInBookingLayout = () => {
 
                     <div className="text-sm text-gray-700 p-3 bg-gray-50 rounded-md">
                       <div className="flex justify-between">
-                        <span>Booking Fee:</span>
+                        <span>Booking fee</span>
                         <span>₱{bookingFee}</span>
                       </div>
                       <div className="flex justify-between">
@@ -162,12 +162,12 @@ const WalkInBookingLayout = () => {
                         <span>₱{initialPayment}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Car Wash Fee:</span>
+                        <span>Car wash fee</span>
                         <span>₱{carWashFee}</span>
                       </div>
-                      <div className="flex justify-between font-semibold border-t mt-2 pt-2">
-                        <span>Total Payment:</span>
-                        <span>₱{initialTotalPayment}</span>
+                      <div className="flex justify-between font-medium border-t border-ink mt-2 pt-2">
+                        <span>Total payment</span>
+                        <span className="num text-clay">₱{initialTotalPayment}</span>
                       </div>
                     </div>
                   </div>
@@ -177,7 +177,7 @@ const WalkInBookingLayout = () => {
                   <AsyncButton
                     onClick={handleCancelConfirm}
                     disabled={submitting}
-                    className="flex-1 bg-gray-200 hover:bg-gray-300 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 border border-ink bg-transparent hover:bg-gray-200 shadow-sm text-gray-700 font-medium py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </AsyncButton>
@@ -186,7 +186,7 @@ const WalkInBookingLayout = () => {
                     disabled={submitting || notificationPreferences.length === 0}
                     isLoading={submitting}
                     loadingText="Submitting..."
-                    className="flex-1 bg-[#A1E3F9] hover:bg-blue-400 shadow-sm text-white font-medium py-2 px-4 rounded-md disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="flex-1 bg-forest hover:bg-forest-hover shadow-sm text-white font-medium py-2 px-4 rounded-md disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     Confirm
                   </AsyncButton>

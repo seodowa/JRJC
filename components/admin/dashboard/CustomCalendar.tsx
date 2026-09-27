@@ -133,18 +133,18 @@ const CustomCalendar = ({ bookings }: CustomCalendarProps) => {
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="p-4 rounded-lg flex flex-col h-full">
-        <h1 className="font-bold text-2xl">Calendar</h1>
+    <div className="flex h-full flex-col gap-2">
+        <h2 className="text-2xl">Calendar</h2>
       <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">
+          <h3 className="num text-sm text-ink-2 uppercase tracking-[0.08em]">
               {currentDate.format('MMMM YYYY')}
-          </h2>
+          </h3>
         <div className="flex items-center gap-2">
-            <button onClick={handlePrevMonth} className="p-2 rounded-full hover:bg-gray-100"><ChevronLeftIcon /></button>
-            <button onClick={handleNextMonth} className="p-2 rounded-full hover:bg-gray-100"><ChevronRightIcon /></button>
+            <button onClick={handlePrevMonth} className="rounded-md p-1.5 text-ink-2 hover:bg-gray-200 hover:text-ink"><ChevronLeftIcon /></button>
+            <button onClick={handleNextMonth} className="rounded-md p-1.5 text-ink-2 hover:bg-gray-200 hover:text-ink"><ChevronRightIcon /></button>
         </div>
       </div>
-      <div className="grid grid-cols-7 gap-0 text-center font-semibold text-gray-600">
+      <div className="num grid grid-cols-7 gap-0 border-b border-line pb-2 text-center text-[11px] tracking-[0.08em] text-ink-2 uppercase">
         {weekDays.map(wd => <div key={wd}>{wd}</div>)}
       </div>
       <div className="grid grid-cols-7 grid-rows-6 gap-0 flex-grow">
@@ -208,7 +208,7 @@ const CustomCalendar = ({ bookings }: CustomCalendarProps) => {
                         })}
                     </div>
                 )}
-              <span className={`relative z-10 font-medium w-8 h-8 flex items-center justify-center ${isToday ? 'text-white bg-blue-500 rounded-full' : ''}`}>
+              <span className={`relative z-10 num text-sm w-8 h-8 flex items-center justify-center ${isToday ? 'text-paper bg-ink rounded-full' : ''}`}>
                 {d.format('D')}
               </span>
             </div>

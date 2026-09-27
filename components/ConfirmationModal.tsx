@@ -32,20 +32,20 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     }
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-            <div className="relative bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-ink/40 flex justify-center items-center z-50 p-4">
+            <div className="relative w-full max-w-md rounded-md bg-surface p-6 shadow-xl">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">{title}</h2>
-                    <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-gray-200">
+                    <h2 className="text-2xl text-ink">{title}</h2>
+                    <button type="button" onClick={onClose} aria-label="Close" className="rounded-md p-1.5 text-ink-2 hover:bg-gray-200 hover:text-ink">
                         <CloseIcon />
                     </button>
                 </div>
                 <div>
-                    <p className="text-sm text-gray-700">{message}</p>
+                    <p className="text-[15px] leading-relaxed text-ink-2">{message}</p>
                     <div className="flex justify-end gap-4 mt-6">
                         <AsyncButton
                             onClick={onClose}
-                            className="px-4 py-2 rounded-md text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300"
+                            className="px-4 py-2 rounded-md text-sm font-medium text-gray-700 border border-ink bg-transparent hover:bg-gray-200"
                         >
                             {cancelButtonText}
                         </AsyncButton>
@@ -53,7 +53,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                             onClick={onConfirm}
                             isLoading={isLoading}
                             loadingText={loadingText}
-                            className="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-500 hover:bg-red-600"
+                            className="px-4 py-2 rounded-md text-sm font-medium text-paper bg-red-600 hover:bg-red-700"
                         >
                             {confirmButtonText}
                         </AsyncButton>

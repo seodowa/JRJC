@@ -17,19 +17,19 @@ const FilterDropdown = ({ cars, onApply, onReset, initialFilters }: FilterDropdo
   const [selectedCar, setSelectedCar] = useState(initialFilters.car || '');
 
   return (
-    <div className="absolute top-10 right-0 mt-2 w-64 bg-white rounded-xl shadow-xl z-10 border border-gray-200">
+    <div className="absolute top-10 right-0 mt-2 w-64 bg-white rounded-md shadow-xl z-10 border border-gray-200">
       <div className="p-4">
-        <h3 className="text-lg font-semibold">Filter Reviews</h3>
+        <h3 className="eyebrow">Filter reviews</h3>
       </div>
       
       <div className="divide-y divide-gray-200">
         <div className="px-4 py-3">
-            <label htmlFor="date-filter" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <label htmlFor="date-filter" className="field-label">Date</label>
             <div className="relative mt-1">
                 <input
                     type="date"
                     id="date-filter"
-                    className="block w-full pl-3 pr-2 py-2 text-base border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    className="field"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                 />
@@ -37,16 +37,16 @@ const FilterDropdown = ({ cars, onApply, onReset, initialFilters }: FilterDropdo
         </div>
 
         <div className="px-4 py-3">
-            <label className="block text-sm font-medium text-gray-700">Rating</label>
+            <label className="field-label">Rating</label>
             <CustomStarSelect className="mt-1" selectedRating={selectedRating} onRatingChange={setSelectedRating} />
         </div>
 
         <div className="px-4 py-3">
-            <label htmlFor="car-filter" className="block text-sm font-medium text-gray-700 mb-1">Car</label>
+            <label htmlFor="car-filter" className="field-label">Car</label>
             <div className="relative mt-1">
                 <select
                     id="car-filter"
-                    className="appearance-none block w-full pl-3 pr-10 py-2 text-base border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    className="field appearance-none pr-10"
                     value={selectedCar}
                     onChange={(e) => setSelectedCar(e.target.value)}
                 >

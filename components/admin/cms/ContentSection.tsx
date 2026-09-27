@@ -1,3 +1,4 @@
+import { buttonClass } from "@/components/ui/button";
 import React, { useEffect, useState } from 'react';
 import { CMSContent } from '@/types/cms';
 import AsyncButton from '@/components/AsyncButton';
@@ -138,11 +139,11 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
 
   return (
     <div id={sectionKey} className="bg-white p-6 rounded-lg shadow mb-6 border border-gray-100">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">{title}</h2>
+      <h2 className="mb-4 text-2xl">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {fields.map(field => (
           <div key={field.key}>
-            <label htmlFor={`${sectionKey}-${field.key}`} className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor={`${sectionKey}-${field.key}`} className="field-label">
               {field.label}
             </label>
             
@@ -153,7 +154,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                 value={formData[field.key]?.toString() || ''}
                 onChange={handleChange}
                 rows={5}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 text-sm"
+                className="field mt-1"
                 placeholder={field.placeholder}
               ></textarea>
             ) : field.type === 'image_url' ? (
@@ -169,7 +170,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, [field.key]: '' }))}
                       className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600 transition-colors"
-                      title="Remove Image"
+                      title="Remove image"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -204,7 +205,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                     ) : (
                       <>
                         <PhotoIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" aria-hidden="true" />
-                        {formData[field.key] ? 'Change Image' : 'Upload Image'}
+                        {formData[field.key] ? 'Change image' : 'Upload image'}
                       </>
                     )}
                   </label>
@@ -217,7 +218,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
                 name={field.key}
                 value={formData[field.key]?.toString() || ''}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 text-sm"
+                className="field mt-1"
                 placeholder={field.placeholder}
               />
             )}
@@ -227,9 +228,9 @@ const ContentSection: React.FC<ContentSectionProps> = ({ title, sectionKey, cont
           type="submit"
           isLoading={loading}
           loadingText="Saving..."
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-md transition-colors shadow-sm"
+          className={buttonClass("primary", "md", "w-full sm:w-auto px-6")}
         >
-          Save {title}
+          Save {title.toLowerCase()}
         </AsyncButton>
       </form>
     </div>

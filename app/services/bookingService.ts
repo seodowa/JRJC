@@ -187,21 +187,21 @@ export const sendBookingConfirmationService = async (
     if (notificationType.includes('Email')) {
       // UPDATED: Email HTML with Reminders section
       const html = `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Booking Received</h2>
+        <div style="font-family: Helvetica, Arial, sans-serif; color: #1B1915; background: #FBF8F2; padding: 24px; border: 1px solid #DDD4C4; border-radius: 4px; max-width: 600px; margin: 0 auto;">
+          <h2 style="font-family: Georgia, serif; font-weight: 400; color: #1B1915;">Booking Received</h2>
           <p>Hi ${firstName},</p>
           <p>Thank you for your booking. We have received your request.</p>
           
-          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <div style="background-color: #F4EFE6; padding: 15px; border-radius: 4px; border: 1px solid #DDD4C4; margin: 20px 0;">
             <p style="margin: 5px 0;"><strong>Booking ID:</strong> ${bookingId}</p>
             <p style="margin: 5px 0;"><strong>Status:</strong> ${status}</p>
             <p style="margin: 5px 0;"><strong>Total Amount:</strong> P${totalAmount}</p>
             <p style="margin: 5px 0;"><strong>Reference Number:</strong> ${bfReferenceNumber}</p>
           </div>
 
-          <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px;">
-            <p style="font-weight: bold; color: #555;">Reminders:</p>
-            <ul style="color: #666; padding-left: 20px;">
+          <div style="border-top: 1px solid #DDD4C4; padding-top: 15px; margin-top: 20px;">
+            <p style="font-weight: bold; color: #1B1915;">Reminders:</p>
+            <ul style="color: #5E574C; padding-left: 20px;">
                 <li style="margin-bottom: 5px;">Booking fee is non-refundable.</li>
                 <li>Keep posted and we will notify you once the booking has been confirmed.</li>
             </ul>

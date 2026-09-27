@@ -85,7 +85,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex bg-gray-100 h-screen">
+    <div className="flex h-screen bg-paper text-ink">
       {/* Real-time listener for session invalidation */}
       <AuthRefresher userId={user?.id} />
 
@@ -93,7 +93,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
       {!isCollapsed && (
         <div
           onClick={() => setIsCollapsed(true)}
-          className="fixed h-screen inset-0 bg-black opacity-50 z-20 md:hidden"
+          className="fixed inset-0 z-20 h-screen bg-ink/40 md:hidden"
         />
       )}
       <AdminSidebar
@@ -102,7 +102,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         user={user}
         handleLogout={handleLogout}
       />
-      <div className="flex flex-col flex-1">
+      <div className="flex min-w-0 flex-1 flex-col">
         <AdminHeader
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
@@ -111,7 +111,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
           setIsUserMenuOpen={setIsUserMenuOpen}
           handleLogout={handleLogout}
         />
-        <main className="flex-1 w-full max-w-screen mx-auto p-2 sm:p-4 md:p-8 text-gray-800 overflow-y-auto md:overflow-y-hidden">
+        <main className="mx-auto w-full max-w-screen flex-1 overflow-y-auto p-3 text-ink sm:p-5 md:overflow-y-hidden md:px-10 md:py-8">
             {/* Pass the updated user object (with email) to the Provider */}
             <UserProvider user={user}>
                 {children}

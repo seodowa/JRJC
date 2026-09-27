@@ -80,7 +80,7 @@ export async function POST(req: Request) {
           // Rich HTML for Email
           emailBodyTemplate = `
             <p>Good news! Your booking (ID: {id}) has been <strong>APPROVED</strong>.</p>
-            <div style="background-color: #ffffcc; padding: 15px; border-radius: 5px; border: 1px solid #e6e600; margin: 15px 0;">
+            <div style="background-color: #F3EAD3; padding: 15px; border-radius: 4px; border: 1px solid #D6C08A; color: #1B1915; margin: 15px 0;">
                 <strong>Important Reminders:</strong>
                 <ul style="margin-bottom: 0;">
                     <li>Fuel level must be returned to the same level when received.</li>
@@ -122,9 +122,9 @@ export async function POST(req: Request) {
             <p>Thank you for choosing us!</p>
             <p>We would love to hear your feedback:</p>
             <p>
-                <a href="https://jrjc.vercel.app/compose-review" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Rate your experience</a>
+                <a href="https://jrjc.vercel.app/compose-review" style="background-color: #1E4A36; color: #F4EFE6; padding: 12px 22px; text-decoration: none; border-radius: 4px; font-weight: 500; display: inline-block;">Rate your experience</a>
             </p>
-            <p style="font-size: 12px; color: #888;">Or click here: https://jrjc.vercel.app/compose-review</p>
+            <p style="font-size: 12px; color: #5E574C;">Or click here: https://jrjc.vercel.app/compose-review</p>
           `;
 
           // Extract finish-specific data from payload
@@ -240,8 +240,8 @@ export async function POST(req: Request) {
             // --- 2. Check Email Preference (Independent check) ---
             if (preference.includes('Email') && customer.Email) {
                 const html = `
-                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #333;">${emailSubject}</h2>
+                    <div style="font-family: Helvetica, Arial, sans-serif; color: #1B1915; background: #FBF8F2; padding: 24px; border: 1px solid #DDD4C4; border-radius: 4px; max-width: 600px; margin: 0 auto;">
+                        <h2 style="font-family: Georgia, serif; font-weight: 400; color: #1B1915;">${emailSubject}</h2>
                         <p>Hi ${firstName},</p>
                         ${emailBody}
                         <br/>

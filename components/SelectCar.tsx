@@ -126,7 +126,7 @@ export default function SelectCar({
                     role="button"
                     tabIndex={0}
                     className={`flex-shrink-0 cursor-pointer transition-all duration-200 snap-start
-                      ${selectedCar === car.id ? "ring-2 ring-blue-500 ring-offset-2 rounded-3xl" : "hover:scale-105"}`}
+                      ${selectedCar === car.id ? "ring-2 ring-blue-500 ring-offset-2 rounded-md" : "hover:scale-105"}`}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         handleCarSelect(car);

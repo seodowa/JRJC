@@ -34,15 +34,17 @@ export default function Carousel({ children, itemsPerView = 1, height = 400 }: C
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-0 z-40 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors cursor-pointer"
+                aria-label="Previous"
+                className="absolute left-0 z-40 flex h-11 w-11 items-center justify-center rounded-md border border-ink bg-paper transition-colors hover:bg-ink hover:text-paper"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={20} strokeWidth={1.75} />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-0 z-40 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors cursor-pointer"
+                aria-label="Next"
+                className="absolute right-0 z-40 flex h-11 w-11 items-center justify-center rounded-md border border-ink bg-paper transition-colors hover:bg-ink hover:text-paper"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={20} strokeWidth={1.75} />
               </button>
             </>
           )}
@@ -85,7 +87,7 @@ export default function Carousel({ children, itemsPerView = 1, height = 400 }: C
                     transform: `${transformStyle} scale(${scale})`,
                     zIndex,
                     opacity: isVisible ? opacity : 0,
-                    filter: isCenter ? 'blur(0)' : 'blur(2px)',
+                    
                     pointerEvents: isVisible ? 'auto' : 'none'
                   }}
                 >
@@ -101,8 +103,9 @@ export default function Carousel({ children, itemsPerView = 1, height = 400 }: C
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentIndex ? 'bg-[#578FCA] 0 w-8' : 'bg-gray-300'
+                  aria-label={`Go to slide ${index + 1}`}
+                  className={`h-0.5 transition-all ${
+                    index === currentIndex ? 'w-10 bg-ink' : 'w-6 bg-line-strong'
                   }`}
                 />
               ))}

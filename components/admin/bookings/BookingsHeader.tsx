@@ -3,6 +3,7 @@
 import React from 'react';
 import SearchBar from '@/components/SearchBar';
 import AsyncButton from "@/components/AsyncButton";
+import { buttonClass } from "@/components/ui/button";
 import BookingTabs from './BookingTabs';
 import HistoryIcon from '@/components/icons/HistoryIcon';
 import Link from 'next/link';
@@ -46,16 +47,16 @@ const BookingsHeader = ({
   return (
     <div>
       {/* Changed to flex-row and justify-between for all screen sizes */}
-      <div className="flex flex-row justify-between items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold">{view === 'history' ? 'Bookings History' : 'Manage Bookings'}</h1>
+      <div className="flex flex-row justify-between items-end gap-4 mb-6">
+        <h1 className="text-4xl leading-none font-normal tracking-[-0.03em] md:text-5xl">{view === 'history' ? 'Booking history' : 'Bookings'}</h1>
         {view === 'history' ? (
-          <AsyncButton onClick={() => router.back()} className="px-4 py-2 shadow-sm bg-gray-200 rounded-md hover:bg-[#A1E3F9]">
+          <AsyncButton onClick={() => router.back()} className={buttonClass("secondary", "sm")}>
             Back
           </AsyncButton>
         ) : (
           <Link href="?view=history" passHref>
-            <AsyncButton className="p-2 rounded-full hover:bg-gray-200">
-              <HistoryIcon className="w-6 h-6" />
+            <AsyncButton className={buttonClass("ghost", "sm")} aria-label="Booking history">
+              <HistoryIcon className="w-5 h-5" /> <span className="hidden sm:inline">History</span>
             </AsyncButton>
           </Link>
         )}
@@ -71,13 +72,13 @@ const BookingsHeader = ({
           {view !== 'history' && (
             <div className="flex gap-2 w-full md:w-auto">
               {activeTab !== 'All' && (
-                <AsyncButton onClick={onSelectAll} className="shadow-sm p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400 flex-1 md:flex-none text-center justify-center">
+                <AsyncButton onClick={onSelectAll} className={buttonClass("secondary", "md", "flex-1 md:flex-none")}>
                   {isAllSelected ? 'Deselect' : 'Select All'}
                 </AsyncButton>
               )}
               <AsyncButton onClick={() => router.push('/adminSU/manageBookings/walk-inBooking')}
-                className="shadow-sm p-2 bg-[#A1E3F9] rounded-lg text-white hover:bg-blue-400 flex-1 md:flex-none text-center justify-center">
-                Walk-in Book
+                className={buttonClass("primary", "md", "flex-1 md:flex-none")}>
+                + Walk-in booking
               </AsyncButton>
             </div>
           )}
@@ -88,13 +89,13 @@ const BookingsHeader = ({
               <>
                 <AsyncButton 
                   onClick={onDecline} 
-                  className="px-4 py-2 shadow-sm text-red-500 rounded-lg hover:bg-red-400 hover:text-white"
+                  className={buttonClass("secondary", "md", "border-red-600 text-red-700 hover:bg-red-600 hover:text-paper")}
                 >
                   Decline
                 </AsyncButton>
                 <AsyncButton 
                   onClick={onApprove} 
-                  className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg hover:bg-blue-300"
+                  className={buttonClass("primary", "md")}
                 >
                   Approve
                 </AsyncButton>
@@ -104,13 +105,13 @@ const BookingsHeader = ({
               <>
                 <AsyncButton 
                   onClick={onCancel} 
-                  className="px-4 py-2 shadow-sm text-red-500 rounded-lg hover:bg-red-400 hover:text-white"
+                  className={buttonClass("secondary", "md", "border-red-600 text-red-700 hover:bg-red-600 hover:text-paper")}
                 >
                   Cancel
                 </AsyncButton>
                 <AsyncButton 
                   onClick={onStart} 
-                  className="px-4 py-2 shadow-sm bg-[#A1E3F9] text-white rounded-lg hover:bg-blue-400"
+                  className={buttonClass("primary", "md")}
                 >
                   Start
                 </AsyncButton>
@@ -121,7 +122,7 @@ const BookingsHeader = ({
                 <AsyncButton 
                   onClick={onExtend} 
                   disabled={isExtendDisabled}
-                  className={`px-4 py-2 shadow-sm text-gray-700 rounded-lg hover:bg-green-400 ${isExtendDisabled ? 'opacity-50 cursor-not-allowed hover:bg-gray-100' : ''}`}
+                  className={buttonClass("secondary", "md")}
                 >
                   Extend
                 </AsyncButton>
